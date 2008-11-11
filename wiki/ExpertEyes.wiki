@@ -1,4 +1,4 @@
-The First Open Source Eyetracking Application built in java.
+The First Open Source Eyetracking Application.
 
 = Introduction =
 
