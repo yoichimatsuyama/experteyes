@@ -1,13 +1,15 @@
-#summary One-sentence summary of this page.
+The First Open Source Eyetracking Application built in java.
 
 = Introduction =
 
-Add your content here.
+Expert Eyes is an open source eyetracking application built in java. Two video streams are recorded from this open source hardware design:
 
+Babcock, J.S., and Pelz, J. (2004). Building a lightweight eyetracking headgear, ETRA 2004: Eye Tracking Research and Applications Symposium, 109-113.
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+http://www.jasonbabcock.com/research/ETRA04_babcock_pelz_color_small.pdf
+
+and the video files are split into image sequences for temporal alignment and calibration.
+
+We anticipate the code becoming available in December 2008.
