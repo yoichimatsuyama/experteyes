@@ -1,4 +1,4 @@
-The First Open Source Eyetracking Application.
+An Open Source Eyetracking Application.
 
 = Introduction =
 
