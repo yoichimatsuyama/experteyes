@@ -12,4 +12,4 @@ http://www.jasonbabcock.com/research/ETRA04_babcock_pelz_color_small.pdf
 
 and the video files are split into image sequences for temporal alignment and calibration.
 
-We anticipate the code becoming available in December 2008.
+We anticipate the code becoming available in January 2008.
