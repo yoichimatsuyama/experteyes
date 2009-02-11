@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -124,12 +124,14 @@ public class MovieFrameExporter {
     public void exportThread(final File exportDirectory, final int start, final int end,
             final boolean withCorners, final boolean eyeOnly, final boolean screenOnly,
             final boolean sideBySide, final boolean eyeInCorner, final boolean screenInCorner,
+            final boolean createMovieFile, final boolean deleteMoviePictureFile,
             final int averageFrames) {
         Thread t = new Thread(new Runnable() {
 
             public void run() {
                 export(exportDirectory, start, end, withCorners, eyeOnly,
                         screenOnly, sideBySide, eyeInCorner, screenInCorner,
+                        createMovieFile, deleteMoviePictureFile,
                         averageFrames);
             }
         });
@@ -139,6 +141,7 @@ public class MovieFrameExporter {
     public void export(File exportDirectory, int start, int end,
             boolean withCorners, boolean eyeOnly, boolean screenOnly,
             boolean sideBySide, boolean eyeInCorner, boolean screenInCorner,
+            boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
         this.alive = true;
         Point2D.Double eyeVector = new Point2D.Double();
@@ -183,7 +186,7 @@ public class MovieFrameExporter {
         // loop for all frames
         for (int i = start; i <= end && alive; i++) {
             // Create file name
-            String fileName = numberFormat.format(i) + ".tiff";
+            String fileName = numberFormat.format(i - start + 1) + ".tiff";
 
             // Get eye frame
             BufferedImage eyeImage = renderEyeImage(
@@ -231,7 +234,66 @@ public class MovieFrameExporter {
             // Update property
             if (this.listener != null) {
                 this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "progress", i - 1, i));
+                        "Creating Images", i - 1, i));
+            }
+        }
+
+        // Run ffmpeg
+
+        // Handle temp files accordingly
+        for (int i = start; i <= end; i++) {
+            // Create file name
+            String fileName = numberFormat.format(i - start + 1) + ".tiff";
+
+            String newFileName = numberFormat.format(i) + ".tiff";
+
+            // Get eye frame
+            BufferedImage eyeImage = renderEyeImage(
+                    i + eyeOffset, eyeFrameManager);
+
+            // Get average eye gaze
+            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset, averageFrames, scaleFactor);
+            if (point != null) {
+                gazePoint.setLocation(point);
+            } else {
+                gazePoint.setLocation(-666, -666);
+            }
+
+            // Get screen frame
+            BufferedImage screenImage = renderScreenImage(i, screenFrameManager,
+                    withCorners, gazePoint);
+
+            // Writing out information
+            if (eyeOnly) {
+                writeImage(eyeImage,
+                        new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName));
+            }
+
+            // Writing out information
+            if (screenOnly) {
+                writeImage(screenImage,
+                        new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName));
+            }
+
+            if (sideBySide) {
+                writeImage(renderSideBySideImage(eyeImage, screenImage),
+                        new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName));
+            }
+
+            if (eyeInCorner) {
+                writeImage(renderInCornerImage(eyeImage, screenImage),
+                        new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName));
+            }
+
+            if (screenInCorner) {
+                writeImage(renderInCornerImage(screenImage, eyeImage),
+                        new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName));
+            }
+
+            // Update property
+            if (this.listener != null) {
+                this.listener.propertyChange(new PropertyChangeEvent(this,
+                        "Clean Up Temp Files", i - 1, i));
             }
         }
     }
@@ -350,14 +412,6 @@ public class MovieFrameExporter {
     private void writeImage(BufferedImage image, File outputFile) {
         // Store the image in the TIFF format.
         JAI.create("filestore", image, outputFile.getAbsolutePath(), "TIFF", null);
-//                //Store image in jpg format
-//                try {
-//                    ImageIO.write(eyeImage, "jpg",
-//                            new File(exportDirectory, EYE_ONLY_FILE_NAME + fileName));
-//                } catch (IOException ex) {
-//                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-//                    return;
-//                }
     }
 
     /**
