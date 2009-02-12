@@ -47,9 +47,12 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.jai.JAI;
 
 /**
@@ -80,6 +83,7 @@ public class MovieFrameExporter {
     ScreenFrameManager screenFrameManager;
     int eyeOffset;
     int screenOffset;
+    private File ffmpegExecutable;
 
     /**
      * 
@@ -97,13 +101,14 @@ public class MovieFrameExporter {
     public MovieFrameExporter(int width, int height, double smallImageScale,
             EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
-            PropertyChangeListener listener) {
+            File ffmpegExecutable, PropertyChangeListener listener) {
         this.width = width;
         this.height = height;
         this.smallImageScale = smallImageScale;
         this.eyeGazeComputing = eyeGazeComputing;
         this.eyeFrameManager = eyeFrameManager;
         this.screenFrameManager = screenFrameManager;
+        this.ffmpegExecutable = ffmpegExecutable;
 
         // Compute the real offset
         if (eyeOffset > screenOffset) {
@@ -115,6 +120,14 @@ public class MovieFrameExporter {
         }
 
         this.listener = listener;
+    }
+
+    public File getFfmpegExecutable() {
+        return ffmpegExecutable;
+    }
+
+    public void setFfmpegExecutable(File ffmpegExecutable) {
+        this.ffmpegExecutable = ffmpegExecutable;
     }
 
     /**
@@ -239,6 +252,74 @@ public class MovieFrameExporter {
         }
 
         // Run ffmpeg
+        // Check if FFMPEG exists
+        if (this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
+
+            // Start ffmpeg process for each type
+            Runtime runtime = Runtime.getRuntime();
+
+            if (eyeOnly && alive) {
+                // Update property
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this,
+                            "Create eye only movie", 0, 1));
+                }
+                try {
+                    runtime.exec(constructFFMPEGCommand(EYE_ONLY_FILE_NAME, digit),
+                            null, eyeOnlyDir);
+                } catch (IOException ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            // Writing out information
+            if (screenOnly && alive) {
+                // Update property
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this,
+                            "Create screen only movie", 0, 1));
+                }
+                try {
+                    runtime.exec(constructFFMPEGCommand(SCREEN_ONLY_FILE_NAME, digit),
+                            null, screenOnlyDir);
+                } catch (IOException ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (sideBySide && alive) {
+                // Update property
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this,
+                            "Create side by side movie", 0, 1));
+                }
+                try {
+                    runtime.exec(constructFFMPEGCommand(SIDE_BY_SIDE_FILE_NAME, digit),
+                            null, sideBySideDir);
+                } catch (IOException ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (eyeInCorner && alive) {
+                try {
+                    runtime.exec(constructFFMPEGCommand(EYE_IN_CORNER_FILE_NAME, digit),
+                            null, eyeInCornerDir);
+                } catch (IOException ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (screenInCorner && alive) {
+                try {
+                    runtime.exec(constructFFMPEGCommand(SCREEN_IN_CORNER_FILE_NAME, digit),
+                            null, screenInCornerDir);
+                } catch (IOException ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
 
         // Handle temp files accordingly
         for (int i = start; i <= end; i++) {
@@ -247,47 +328,52 @@ public class MovieFrameExporter {
 
             String newFileName = numberFormat.format(i) + ".tiff";
 
-            // Get eye frame
-            BufferedImage eyeImage = renderEyeImage(
-                    i + eyeOffset, eyeFrameManager);
-
-            // Get average eye gaze
-            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset, averageFrames, scaleFactor);
-            if (point != null) {
-                gazePoint.setLocation(point);
-            } else {
-                gazePoint.setLocation(-666, -666);
-            }
-
-            // Get screen frame
-            BufferedImage screenImage = renderScreenImage(i, screenFrameManager,
-                    withCorners, gazePoint);
-
-            // Writing out information
+            // Handle file
+            File file = null;
             if (eyeOnly) {
-                writeImage(eyeImage,
-                        new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName));
+                file = new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName);
+                if (deleteMoviePictureFile) {
+                    file.delete();
+                } else {
+                    file.renameTo(new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + newFileName));
+                }
             }
 
             // Writing out information
             if (screenOnly) {
-                writeImage(screenImage,
-                        new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName));
+                file = new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName);
+                if (deleteMoviePictureFile) {
+                    file.delete();
+                } else {
+                    file.renameTo(new File(eyeOnlyDir, SCREEN_ONLY_FILE_NAME + newFileName));
+                }
             }
 
             if (sideBySide) {
-                writeImage(renderSideBySideImage(eyeImage, screenImage),
-                        new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName));
+                file = new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName);
+                if (deleteMoviePictureFile) {
+                    file.delete();
+                } else {
+                    file.renameTo(new File(eyeOnlyDir, SIDE_BY_SIDE_FILE_NAME + newFileName));
+                }
             }
 
             if (eyeInCorner) {
-                writeImage(renderInCornerImage(eyeImage, screenImage),
-                        new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName));
+                file =  new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName);
+                if (deleteMoviePictureFile) {
+                    file.delete();
+                } else {
+                    file.renameTo(new File(eyeOnlyDir, EYE_IN_CORNER_FILE_NAME + newFileName));
+                }
             }
 
             if (screenInCorner) {
-                writeImage(renderInCornerImage(screenImage, eyeImage),
-                        new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName));
+                file =  new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName);
+                if (deleteMoviePictureFile) {
+                    file.delete();
+                } else {
+                    file.renameTo(new File(eyeOnlyDir, SCREEN_IN_CORNER_FILE_NAME + newFileName));
+                }
             }
 
             // Update property
@@ -296,6 +382,12 @@ public class MovieFrameExporter {
                         "Clean Up Temp Files", i - 1, i));
             }
         }
+    }
+
+    private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
+        return this.ffmpegExecutable.getAbsolutePath() + " -f image2 -i " +
+                name.trim() + "%0" + totalDigitInFileName + "d.tiff " +
+                name.trim() + ".mov";
     }
 
     /**
