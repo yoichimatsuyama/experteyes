@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.JAI;
@@ -84,6 +85,8 @@ public class MovieFrameExporter {
     int eyeOffset;
     int screenOffset;
     private File ffmpegExecutable;
+    private ReentrantLock processLock = new ReentrantLock();
+    Process process = null;
 
     /**
      * 
@@ -220,28 +223,28 @@ public class MovieFrameExporter {
             // Writing out information
             if (eyeOnly) {
                 writeImage(eyeImage,
-                        new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName));
+                        new File(eyeOnlyDir, fileName));
             }
 
             // Writing out information
             if (screenOnly) {
                 writeImage(screenImage,
-                        new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName));
+                        new File(screenOnlyDir, fileName));
             }
 
             if (sideBySide) {
                 writeImage(renderSideBySideImage(eyeImage, screenImage),
-                        new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName));
+                        new File(sideBySideDir, fileName));
             }
 
             if (eyeInCorner) {
                 writeImage(renderInCornerImage(eyeImage, screenImage),
-                        new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName));
+                        new File(eyeInCornerDir, fileName));
             }
 
             if (screenInCorner) {
                 writeImage(renderInCornerImage(screenImage, eyeImage),
-                        new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName));
+                        new File(screenInCornerDir, fileName));
             }
 
             // Update property
@@ -264,11 +267,19 @@ public class MovieFrameExporter {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
                             "Create eye only movie", 0, 1));
                 }
+                this.processLock.lock();
                 try {
-                    runtime.exec(constructFFMPEGCommand(EYE_ONLY_FILE_NAME, digit),
+                    process = runtime.exec(constructFFMPEGCommand(EYE_ONLY_FILE_NAME, digit),
                             null, eyeOnlyDir);
                 } catch (IOException ex) {
                     Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                this.processLock.unlock();
+                // Wait for process
+                try {
+                    this.process.waitFor();
+                } catch (InterruptedException interruptedException) {
                 }
             }
 
@@ -279,11 +290,18 @@ public class MovieFrameExporter {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
                             "Create screen only movie", 0, 1));
                 }
+                this.processLock.lock();
                 try {
-                    runtime.exec(constructFFMPEGCommand(SCREEN_ONLY_FILE_NAME, digit),
+                    process = runtime.exec(constructFFMPEGCommand(SCREEN_ONLY_FILE_NAME, digit),
                             null, screenOnlyDir);
                 } catch (IOException ex) {
                     Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                this.processLock.unlock();
+                // Wait for process
+                try {
+                    this.process.waitFor();
+                } catch (InterruptedException interruptedException) {
                 }
             }
 
@@ -293,31 +311,66 @@ public class MovieFrameExporter {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
                             "Create side by side movie", 0, 1));
                 }
+                this.processLock.lock();
                 try {
-                    runtime.exec(constructFFMPEGCommand(SIDE_BY_SIDE_FILE_NAME, digit),
+                    process = runtime.exec(constructFFMPEGCommand(SIDE_BY_SIDE_FILE_NAME, digit),
                             null, sideBySideDir);
                 } catch (IOException ex) {
                     Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                this.processLock.unlock();
+                // Wait for process
+                try {
+                    this.process.waitFor();
+                } catch (InterruptedException interruptedException) {
+                }
             }
 
             if (eyeInCorner && alive) {
+                // Update property
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this,
+                            "Create eye in the corner movie", 0, 1));
+                }
+                this.processLock.lock();
                 try {
-                    runtime.exec(constructFFMPEGCommand(EYE_IN_CORNER_FILE_NAME, digit),
+                    process = runtime.exec(constructFFMPEGCommand(EYE_IN_CORNER_FILE_NAME, digit),
                             null, eyeInCornerDir);
                 } catch (IOException ex) {
                     Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                this.processLock.unlock();
+                // Wait for process
+                try {
+                    this.process.waitFor();
+                } catch (InterruptedException interruptedException) {
+                }
             }
 
             if (screenInCorner && alive) {
+                // Update property
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this,
+                            "Create screen in the corner movie", 0, 1));
+                }
+                this.processLock.lock();
                 try {
-                    runtime.exec(constructFFMPEGCommand(SCREEN_IN_CORNER_FILE_NAME, digit),
+                    process = runtime.exec(constructFFMPEGCommand(SCREEN_IN_CORNER_FILE_NAME, digit),
                             null, screenInCornerDir);
                 } catch (IOException ex) {
                     Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                this.processLock.unlock();
+                // Wait for process
+                try {
+                    this.process.waitFor();
+                } catch (InterruptedException interruptedException) {
+                }
             }
+
+            this.processLock.lock();
+            this.process = null;
+            this.processLock.unlock();
         }
 
 
@@ -331,48 +384,78 @@ public class MovieFrameExporter {
             // Handle file
             File file = null;
             if (eyeOnly) {
-                file = new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName);
+                file = new File(eyeOnlyDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
                 } else {
-                    file.renameTo(new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + newFileName));
+                    //Remove old file if any
+                    File outFile = new File(eyeOnlyDir,
+                            EYE_ONLY_FILE_NAME + newFileName);
+                    if (outFile.exists()) {
+                        outFile.delete();
+                    }
+                    file.renameTo(outFile);
                 }
             }
 
             // Writing out information
             if (screenOnly) {
-                file = new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName);
+                file = new File(screenOnlyDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
                 } else {
-                    file.renameTo(new File(eyeOnlyDir, SCREEN_ONLY_FILE_NAME + newFileName));
+                    //Remove old file if any
+                    File outFile = new File(screenOnlyDir,
+                            SCREEN_ONLY_FILE_NAME + newFileName);
+                    if (outFile.exists()) {
+                        outFile.delete();
+                    }
+                    file.renameTo(outFile);
                 }
             }
 
             if (sideBySide) {
-                file = new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName);
+                file = new File(sideBySideDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
                 } else {
-                    file.renameTo(new File(eyeOnlyDir, SIDE_BY_SIDE_FILE_NAME + newFileName));
+                    //Remove old file if any
+                    File outFile = new File(sideBySideDir,
+                            SIDE_BY_SIDE_FILE_NAME + newFileName);
+                    if (outFile.exists()) {
+                        outFile.delete();
+                    }
+                    file.renameTo(outFile);
                 }
             }
 
             if (eyeInCorner) {
-                file =  new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName);
+                file = new File(eyeInCornerDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
                 } else {
-                    file.renameTo(new File(eyeOnlyDir, EYE_IN_CORNER_FILE_NAME + newFileName));
+                    //Remove old file if any
+                    File outFile = new File(eyeInCornerDir,
+                            EYE_IN_CORNER_FILE_NAME + newFileName);
+                    if (outFile.exists()) {
+                        outFile.delete();
+                    }
+                    file.renameTo(outFile);
                 }
             }
 
             if (screenInCorner) {
-                file =  new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName);
+                file = new File(screenInCornerDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
                 } else {
-                    file.renameTo(new File(eyeOnlyDir, SCREEN_IN_CORNER_FILE_NAME + newFileName));
+                    //Remove old file if any
+                    File outFile = new File(screenInCornerDir,
+                            SCREEN_IN_CORNER_FILE_NAME + newFileName);
+                    if (outFile.exists()) {
+                        outFile.delete();
+                    }
+                    file.renameTo(outFile);
                 }
             }
 
@@ -382,11 +465,17 @@ public class MovieFrameExporter {
                         "Clean Up Temp Files", i - 1, i));
             }
         }
+
+        // Update property
+        if (this.listener != null) {
+            this.listener.propertyChange(new PropertyChangeEvent(this,
+                    "Done", end, end));
+        }
     }
 
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
         return this.ffmpegExecutable.getAbsolutePath() + " -f image2 -i " +
-                name.trim() + "%0" + totalDigitInFileName + "d.tiff " +
+                "%0" + totalDigitInFileName + "d.tiff " + "-y " +
                 name.trim() + ".mov";
     }
 
@@ -511,6 +600,12 @@ public class MovieFrameExporter {
      */
     public void cancel() {
         this.alive = false;
+        processLock.lock();
+        if (this.process != null) {
+            // Terminate the ffmpeg
+            this.process.destroy();
+        }
+        processLock.unlock();
     }
 
     /**
@@ -522,13 +617,9 @@ public class MovieFrameExporter {
     private BufferedImage renderEyeImage(
             int i, FrameManager eyeFrameManager) {
 
-        BufferedImage eyeImage = new BufferedImage(
-                this.width, this.height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage eyeImage = null;
 
-        Graphics2D g = eyeImage.createGraphics();
-        // Fill with black    
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, width, height);
+        Graphics2D g = null;
 
         BufferedImage image = eyeFrameManager.getFrame(i);
         double scale = 1d;
@@ -551,7 +642,20 @@ public class MovieFrameExporter {
             }
 
             // Put picture in
+            eyeImage = new BufferedImage(
+                    scaledImage.getWidth(null), scaledImage.getHeight(null),
+                    BufferedImage.TYPE_INT_RGB);
+
+            g = eyeImage.createGraphics();
             g.drawImage(scaledImage, 0, 0, null);
+        } else {
+            eyeImage = new BufferedImage(
+                    this.width, this.height,
+                    BufferedImage.TYPE_INT_RGB);
+            g = eyeImage.createGraphics();
+            // Fill with black
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, width, height);
         }
 
         EyeViewFrameInfo info =
@@ -597,13 +701,46 @@ public class MovieFrameExporter {
             int i, ScreenFrameManager screenFrameManager, boolean withCorners,
             Point gazePosition) {
 
-        BufferedImage screenImage = new BufferedImage(
-                this.width, this.height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage screenImage = null;
 
-        Graphics2D g = screenImage.createGraphics();
-        // Fill with black    
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, width, height);
+        Graphics2D g = null;
+
+        BufferedImage image = eyeFrameManager.getFrame(i);
+        double scale = 1d;
+        if (image != null) {
+
+            // Scale image
+            int widthDiff = image.getWidth() - this.width;
+            int heightDiff = image.getHeight() - this.height;
+            Image scaledImage = null;
+            if (widthDiff > heightDiff) {
+                // We should scale by width
+                scale = (double) this.width / (double) image.getWidth();
+                scaledImage = image.getScaledInstance(
+                        this.width, -1, Image.SCALE_FAST);
+            } else {
+                // We should scale by width
+                scale = (double) this.height / (double) image.getHeight();
+                scaledImage = image.getScaledInstance(
+                        -1, this.height, Image.SCALE_FAST);
+            }
+
+            // Put picture in
+            screenImage = new BufferedImage(
+                    scaledImage.getWidth(null), scaledImage.getHeight(null),
+                    BufferedImage.TYPE_INT_RGB);
+
+            g = screenImage.createGraphics();
+            g.drawImage(scaledImage, 0, 0, null);
+        } else {
+            screenImage = new BufferedImage(
+                    this.width, this.height,
+                    BufferedImage.TYPE_INT_RGB);
+            g = screenImage.createGraphics();
+            // Fill with black
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, width, height);
+        }
 
         BufferedImage buffer = screenFrameManager.getFrame(i);
         if (buffer != null) {
@@ -742,13 +879,15 @@ public class MovieFrameExporter {
     private BufferedImage renderSideBySideImage(
             BufferedImage eyeImage, BufferedImage screenImage) {
         BufferedImage image = new BufferedImage(
-                width * 2, height, BufferedImage.TYPE_INT_RGB);
+                eyeImage.getWidth() + screenImage.getWidth(),
+                Math.max(eyeImage.getHeight(), screenImage.getHeight()),
+                BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
 
         // Draw eyeImage
         g.drawImage(eyeImage, null, 0, 0);
-        g.drawImage(screenImage, null, width, 0);
+        g.drawImage(screenImage, null, eyeImage.getWidth(), 0);
 
         return image;
     }
@@ -757,7 +896,8 @@ public class MovieFrameExporter {
             BufferedImage cornerImage, BufferedImage mainImage) {
 
         BufferedImage image = new BufferedImage(
-                width, height, BufferedImage.TYPE_INT_RGB);
+                mainImage.getWidth(), mainImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
 
@@ -771,8 +911,8 @@ public class MovieFrameExporter {
 
         // Draw a box around corner image
         g.setColor(Color.WHITE);
-        g.drawRect(0, 0, (int) (this.width * this.smallImageScale),
-                (int) (this.height * this.smallImageScale));
+        g.drawRect(0, 0, (int) (cornerImage.getWidth() * this.smallImageScale),
+                (int) (cornerImage.getHeight() * this.smallImageScale));
 
         return image;
     }
