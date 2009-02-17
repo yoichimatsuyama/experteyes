@@ -209,7 +209,8 @@ public class MovieFrameExporter {
                     i + eyeOffset, eyeFrameManager);
 
             // Get average eye gaze
-            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset, averageFrames, scaleFactor);
+            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset,
+                    averageFrames, scaleFactor);
             if (point != null) {
                 gazePoint.setLocation(point);
             } else {
@@ -217,8 +218,8 @@ public class MovieFrameExporter {
             }
 
             // Get screen frame
-            BufferedImage screenImage = renderScreenImage(i + screenOffset, screenFrameManager,
-                    withCorners, gazePoint);
+            BufferedImage screenImage = renderScreenImage(i + screenOffset,
+                    screenFrameManager, withCorners, gazePoint);
 
             // Writing out information
             if (eyeOnly) {
@@ -265,7 +266,7 @@ public class MovieFrameExporter {
                 // Update property
                 if (this.listener != null) {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create eye only movie", 0, 1));
+                            "Create eye only movie", -1, -1));
                 }
                 this.processLock.lock();
                 try {
@@ -288,7 +289,7 @@ public class MovieFrameExporter {
                 // Update property
                 if (this.listener != null) {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create screen only movie", 0, 1));
+                            "Create screen only movie", -1, -1));
                 }
                 this.processLock.lock();
                 try {
@@ -309,7 +310,7 @@ public class MovieFrameExporter {
                 // Update property
                 if (this.listener != null) {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create side by side movie", 0, 1));
+                            "Create side by side movie", -1, -1));
                 }
                 this.processLock.lock();
                 try {
@@ -330,7 +331,7 @@ public class MovieFrameExporter {
                 // Update property
                 if (this.listener != null) {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create eye in the corner movie", 0, 1));
+                            "Create eye in the corner movie", -1, -1));
                 }
                 this.processLock.lock();
                 try {
@@ -351,7 +352,7 @@ public class MovieFrameExporter {
                 // Update property
                 if (this.listener != null) {
                     this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create screen in the corner movie", 0, 1));
+                            "Create screen in the corner movie", -1, -1));
                 }
                 this.processLock.lock();
                 try {
@@ -474,7 +475,7 @@ public class MovieFrameExporter {
     }
 
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
-        return this.ffmpegExecutable.getAbsolutePath() + " -f image2 -i " +
+        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r 30 -i "+
                 "%0" + totalDigitInFileName + "d.tiff " + "-y " +
                 name.trim() + ".mov";
     }
@@ -673,8 +674,10 @@ public class MovieFrameExporter {
                 if (info.getPupilAngle() > 0) {
                     Graphics2D g2d = (Graphics2D) g;
                     AffineTransform oldTransform = g2d.getTransform();
-                    AffineTransform aff = AffineTransform.getTranslateInstance(oldTransform.getTranslateX(), oldTransform.getTranslateY());
-                    Ellipse2D.Double e = new Ellipse2D.Double(ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
+                    AffineTransform aff = AffineTransform.getTranslateInstance(
+                            oldTransform.getTranslateX(), oldTransform.getTranslateY());
+                    Ellipse2D.Double e = new Ellipse2D.Double(
+                            ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
                     aff.rotate(info.getPupilAngle(), e.getCenterX(), e.getCenterY());
                     g2d.setTransform(aff);
                     g2d.draw(e);
