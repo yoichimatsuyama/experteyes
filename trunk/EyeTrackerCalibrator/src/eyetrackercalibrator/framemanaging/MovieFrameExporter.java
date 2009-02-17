@@ -217,7 +217,7 @@ public class MovieFrameExporter {
             }
 
             // Get screen frame
-            BufferedImage screenImage = renderScreenImage(i, screenFrameManager,
+            BufferedImage screenImage = renderScreenImage(i + screenOffset, screenFrameManager,
                     withCorners, gazePoint);
 
             // Writing out information
@@ -674,8 +674,7 @@ public class MovieFrameExporter {
                     Graphics2D g2d = (Graphics2D) g;
                     AffineTransform oldTransform = g2d.getTransform();
                     AffineTransform aff = AffineTransform.getTranslateInstance(oldTransform.getTranslateX(), oldTransform.getTranslateY());
-                    Ellipse2D.Double e = new Ellipse2D.Double();
-                    e.setFrameFromDiagonal(ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
+                    Ellipse2D.Double e = new Ellipse2D.Double(ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
                     aff.rotate(info.getPupilAngle(), e.getCenterX(), e.getCenterY());
                     g2d.setTransform(aff);
                     g2d.draw(e);
