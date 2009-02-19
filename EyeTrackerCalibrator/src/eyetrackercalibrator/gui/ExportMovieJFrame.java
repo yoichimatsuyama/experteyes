@@ -94,6 +94,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private void initComponents() {
 
         outputButtonGroup = new javax.swing.ButtonGroup();
+        eyetrackercalibrator.gui.util.TextFieldPosIntInputVerifier textFieldPosIntInputVerifier = new eyetrackercalibrator.gui.util.TextFieldPosIntInputVerifier();
         jLabel1 = new javax.swing.JLabel();
         exportLocationTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
@@ -117,6 +118,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
         movieOnlyRadioButton = new javax.swing.JRadioButton();
         movieAndFramesRadioButton = new javax.swing.JRadioButton();
         framesOnlyRadioButton = new javax.swing.JRadioButton();
@@ -194,14 +196,17 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jLabel3.setText("To:");
 
         fromTextField.setText("1");
+        fromTextField.setInputVerifier(textFieldPosIntInputVerifier);
 
         toTextField.setText("1");
+        toTextField.setInputVerifier(textFieldPosIntInputVerifier);
 
         drawCornerCheckBox.setText("Draw corners in screen frames");
 
         jLabel4.setText("Moving median gaze point across");
 
         gazeAverageTextField.setText("3");
+        gazeAverageTextField.setInputVerifier(textFieldPosIntInputVerifier);
         gazeAverageTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 gazeAverageTextFieldActionPerformed(evt);
@@ -216,8 +221,12 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jPanel2.add(jLabel7);
 
         jTextField1.setText("30");
+        jTextField1.setInputVerifier(textFieldPosIntInputVerifier);
         jTextField1.setPreferredSize(new java.awt.Dimension(60, 28));
         jPanel2.add(jTextField1);
+
+        jLabel6.setText("fps");
+        jPanel2.add(jLabel6);
 
         outputButtonGroup.add(movieOnlyRadioButton);
         movieOnlyRadioButton.setSelected(true);
@@ -242,7 +251,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
+                        .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(browseButton)
                         .addContainerGap())
@@ -253,7 +262,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(cancelButton)
                                 .add(5, 5, 5))
-                            .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE))
+                            .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE))
                         .add(22, 22, 22))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
@@ -262,8 +271,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(jLabel2)
-                                    .add(jLabel3))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                                    .add(jLabel3)))
                             .add(layout.createSequentialGroup()
                                 .add(drawCornerCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -275,8 +283,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                                 .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel5))
-                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
+                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -443,6 +451,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
