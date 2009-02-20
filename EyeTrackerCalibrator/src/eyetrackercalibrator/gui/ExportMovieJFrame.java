@@ -31,13 +31,23 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.Main;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.math.EyeGazeComputing;
+import java.awt.FileDialog;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -48,6 +58,7 @@ import javax.swing.JOptionPane;
 public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
     private static double CORNER_FRAME_SCALE = 0.3;
+    public static String FFMPEG_LOCATION_PROPERTY_KEY = "ffmpeg location";
     MovieFrameExporter movieFrameExporter = null;
     int start;
     int totalProcess;
@@ -57,10 +68,23 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager) {
 
-        // Set up exporter
-        this.movieFrameExporter = new MovieFrameExporter(exportWidth, exportHeight,
-                CORNER_FRAME_SCALE, eyeGazeComputing, eyeOffset, screenOffset,
-                eyeFrameManager, screenFrameManager, new File("/opt/local/bin/ffmpeg"), this);
+        // Load ffmpeg location
+        File propertyFile = new File(Main.PROPERTY_FILE);
+        File ffmpegFile = null;
+        Properties properties = new Properties();
+        try {
+            FileInputStream fileInputStream = null;
+            fileInputStream = new FileInputStream(propertyFile);
+            properties.loadFromXML(fileInputStream);
+            String ffmpegLocationStr = properties.getProperty(FFMPEG_LOCATION_PROPERTY_KEY);
+            if (ffmpegLocationStr != null) {
+                ffmpegFile = new File(ffmpegLocationStr);
+            }
+            fileInputStream.close();
+        } catch (FileNotFoundException fileNotFoundException) {
+        } catch (IOException ex) {
+            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         initComponents();
 
@@ -82,6 +106,13 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         File defaultPath = new File(currentDir, "MovieFrames");
         this.exportLocationTextField.setText(defaultPath.getAbsolutePath());
         repaint();
+
+        // Set up exporter
+        this.movieFrameExporter = new MovieFrameExporter(exportWidth, exportHeight,
+                CORNER_FRAME_SCALE, eyeGazeComputing, eyeOffset, screenOffset,
+                eyeFrameManager, screenFrameManager, ffmpegFile,
+                Integer.parseInt(this.frameRateTextField.getText()), this);
+
     }
 
     /** 
@@ -117,7 +148,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        frameRateTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         movieOnlyRadioButton = new javax.swing.JRadioButton();
         movieAndFramesRadioButton = new javax.swing.JRadioButton();
@@ -142,6 +173,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         screenOnlyCheckBox.setText("Screen only");
 
+        sideBySideCheckBox.setSelected(true);
         sideBySideCheckBox.setText("Eye and screen side by side");
 
         screenInCornerCheckBox.setText("Screen in the corner of eye");
@@ -220,10 +252,10 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jLabel7.setText("Frame rate:");
         jPanel2.add(jLabel7);
 
-        jTextField1.setText("30");
-        jTextField1.setInputVerifier(textFieldPosIntInputVerifier);
-        jTextField1.setPreferredSize(new java.awt.Dimension(60, 28));
-        jPanel2.add(jTextField1);
+        frameRateTextField.setText("30");
+        frameRateTextField.setInputVerifier(textFieldPosIntInputVerifier);
+        frameRateTextField.setPreferredSize(new java.awt.Dimension(60, 28));
+        jPanel2.add(frameRateTextField);
 
         jLabel6.setText("fps");
         jPanel2.add(jLabel6);
@@ -339,25 +371,21 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+
+        // Check if it has focus
+        if (!this.okButton.isFocusOwner()) {
+            return;
+        }
+
         boolean error = false;
 
         // Get to and from
         int from = 0, to = 0;
-        try {
-            from = Integer.parseInt(this.fromTextField.getText());
-            to = Integer.parseInt(this.toTextField.getText());
-        } catch (NumberFormatException e) {
-            error = true;
-        }
+        // There is no need to catch error here coz we do input validation at the textfield
+        from = Integer.parseInt(this.fromTextField.getText());
+        to = Integer.parseInt(this.toTextField.getText());
 
         File exportDirectory = new File(this.exportLocationTextField.getText());
-
-        if (error || from < 1 || to < 1) {
-            // Show warning dialog
-            JOptionPane.showMessageDialog(this, "Please check from/to value.",
-                    "Error in from/to value.", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
         // Set up start and end
         this.start = Math.min(to, from);
@@ -379,6 +407,19 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         }
 
         // Check output type
+        if (!(eyeOnlyCheckBox.isSelected() ||
+                screenOnlyCheckBox.isSelected() ||
+                eyeInCornerCheckBox.isSelected() ||
+                screenInCornerCheckBox.isSelected() ||
+                sideBySideCheckBox.isSelected())) {
+            // None is selected so warn the user and do nothing
+            // Show warning dialog
+            JOptionPane.showMessageDialog(this,
+                    "Please select at least one export type.",
+                    "No Export Type Is Selected",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         boolean createMovieFile = true;
         boolean deleteMoviePictureFile = true;
         if (movieAndFramesRadioButton.isSelected()) {
@@ -386,6 +427,62 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         } else if (framesOnlyRadioButton.isSelected()) {
             deleteMoviePictureFile = false;
             createMovieFile = false;
+        }
+
+        // Check if ffmpeg is needed
+        if (this.movieOnlyRadioButton.isSelected() ||
+                this.movieAndFramesRadioButton.isSelected()) {
+            File ffmpegFile = this.movieFrameExporter.getFfmpegExecutable();
+            if (ffmpegFile == null || !ffmpegFile.exists()) {
+                // We don't have valid copy of ffmpeg.  Ask user to give one
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogTitle("Please Locate FFMPEG Executable");
+                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    ffmpegFile = chooser.getSelectedFile();
+
+                    // Set ffmpeg file for exporter
+                    this.movieFrameExporter.setFfmpegExecutable(ffmpegFile);
+
+                    // Save the selection
+                    File propertyFile = new File(Main.PROPERTY_FILE);
+                    Properties properties = new Properties();
+
+                    // If old file exists load it
+                    if (propertyFile.exists()) {
+                        try {
+                            FileInputStream fileInputStream = null;
+                            fileInputStream = new FileInputStream(propertyFile);
+                            properties.loadFromXML(fileInputStream);
+                            fileInputStream.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } else {
+                        try {
+                            // Make one
+                            propertyFile.createNewFile();
+                        } catch (IOException ex) {
+                            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    // Set new property
+                    properties.setProperty(FFMPEG_LOCATION_PROPERTY_KEY, ffmpegFile.getAbsolutePath());
+
+                    // Save the config
+                    FileOutputStream outputStream;
+                    try {
+                        outputStream = new FileOutputStream(Main.PROPERTY_FILE);
+                        properties.storeToXML(outputStream, null);
+                        outputStream.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                } else {
+                    return;
+                }
+            }
         }
 
         this.okButton.setVisible(false);
@@ -443,6 +540,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JTextField exportLocationTextField;
     private javax.swing.JCheckBox eyeInCornerCheckBox;
     private javax.swing.JCheckBox eyeOnlyCheckBox;
+    private javax.swing.JTextField frameRateTextField;
     private javax.swing.JRadioButton framesOnlyRadioButton;
     private javax.swing.JTextField fromTextField;
     private javax.swing.JTextField gazeAverageTextField;
@@ -455,7 +553,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JRadioButton movieAndFramesRadioButton;
     private javax.swing.JRadioButton movieOnlyRadioButton;
     private javax.swing.JButton okButton;
@@ -475,7 +572,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
             this.progressBar.setString(evt.getPropertyName() + " " + completed + " of " + this.totalProcess);
             this.progressBar.setValue(completed);
-        }else{
+        } else {
             this.progressBar.setString(evt.getPropertyName());
             this.progressBar.setValue(this.totalProcess - 1);
         }

@@ -87,6 +87,7 @@ public class MovieFrameExporter {
     private File ffmpegExecutable;
     private ReentrantLock processLock = new ReentrantLock();
     Process process = null;
+    private int frameRate;
 
     /**
      * 
@@ -104,7 +105,7 @@ public class MovieFrameExporter {
     public MovieFrameExporter(int width, int height, double smallImageScale,
             EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
-            File ffmpegExecutable, PropertyChangeListener listener) {
+            File ffmpegExecutable, int frameRate, PropertyChangeListener listener) {
         this.width = width;
         this.height = height;
         this.smallImageScale = smallImageScale;
@@ -112,6 +113,7 @@ public class MovieFrameExporter {
         this.eyeFrameManager = eyeFrameManager;
         this.screenFrameManager = screenFrameManager;
         this.ffmpegExecutable = ffmpegExecutable;
+        this.frameRate = frameRate;
 
         // Compute the real offset
         if (eyeOffset > screenOffset) {
@@ -475,9 +477,9 @@ public class MovieFrameExporter {
     }
 
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
-        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r 30 -i "+
-                "%0" + totalDigitInFileName + "d.tiff " + "-y " +
-                name.trim() + ".mov";
+        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r " +
+                this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff " +
+                "-y " + name.trim() + ".mov";
     }
 
     /**
