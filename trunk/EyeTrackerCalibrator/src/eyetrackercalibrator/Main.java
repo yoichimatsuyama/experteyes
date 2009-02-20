@@ -126,6 +126,7 @@ public class Main extends javax.swing.JFrame {
     static final public String FULL_SCREEN_WIDTH = "fullscreenwidth";
     static final public String FULL_SCREEN_HEIGHT = "fullscreenheight";
     static final public String COMMENT = "comment";
+    static final public String PROPERTY_FILE = "eyetrackercalibrator.properties";
     static final public int ERROR_VALUE = -666;
     private static String DATABASE_NAME = "IlluminationDb";
     static final public String CORNERHINT_DIR = "CornerHints";
