@@ -32,6 +32,7 @@
  */
 package eyetrackercalibrator.framemanaging;
 
+import eyetrackercalibrator.gui.util.StreamGobbler;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Color;
@@ -259,117 +260,17 @@ public class MovieFrameExporter {
 
         // Run ffmpeg
         // Check if FFMPEG exists
-        if (this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
+        if (createMovieFile && this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
 
-            // Start ffmpeg process for each type
-            Runtime runtime = Runtime.getRuntime();
+            createMovie(eyeOnly, "Create eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
 
-            if (eyeOnly && alive) {
-                // Update property
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create eye only movie", -1, -1));
-                }
-                this.processLock.lock();
-                try {
-                    process = runtime.exec(constructFFMPEGCommand(EYE_ONLY_FILE_NAME, digit),
-                            null, eyeOnlyDir);
-                } catch (IOException ex) {
-                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            createMovie(screenOnly, "Create screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
 
-                this.processLock.unlock();
-                // Wait for process
-                try {
-                    this.process.waitFor();
-                } catch (InterruptedException interruptedException) {
-                }
-            }
+            createMovie(sideBySide, "Create side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
 
-            // Writing out information
-            if (screenOnly && alive) {
-                // Update property
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create screen only movie", -1, -1));
-                }
-                this.processLock.lock();
-                try {
-                    process = runtime.exec(constructFFMPEGCommand(SCREEN_ONLY_FILE_NAME, digit),
-                            null, screenOnlyDir);
-                } catch (IOException ex) {
-                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                this.processLock.unlock();
-                // Wait for process
-                try {
-                    this.process.waitFor();
-                } catch (InterruptedException interruptedException) {
-                }
-            }
+            createMovie(eyeInCorner, "Create eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
 
-            if (sideBySide && alive) {
-                // Update property
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create side by side movie", -1, -1));
-                }
-                this.processLock.lock();
-                try {
-                    process = runtime.exec(constructFFMPEGCommand(SIDE_BY_SIDE_FILE_NAME, digit),
-                            null, sideBySideDir);
-                } catch (IOException ex) {
-                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                this.processLock.unlock();
-                // Wait for process
-                try {
-                    this.process.waitFor();
-                } catch (InterruptedException interruptedException) {
-                }
-            }
-
-            if (eyeInCorner && alive) {
-                // Update property
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create eye in the corner movie", -1, -1));
-                }
-                this.processLock.lock();
-                try {
-                    process = runtime.exec(constructFFMPEGCommand(EYE_IN_CORNER_FILE_NAME, digit),
-                            null, eyeInCornerDir);
-                } catch (IOException ex) {
-                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                this.processLock.unlock();
-                // Wait for process
-                try {
-                    this.process.waitFor();
-                } catch (InterruptedException interruptedException) {
-                }
-            }
-
-            if (screenInCorner && alive) {
-                // Update property
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this,
-                            "Create screen in the corner movie", -1, -1));
-                }
-                this.processLock.lock();
-                try {
-                    process = runtime.exec(constructFFMPEGCommand(SCREEN_IN_CORNER_FILE_NAME, digit),
-                            null, screenInCornerDir);
-                } catch (IOException ex) {
-                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                this.processLock.unlock();
-                // Wait for process
-                try {
-                    this.process.waitFor();
-                } catch (InterruptedException interruptedException) {
-                }
-            }
+            createMovie(screenInCorner, "Create screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
 
             this.processLock.lock();
             this.process = null;
@@ -476,10 +377,53 @@ public class MovieFrameExporter {
         }
     }
 
+    protected void createMovie(boolean eyeOnly, String propertyChangeString, String inputFilePrefix, int digit, File eyeOnlyDir) {
+        if (eyeOnly && alive) {
+            // Update property
+            if (this.listener != null) {
+                this.listener.propertyChange(new PropertyChangeEvent(this, propertyChangeString, -1, -1));
+            }
+            ProcessBuilder processBuilder = new ProcessBuilder(constructFFMPEGCommandList(inputFilePrefix, digit));
+            processBuilder = processBuilder.directory(eyeOnlyDir);
+            this.processLock.lock();
+            try {
+                process = processBuilder.start();
+                StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "Output");
+                StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "Error");
+                outputGobbler.start();
+                errorGobbler.start();
+            } catch (IOException ex) {
+                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.processLock.unlock();
+            // Wait for process
+            try {
+                this.process.waitFor();
+            } catch (InterruptedException interruptedException) {
+                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, interruptedException);
+            }
+        }
+    }
+
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
         return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r " +
                 this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff " +
                 "-y " + name.trim() + ".mov";
+    }
+
+    private LinkedList<String> constructFFMPEGCommandList(String name, int totalDigitInFileName) {
+        LinkedList<String> list = new LinkedList<String>();
+
+        list.add(this.ffmpegExecutable.getAbsolutePath());
+        list.add("-sameq");
+        list.add("-r");
+        list.add(String.valueOf(this.frameRate));
+        list.add("-i");
+        list.add("%0" + totalDigitInFileName + "d.tiff");
+        list.add("-y");
+        list.add(name.trim() + ".mov");
+
+        return list;
     }
 
     /**
