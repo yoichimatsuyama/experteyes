@@ -35,8 +35,7 @@ import java.io.File;
  */
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.swing.JProgressBar;
-import org.apache.sanselan.Sanselan;
+
 
 /**
  *
@@ -91,7 +90,7 @@ public class ThreadedImageProcessor implements Runnable {
             BufferedImage oldAvgImg = avgImg;
 
             // get the initial img and pixels
-            img = Sanselan.getBufferedImage(imgFiles[0]);
+            img = ImageUtils.loadImage(imgFiles[0]);
 
             minImg = new BufferedImage(img.getWidth(), img.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
@@ -107,7 +106,7 @@ public class ThreadedImageProcessor implements Runnable {
 
             // now do this for all files
             for (int i = 0; i < imgFiles.length && alive; i += FRAME_SKIP) {
-                img = Sanselan.getBufferedImage(imgFiles[i]);
+                img = ImageUtils.loadImage(imgFiles[i]);
                 pixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(img));
                 for (int j = 0; j < pixels.length; j++) {
                     minImgPixels[j] = Math.min(minImgPixels[j], pixels[j]);

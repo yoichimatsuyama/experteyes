@@ -37,9 +37,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
-
-
-import org.apache.sanselan.Sanselan;
 import org.spaceroots.mantissa.optimization.ConvergenceChecker;
 import org.spaceroots.mantissa.optimization.CostException;
 import org.spaceroots.mantissa.optimization.CostFunction;
@@ -370,7 +367,7 @@ public class FitEyeModel implements Runnable {
             startTime = System.currentTimeMillis();
 
             // get eye image
-            eyeImg = Sanselan.getBufferedImage(imageFile);
+            eyeImg = ImageUtils.loadImage(imageFile);
 
             RotatedEllipse2D pupil = null;
 

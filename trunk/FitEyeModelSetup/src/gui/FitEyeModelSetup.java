@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package gui;
 
 import edu.cornell.chew.delaunay.DelaunayTriangulation;
@@ -45,6 +45,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -67,13 +68,11 @@ import javax.swing.event.ChangeListener;
 import logic.FitEyeModel;
 import logic.FittingListener;
 import logic.ImageUtils;
-import logic.NotHiddenTiffFilter;
+import logic.NotHiddenPictureFilter;
 import logic.PointToFrameByEstimatedPupilLocation;
 import logic.RotatedEllipse2D;
 import logic.ThreadedImageProcessor;
 import logic.ThreadedImageProcessorListener;
-import org.apache.sanselan.ImageReadException;
-import org.apache.sanselan.Sanselan;
 import util.FitEyeModelRunner;
 import util.ParameterList;
 import util.ParameterList.Entry;
@@ -253,15 +252,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             Thread t = new Thread(new Runnable() {
 
                 public void run() {
+                    pointToFrameByEstimatedPupilLocation.loadFrames(eyeFiles,
+                            thresholdPanel1.getPupilThresh(),
+                            paintPanel1.getSearchRect(), ESTIMATE_PUPIL_SAMPLING_RATE);
                     try {
-                        pointToFrameByEstimatedPupilLocation.loadFrames(eyeFiles,
-                                thresholdPanel1.getPupilThresh(),
-                                paintPanel1.getSearchRect(), ESTIMATE_PUPIL_SAMPLING_RATE);
                         pointToFrameByEstimatedPupilLocation.save(saveFile);
-                    } catch (ImageReadException ex) {
-                        JOptionPane.showMessageDialog(null, ex, "Error Reestimate Pupil Location", JOptionPane.ERROR_MESSAGE);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(null, ex, "Error Reestimate Pupil Location", JOptionPane.ERROR_MESSAGE);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             });
@@ -1059,7 +1056,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
 
             // list the eye files and set the text field to reflect their directory
-            eyeFiles = eyeDir.listFiles(new NotHiddenTiffFilter());
+            eyeFiles = eyeDir.listFiles(new NotHiddenPictureFilter());
 
             // Set correct total images
             this.frameSlider.setMaximum(eyeFiles.length - 1);
@@ -1166,7 +1163,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
                 Thread threads = new Thread(fem, "Eye fitting " + curEyeFile);
                 threads.start();
-            }else{
+            } else {
                 sem.release();
             }
 
@@ -1221,7 +1218,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 BufferedImage paintedImg = null;
 
                 // Load image
-                paintedImg = Sanselan.getBufferedImage(eyeFiles[newFrameNumber]);
+                paintedImg = ImageUtils.loadImage(eyeFiles[newFrameNumber]);
 
                 if (this.colorSelectionPanel1.getSigma() > 0) {
                     // Avoid avoid loading image from image plus directly since
@@ -1377,32 +1374,29 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private Point2D.Double estimatePupilFromThreshold(int frameNum) {
         Point2D.Double pupil = null;
 
-        try {
-            BufferedImage paintedImg =
-                    Sanselan.getBufferedImage(eyeFiles[frameNum]);
+        BufferedImage paintedImg = ImageUtils.loadImage(eyeFiles[frameNum]);
 
-            Rectangle searchArea = null;
+        if(paintedImg != null){
 
-            if (!this.configListModel.isEmpty()) {
-                // Try getting search rect from the first stored config
-                ConfigutationInfo info =
-                        (ConfigutationInfo) this.configListModel.firstElement();
-                searchArea = info.getSearchArea();
-            } else {
-                searchArea = this.paintPanel1.getSearchRect();
-            }
-            // Get pupil estimate
-            Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
-                    searchArea, this.thresholdPanel1.getPupilThresh(),
-                    false);
+        Rectangle searchArea = null;
 
-            pupil = new Point2D.Double(foundPupil.getCenterX(),
-                    foundPupil.getCenterY());
-        } catch (ImageReadException ex) {
-            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
+        if (!this.configListModel.isEmpty()) {
+            // Try getting search rect from the first stored config
+            ConfigutationInfo info =
+                    (ConfigutationInfo) this.configListModel.firstElement();
+            searchArea = info.getSearchArea();
+        } else {
+            searchArea = this.paintPanel1.getSearchRect();
         }
+        // Get pupil estimate
+        Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
+                searchArea, this.thresholdPanel1.getPupilThresh(),
+                false);
+
+        pupil = new Point2D.Double(foundPupil.getCenterX(),
+                foundPupil.getCenterY());
+        }
+        
         return pupil;
     }
 

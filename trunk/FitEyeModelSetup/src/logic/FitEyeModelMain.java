@@ -75,7 +75,7 @@ public class FitEyeModelMain {
             System.out.println(eyeRoot + " directory does not exists!");
             return;
         }
-        File[] eyeFiles = dir.listFiles(new NotHiddenTiffFilter());
+        File[] eyeFiles = dir.listFiles(new NotHiddenPictureFilter());
         int curEyeFile = 0;
 
         // args[1] is the number of CPUs we want to utilize
