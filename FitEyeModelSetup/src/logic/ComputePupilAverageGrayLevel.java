@@ -33,9 +33,6 @@ package logic;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import org.apache.sanselan.ImageReadException;
-import org.apache.sanselan.Sanselan;
 import util.Parameters;
 
 /**
@@ -61,10 +58,9 @@ public class ComputePupilAverageGrayLevel {
         public double gray;
     }
 
-    static public PupilInfo compute(File input, Parameters parameters) throws IOException, ImageReadException {
+    static public PupilInfo compute(File input, Parameters parameters){
         // Get image from file
-        BufferedImage paintedImg =
-                Sanselan.getBufferedImage(input);
+        BufferedImage paintedImg = ImageUtils.loadImage(input);
 
         // Get pupil estimate
         Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
