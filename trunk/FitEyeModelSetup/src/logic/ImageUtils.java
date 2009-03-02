@@ -533,7 +533,7 @@ public class ImageUtils {
         ip.insert(I.convertToByte(false), 0, 0);
     }
 
-    public static BufferedImage loadImage(File inputFile) {
+    public static BufferedImage loadRGBImage(File inputFile) {
         RenderedOp op = null;
         try {
             op = JAI.create("fileload", inputFile.getAbsolutePath());
@@ -541,6 +541,10 @@ public class ImageUtils {
             e.printStackTrace();
             return null;
         }
-        return op.getAsBufferedImage();
+        BufferedImage buffer = op.getAsBufferedImage();
+        BufferedImage image = new BufferedImage(buffer.getWidth(), buffer.getHeight(), BufferedImage.TYPE_INT_RGB);
+        image.getGraphics().drawImage(buffer, 0, 0, null);
+
+        return image;
     }
 }

@@ -367,7 +367,7 @@ public class FitEyeModel implements Runnable {
             startTime = System.currentTimeMillis();
 
             // get eye image
-            eyeImg = ImageUtils.loadImage(imageFile);
+            eyeImg = ImageUtils.loadRGBImage(imageFile);
 
             RotatedEllipse2D pupil = null;
 
@@ -394,7 +394,6 @@ public class FitEyeModel implements Runnable {
             if (this.parameters.unsharpRadious > 0) {
                 // Do unsharpen first
                 ImagePlus imagePlus = new ImagePlus("Unsharpen", eyeImg);
-                //imageFile.getAbsolutePath());
 
                 ImageUtils.unsharpMask(imagePlus.getProcessor(),
                         this.parameters.unsharpRadious,

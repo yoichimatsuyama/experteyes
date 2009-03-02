@@ -1218,7 +1218,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 BufferedImage paintedImg = null;
 
                 // Load image
-                paintedImg = ImageUtils.loadImage(eyeFiles[newFrameNumber]);
+                paintedImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
 
                 if (this.colorSelectionPanel1.getSigma() > 0) {
                     // Avoid avoid loading image from image plus directly since
@@ -1227,7 +1227,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     // Limit sharpen to the search space area to increase the speed
                     Rectangle r = this.paintPanel1.searchRect;
                     BufferedImage img = paintedImg.getSubimage(r.x, r.y, r.width, r.height);
-
+                    
                     ImagePlus imagePlus = new ImagePlus("", img);
 
                     ImageUtils.unsharpMask(imagePlus.getProcessor(),
@@ -1374,7 +1374,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private Point2D.Double estimatePupilFromThreshold(int frameNum) {
         Point2D.Double pupil = null;
 
-        BufferedImage paintedImg = ImageUtils.loadImage(eyeFiles[frameNum]);
+        BufferedImage paintedImg = ImageUtils.loadRGBImage(eyeFiles[frameNum]);
 
         if(paintedImg != null){
 

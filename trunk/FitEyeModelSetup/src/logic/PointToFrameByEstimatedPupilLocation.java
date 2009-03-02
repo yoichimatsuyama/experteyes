@@ -146,7 +146,7 @@ public class PointToFrameByEstimatedPupilLocation {
         double totalForAverageCount = 0d;
         for (int i = 0; i < frames.length; i++) {
             if (i % frameSampling == 0) {
-                BufferedImage paintedImg = ImageUtils.loadImage(frames[i]);
+                BufferedImage paintedImg = ImageUtils.loadRGBImage(frames[i]);
 
                 // Get pupil estimate
                 Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
