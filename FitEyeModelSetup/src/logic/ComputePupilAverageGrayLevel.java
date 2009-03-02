@@ -60,7 +60,7 @@ public class ComputePupilAverageGrayLevel {
 
     static public PupilInfo compute(File input, Parameters parameters){
         // Get image from file
-        BufferedImage paintedImg = ImageUtils.loadImage(input);
+        BufferedImage paintedImg = ImageUtils.loadRGBImage(input);
 
         // Get pupil estimate
         Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,

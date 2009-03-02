@@ -90,7 +90,7 @@ public class ThreadedImageProcessor implements Runnable {
             BufferedImage oldAvgImg = avgImg;
 
             // get the initial img and pixels
-            img = ImageUtils.loadImage(imgFiles[0]);
+            img = ImageUtils.loadRGBImage(imgFiles[0]);
 
             minImg = new BufferedImage(img.getWidth(), img.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
@@ -106,7 +106,7 @@ public class ThreadedImageProcessor implements Runnable {
 
             // now do this for all files
             for (int i = 0; i < imgFiles.length && alive; i += FRAME_SKIP) {
-                img = ImageUtils.loadImage(imgFiles[i]);
+                img = ImageUtils.loadRGBImage(imgFiles[i]);
                 pixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(img));
                 for (int j = 0; j < pixels.length; j++) {
                     minImgPixels[j] = Math.min(minImgPixels[j], pixels[j]);
@@ -172,15 +172,15 @@ public class ThreadedImageProcessor implements Runnable {
 
         File inputFile = new File(directory, bundle.getString("minImageFile"));
         if (inputFile.exists()) {
-            minImg = ImageUtils.loadImage(inputFile);
+            minImg = ImageUtils.loadRGBImage(inputFile);
         }
         inputFile = new File(directory, bundle.getString("maxImageFile"));
         if (inputFile.exists()) {
-            maxImg = ImageUtils.loadImage(inputFile);
+            maxImg = ImageUtils.loadRGBImage(inputFile);
         }
         inputFile = new File(directory, bundle.getString("avgImageFile"));
         if (inputFile.exists()) {
-            avgImg = ImageUtils.loadImage(inputFile);
+            avgImg = ImageUtils.loadRGBImage(inputFile);
         }
     }
 
