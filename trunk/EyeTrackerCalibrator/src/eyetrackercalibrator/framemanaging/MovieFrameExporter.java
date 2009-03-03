@@ -653,7 +653,7 @@ public class MovieFrameExporter {
 
         Graphics2D g = null;
 
-        BufferedImage image = eyeFrameManager.getFrame(i);
+        BufferedImage image = screenFrameManager.getFrame(i);
         double scale = 1d;
         if (image != null) {
 
@@ -688,12 +688,6 @@ public class MovieFrameExporter {
             // Fill with black
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, width, height);
-        }
-
-        BufferedImage buffer = screenFrameManager.getFrame(i);
-        if (buffer != null) {
-            // Put picture in
-            g.drawImage(buffer, 0, 0, null);
         }
 
         Point[] point = new Point[1];
