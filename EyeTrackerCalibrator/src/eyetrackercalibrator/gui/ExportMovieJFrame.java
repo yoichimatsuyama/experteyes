@@ -36,14 +36,11 @@ import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.math.EyeGazeComputing;
-import java.awt.FileDialog;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -70,6 +67,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         // Load ffmpeg location
         File propertyFile = new File(Main.PROPERTY_FILE);
+        // Default to OSX path
         File ffmpegFile = null;
         Properties properties = new Properties();
         try {
@@ -81,7 +79,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                 ffmpegFile = new File(ffmpegLocationStr);
             }
             fileInputStream.close();
-        } catch (FileNotFoundException fileNotFoundException) {
         } catch (IOException ex) {
             Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -570,15 +567,18 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         if (completed > 0) {
             completed = completed - start + 1;
 
-            this.progressBar.setString(evt.getPropertyName() + " " + completed + " of " + this.totalProcess);
+            if (completed >= this.totalProcess && evt.getPropertyName().startsWith("Completed")) {
+                this.progressBar.setString(evt.getPropertyName());
+                this.cancelButton.setText("Close");
+            } else {
+                this.progressBar.setString(evt.getPropertyName() + " " + completed + " of " + this.totalProcess);
+            }
             this.progressBar.setValue(completed);
-        } else {
+
+        } else if (completed < 0) {
             this.progressBar.setString(evt.getPropertyName());
             this.progressBar.setValue(this.totalProcess - 1);
         }
 
-        if (completed >= this.totalProcess && evt.getPropertyName().equals("Done")) {
-            this.cancelButton.setText("Close");
-        }
     }
 }
