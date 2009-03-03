@@ -48,7 +48,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -260,17 +259,23 @@ public class MovieFrameExporter {
 
         // Run ffmpeg
         // Check if FFMPEG exists
+        boolean movieCreatedSuccessfully = true;
         if (createMovieFile && this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
 
-            createMovie(eyeOnly, "Create eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully &&
+                    createMovie(eyeOnly, "Creating eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
 
-            createMovie(screenOnly, "Create screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully &&
+                    createMovie(screenOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
 
-            createMovie(sideBySide, "Create side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully &&
+                    createMovie(sideBySide, "Creating side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
 
-            createMovie(eyeInCorner, "Create eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully &&
+                    createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
 
-            createMovie(screenInCorner, "Create screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully &&
+                    createMovie(screenInCorner, "Creating screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
 
             this.processLock.lock();
             this.process = null;
@@ -372,19 +377,24 @@ public class MovieFrameExporter {
 
         // Update property
         if (this.listener != null) {
-            this.listener.propertyChange(new PropertyChangeEvent(this,
-                    "Done", end, end));
+            if (movieCreatedSuccessfully) {
+                this.listener.propertyChange(new PropertyChangeEvent(this,
+                        "Completed successfully", end, end));
+            } else {
+                this.listener.propertyChange(new PropertyChangeEvent(this,
+                        "Completed with errors increating movies", end, end));
+            }
         }
     }
 
-    protected void createMovie(boolean eyeOnly, String propertyChangeString, String inputFilePrefix, int digit, File eyeOnlyDir) {
+    protected boolean createMovie(boolean eyeOnly, String propertyChangeString, String inputFilePrefix, int digit, File outputdir) {
         if (eyeOnly && alive) {
             // Update property
             if (this.listener != null) {
                 this.listener.propertyChange(new PropertyChangeEvent(this, propertyChangeString, -1, -1));
             }
             ProcessBuilder processBuilder = new ProcessBuilder(constructFFMPEGCommandList(inputFilePrefix, digit));
-            processBuilder = processBuilder.directory(eyeOnlyDir);
+            processBuilder = processBuilder.directory(outputdir);
             this.processLock.lock();
             try {
                 process = processBuilder.start();
@@ -392,17 +402,32 @@ public class MovieFrameExporter {
                 StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "Error");
                 outputGobbler.start();
                 errorGobbler.start();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                this.processLock.unlock();
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this, "Error: " + propertyChangeString, -1, -1));
+                }
+                return false;
             }
             this.processLock.unlock();
+
             // Wait for process
             try {
-                this.process.waitFor();
-            } catch (InterruptedException interruptedException) {
-                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, interruptedException);
+                int exitCode = this.process.waitFor();
+                if(exitCode != 0){
+                    return false;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                if (this.listener != null) {
+                    this.listener.propertyChange(new PropertyChangeEvent(this, "Error: " + propertyChangeString, -1, -1));
+                }
+
+                return false;
             }
         }
+        return true;
     }
 
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
