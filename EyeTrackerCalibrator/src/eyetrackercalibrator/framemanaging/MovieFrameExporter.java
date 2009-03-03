@@ -87,7 +87,7 @@ public class MovieFrameExporter {
     private File ffmpegExecutable;
     private ReentrantLock processLock = new ReentrantLock();
     Process process = null;
-    private int frameRate;
+    private float frameRate;
 
     /**
      * 
@@ -105,7 +105,7 @@ public class MovieFrameExporter {
     public MovieFrameExporter(int width, int height, double smallImageScale,
             EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
-            File ffmpegExecutable, int frameRate, PropertyChangeListener listener) {
+            File ffmpegExecutable, float frameRate, PropertyChangeListener listener) {
         this.width = width;
         this.height = height;
         this.smallImageScale = smallImageScale;

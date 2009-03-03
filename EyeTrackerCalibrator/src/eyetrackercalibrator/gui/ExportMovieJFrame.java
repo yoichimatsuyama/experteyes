@@ -123,6 +123,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         outputButtonGroup = new javax.swing.ButtonGroup();
         eyetrackercalibrator.gui.util.TextFieldPosIntInputVerifier textFieldPosIntInputVerifier = new eyetrackercalibrator.gui.util.TextFieldPosIntInputVerifier();
+        textFieldPosFloatInputVerifier1 = new eyetrackercalibrator.gui.util.TextFieldPosFloatInputVerifier();
         jLabel1 = new javax.swing.JLabel();
         exportLocationTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
@@ -250,7 +251,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jPanel2.add(jLabel7);
 
         frameRateTextField.setText("30");
-        frameRateTextField.setInputVerifier(textFieldPosIntInputVerifier);
+        frameRateTextField.setInputVerifier(textFieldPosFloatInputVerifier1);
         frameRateTextField.setPreferredSize(new java.awt.Dimension(60, 28));
         jPanel2.add(frameRateTextField);
 
@@ -558,6 +559,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JCheckBox screenInCornerCheckBox;
     private javax.swing.JCheckBox screenOnlyCheckBox;
     private javax.swing.JCheckBox sideBySideCheckBox;
+    private eyetrackercalibrator.gui.util.TextFieldPosFloatInputVerifier textFieldPosFloatInputVerifier1;
     private javax.swing.JTextField toTextField;
     // End of variables declaration//GEN-END:variables
 
