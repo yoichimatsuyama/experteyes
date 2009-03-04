@@ -1,3 +1,5 @@
+==1.5.1 Windows==
+Correct alignment of image during calibration point detection progress display.
 ==1.5 Windows==
 Fix bad built of jar file
 ==1.4==
