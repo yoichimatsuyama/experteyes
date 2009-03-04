@@ -1,3 +1,5 @@
-=1.4=
+==1.5 Windows==
+Fix bad built of jar file
+==1.4==
 Fix exporting movie does not scale screen image.
 Add better error report when exporting movies.
