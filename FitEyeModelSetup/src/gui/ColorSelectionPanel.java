@@ -139,6 +139,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         backgroundGrayLevelSlider.setMaximum(255);
         backgroundGrayLevelSlider.setMinorTickSpacing(10);
         backgroundGrayLevelSlider.setValue(126);
+        backgroundGrayLevelSlider.setPreferredSize(new java.awt.Dimension(100, 24));
         backgroundGrayLevelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 backgroundGrayLevelSliderStateChanged(evt);
@@ -171,6 +172,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setPreferredSize(new java.awt.Dimension(200, 58));
 
         jLabel4.setText("Sigma:");
 
@@ -181,6 +183,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         sharpeningFactorSlider.setEnabled(false);
         sharpeningFactorSlider.setMinimumSize(new java.awt.Dimension(10, 29));
         sharpeningFactorSlider.setName(SHARPENINGFACTOR_SLIDER_NAME);
+        sharpeningFactorSlider.setPreferredSize(new java.awt.Dimension(100, 24));
         sharpeningFactorSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 sharpeningFactorSliderStateChanged(evt);
@@ -192,6 +195,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         sigmaSlider.setEnabled(false);
         sigmaSlider.setMinimumSize(new java.awt.Dimension(10, 29));
         sigmaSlider.setName(SIGMA_SLIDER_NAME);
+        sigmaSlider.setPreferredSize(new java.awt.Dimension(100, 24));
         sigmaSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 sigmaSliderStateChanged(evt);
@@ -224,8 +228,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                     .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
+                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(sigmaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -254,42 +258,42 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(pupilGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                    .add(crlGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                    .add(backgroundGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
                         .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 198, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 60, Short.MAX_VALUE)
+                        .add(pupilColorHighlightedCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(pupilColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pupilDropperToggleButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pupilColorHighlightedCheckBox))
-                    .add(layout.createSequentialGroup()
+                        .add(pupilDropperToggleButton))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(layout.createSequentialGroup()
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel3)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 153, Short.MAX_VALUE)
-                                .add(backgroundColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(backgroundDropperToggleButton))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, pupilGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 95, Short.MAX_VALUE)
+                                .add(backgroundColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 119, Short.MAX_VALUE)
-                                .add(crColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(crColorHighlightedCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(crDropperToggleButton))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, crlGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, backgroundGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE))
+                                .add(crColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(crColorHighlightedCheckBox))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(backgroundDropperToggleButton)
+                            .add(crDropperToggleButton)))
+                    .add(layout.createSequentialGroup()
                         .add(autoTestModelCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(detectPupilAngleCheckBox))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, unsharpCheckBox))
+                    .add(unsharpCheckBox))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -298,8 +302,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(pupilColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(pupilDropperToggleButton)
+                    .add(pupilColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(pupilColorHighlightedCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(pupilGrayLevelSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -307,14 +311,14 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(crDropperToggleButton)
-                    .add(crColorHighlightedCheckBox)
-                    .add(crColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(crColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(crColorHighlightedCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(crlGrayLevelSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(backgroundDropperToggleButton)
                         .add(backgroundColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

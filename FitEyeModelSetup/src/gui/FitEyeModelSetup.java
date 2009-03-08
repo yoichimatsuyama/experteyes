@@ -63,6 +63,8 @@ import javax.swing.JFileChooser;
  */
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import logic.FitEyeModel;
@@ -353,82 +355,41 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        frameLabel = new javax.swing.JLabel();
+        loadImageButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        loadingProgress = new javax.swing.JProgressBar();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        configList = new javax.swing.JList();
+        addButton = new javax.swing.JButton();
+        deleteButton = new javax.swing.JButton();
+        showVoronoiCheckBox = new javax.swing.JCheckBox();
+        loadSettingButton = new javax.swing.JButton();
+        saveSettingButton = new javax.swing.JButton();
+        runEyeModelFittingButton = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         searchSpacePanel1 = new gui.SearchSpacePanel();
         thresholdPanel1 = new gui.ThresholdPanel();
         colorSelectionPanel1 = new gui.ColorSelectionPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commentTextPane = new javax.swing.JTextPane();
-        frameSlider = new javax.swing.JSlider();
-        frameLabel = new javax.swing.JLabel();
-        frameTextField = new javax.swing.JTextField();
+        paintPanel1 = new gui.PaintPanel();
         eyeDirTextField = new javax.swing.JTextField();
         eyeDirLabel = new javax.swing.JLabel();
-        loadingProgress = new javax.swing.JProgressBar();
-        loadImageButton = new javax.swing.JButton();
-        paintPanel1 = new gui.PaintPanel();
-        saveSettingButton = new javax.swing.JButton();
+        frameSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
+        frameTextField = new javax.swing.JTextField();
         fileNameTextField = new javax.swing.JTextField();
-        loadSettingButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        configList = new javax.swing.JList();
-        addButton = new javax.swing.JButton();
-        deleteButton = new javax.swing.JButton();
-        runEyeModelFittingButton = new javax.swing.JButton();
-        showVoronoiCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
         });
 
-        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jTabbedPane1StateChanged(evt);
-            }
-        });
-        jTabbedPane1.addTab("Search Space", searchSpacePanel1);
-        jTabbedPane1.addTab("Thresholds", thresholdPanel1);
-        jTabbedPane1.addTab("Eye Model Grey Level", colorSelectionPanel1);
-
-        jScrollPane2.setViewportView(commentTextPane);
-
-        jTabbedPane1.addTab("Comment", jScrollPane2);
-
-        frameSlider.setMaximum(0);
-        frameSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                frameSliderStateChanged(evt);
-            }
-        });
-        frameSlider.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                frameSliderKeyPressed(evt);
-            }
-        });
-
         frameLabel.setText("Frame"); // NOI18N
-
-        frameTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                frameTextFieldActionPerformed(evt);
-            }
-        });
-
-        eyeDirTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                eyeDirTextFieldActionPerformed(evt);
-            }
-        });
-
-        eyeDirLabel.setText("Eye Directory"); // NOI18N
-
-        loadingProgress.setString("");
-        loadingProgress.setStringPainted(true);
 
         loadImageButton.setText("..."); // NOI18N
         loadImageButton.addActionListener(new java.awt.event.ActionListener() {
@@ -437,40 +398,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
 
-        paintPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                paintPanel1MouseClicked(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout paintPanel1Layout = new org.jdesktop.layout.GroupLayout(paintPanel1);
-        paintPanel1.setLayout(paintPanel1Layout);
-        paintPanel1Layout.setHorizontalGroup(
-            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 570, Short.MAX_VALUE)
-        );
-        paintPanel1Layout.setVerticalGroup(
-            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 576, Short.MAX_VALUE)
-        );
-
-        saveSettingButton.setText("Save Settings"); // NOI18N
-        saveSettingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveSettingButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("Image file name"); // NOI18N
-
-        fileNameTextField.setEditable(false);
-
-        loadSettingButton.setText("Load Setting"); // NOI18N
-        loadSettingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadSettingButtonActionPerformed(evt);
-            }
-        });
+        loadingProgress.setString("");
+        loadingProgress.setStringPainted(true);
 
         configList.setModel(configListModel);
         configList.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -495,13 +424,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         });
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/FitEyeModelSetup"); // NOI18N
-        runEyeModelFittingButton.setText(bundle.getString("Run Eye Model Fitting button text")); // NOI18N
-        runEyeModelFittingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                runEyeModelFittingButtonActionPerformed(evt);
-            }
-        });
-
         showVoronoiCheckBox.setText(bundle.getString("Show config bound check box text")); // NOI18N
         showVoronoiCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -509,97 +431,212 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
 
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel1Layout.createSequentialGroup()
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                            .add(10, 10, 10))
+                        .add(showVoronoiCheckBox))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(deleteButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
+        );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {addButton, deleteButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(showVoronoiCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(deleteButton)
+                    .add(addButton)))
+        );
+
+        showVoronoiCheckBox.getAccessibleContext().setAccessibleName("");
+
+        loadSettingButton.setText("Load Setting"); // NOI18N
+        loadSettingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadSettingButtonActionPerformed(evt);
+            }
+        });
+
+        saveSettingButton.setText("Save Settings"); // NOI18N
+        saveSettingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveSettingButtonActionPerformed(evt);
+            }
+        });
+
+        runEyeModelFittingButton.setText(bundle.getString("Run Eye Model Fitting button text")); // NOI18N
+        runEyeModelFittingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runEyeModelFittingButtonActionPerformed(evt);
+            }
+        });
+
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
+        jTabbedPane1.addTab("Search Space", searchSpacePanel1);
+        jTabbedPane1.addTab("Thresholds", thresholdPanel1);
+        jTabbedPane1.addTab("Eye Model Grey Level", colorSelectionPanel1);
+
+        jScrollPane2.setViewportView(commentTextPane);
+
+        jTabbedPane1.addTab("Comment", jScrollPane2);
+
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                    .add(runEyeModelFittingButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 110, Short.MAX_VALUE)
+                                    .add(saveSettingButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                                    .add(loadSettingButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)))
+                            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(loadingProgress, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .add(loadSettingButton)
+                        .add(18, 18, 18)
+                        .add(saveSettingButton)
+                        .add(18, 18, 18)
+                        .add(runEyeModelFittingButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 345, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+        );
+
+        paintPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                paintPanel1MouseClicked(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout paintPanel1Layout = new org.jdesktop.layout.GroupLayout(paintPanel1);
+        paintPanel1.setLayout(paintPanel1Layout);
+        paintPanel1Layout.setHorizontalGroup(
+            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 520, Short.MAX_VALUE)
+        );
+        paintPanel1Layout.setVerticalGroup(
+            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 518, Short.MAX_VALUE)
+        );
+
+        eyeDirTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eyeDirTextFieldActionPerformed(evt);
+            }
+        });
+
+        eyeDirLabel.setText("Eye Directory"); // NOI18N
+
+        frameSlider.setMaximum(0);
+        frameSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                frameSliderStateChanged(evt);
+            }
+        });
+        frameSlider.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                frameSliderKeyPressed(evt);
+            }
+        });
+
+        jLabel1.setText("Image file name"); // NOI18N
+
+        frameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                frameTextFieldActionPerformed(evt);
+            }
+        });
+
+        fileNameTextField.setEditable(false);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(eyeDirLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(loadImageButton))
-                    .add(paintPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(frameSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
                             .add(layout.createSequentialGroup()
-                                .add(10, 10, 10)
                                 .add(frameLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(frameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(frameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 90, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel1)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 143, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 474, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(frameSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 471, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(showVoronoiCheckBox)
+                                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 243, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
-                                .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(eyeDirLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(deleteButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 183, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 236, Short.MAX_VALUE)
-                        .add(loadSettingButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(saveSettingButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(runEyeModelFittingButton)))
-                .addContainerGap())
+                                .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(loadImageButton))))
+                    .add(paintPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
-
-        layout.linkSize(new java.awt.Component[] {addButton, deleteButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(eyeDirLabel)
-                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(loadImageButton))
-                    .add(loadingProgress, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                    .add(addButton)
-                                    .add(deleteButton))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(showVoronoiCheckBox))
-                            .add(layout.createSequentialGroup()
-                                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                    .add(frameLabel)
-                                    .add(frameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(jLabel1)
-                                    .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(frameSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(runEyeModelFittingButton)
-                            .add(saveSettingButton)
-                            .add(loadSettingButton)))
-                    .add(paintPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .add(loadImageButton)
+                            .add(eyeDirLabel)
+                            .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(paintPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(frameLabel)
+                            .add(frameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel1)
+                            .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(frameSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
-
-        showVoronoiCheckBox.getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -623,18 +660,19 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         // grab the value and load the image 
         frameNum = frameSlider.getValue();
         setFrame(frameNum);
-        this.fileNameTextField.setText(eyeFiles[frameNum].getName());
+        if (eyeFiles != null && eyeFiles.length > frameNum) {
+            this.fileNameTextField.setText(eyeFiles[frameNum].getName());
 
-        /**
-         * Try setting gray level then if nothing is set then simply signal
-         * a change.  We need this because selectGrayLevelFromDistance triggers
-         * the change in colorSelection so there is no need to signal it twice
-         * by calling colorSelectionHandleSliderStateChange
-         */
-        selectParametersFromDistance();
+            /**
+             * Try setting gray level then if nothing is set then simply signal
+             * a change.  We need this because selectGrayLevelFromDistance triggers
+             * the change in colorSelection so there is no need to signal it twice
+             * by calling colorSelectionHandleSliderStateChange
+             */
+            selectParametersFromDistance();
 
-        triggerAutoFitEyeModelRecompute();
-
+            triggerAutoFitEyeModelRecompute();
+        }
     }//GEN-LAST:event_frameSliderStateChanged
 
     private void saveSettingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveSettingButtonActionPerformed
@@ -1227,7 +1265,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     // Limit sharpen to the search space area to increase the speed
                     Rectangle r = this.paintPanel1.searchRect;
                     BufferedImage img = paintedImg.getSubimage(r.x, r.y, r.width, r.height);
-                    
+
                     ImagePlus imagePlus = new ImagePlus("", img);
 
                     ImageUtils.unsharpMask(imagePlus.getProcessor(),
@@ -1360,6 +1398,19 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        try {
+            // Set look and feel
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(FitEyeModelSetup.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
@@ -1376,27 +1427,27 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         BufferedImage paintedImg = ImageUtils.loadRGBImage(eyeFiles[frameNum]);
 
-        if(paintedImg != null){
+        if (paintedImg != null) {
 
-        Rectangle searchArea = null;
+            Rectangle searchArea = null;
 
-        if (!this.configListModel.isEmpty()) {
-            // Try getting search rect from the first stored config
-            ConfigutationInfo info =
-                    (ConfigutationInfo) this.configListModel.firstElement();
-            searchArea = info.getSearchArea();
-        } else {
-            searchArea = this.paintPanel1.getSearchRect();
+            if (!this.configListModel.isEmpty()) {
+                // Try getting search rect from the first stored config
+                ConfigutationInfo info =
+                        (ConfigutationInfo) this.configListModel.firstElement();
+                searchArea = info.getSearchArea();
+            } else {
+                searchArea = this.paintPanel1.getSearchRect();
+            }
+            // Get pupil estimate
+            Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
+                    searchArea, this.thresholdPanel1.getPupilThresh(),
+                    false);
+
+            pupil = new Point2D.Double(foundPupil.getCenterX(),
+                    foundPupil.getCenterY());
         }
-        // Get pupil estimate
-        Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
-                searchArea, this.thresholdPanel1.getPupilThresh(),
-                false);
 
-        pupil = new Point2D.Double(foundPupil.getCenterX(),
-                foundPupil.getCenterY());
-        }
-        
         return pupil;
     }
 
@@ -1549,6 +1600,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private javax.swing.JSlider frameSlider;
     private javax.swing.JTextField frameTextField;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
