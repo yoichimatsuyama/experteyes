@@ -41,7 +41,7 @@
                   <Group type="102" attributes="0">
                       <Component id="eyeDirLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="eyeDirTextField" pref="351" max="32767" attributes="0"/>
+                      <Component id="eyeDirTextField" pref="338" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="loadImageButton" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -84,7 +84,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="loadImageButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="..." noResource="true"/>
+        <Property name="text" type="java.lang.String" value="Browse" noResource="true"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadImageButtonActionPerformed"/>
@@ -130,8 +130,8 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="showVoronoiCheckBox" min="-2" pref="134" max="-2" attributes="1"/>
-                              <EmptySpace pref="45" max="32767" attributes="0"/>
+                              <Component id="showVoronoiCheckBox" pref="173" max="32767" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="addButton" linkSize="1" min="-2" pref="59" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="deleteButton" linkSize="1" min="-2" pref="52" max="-2" attributes="0"/>
