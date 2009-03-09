@@ -392,7 +392,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         frameLabel.setText("Frame"); // NOI18N
 
-        loadImageButton.setText("..."); // NOI18N
+        loadImageButton.setText("Browse"); // NOI18N
         loadImageButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadImageButtonActionPerformed(evt);
@@ -480,8 +480,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 134, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 45, Short.MAX_VALUE)
+                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(deleteButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -603,7 +603,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     .add(layout.createSequentialGroup()
                         .add(eyeDirLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(loadImageButton)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
