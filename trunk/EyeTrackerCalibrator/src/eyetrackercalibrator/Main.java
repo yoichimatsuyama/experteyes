@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * Main.java
  *
@@ -230,7 +230,7 @@ public class Main extends javax.swing.JFrame {
                     // Found calibration points so output info
                     ScreenViewFrameInfo info =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
-                    
+
 
                     out.print(i);
 
@@ -572,15 +572,6 @@ public class Main extends javax.swing.JFrame {
      * are pressed.
      */
     public void projectSelectPanelActionPerformed(java.awt.event.ActionEvent evt) {
-        // Set up scaling factor of the screen info
-        Dimension d = projectSelectPanel.getFullScreenDimension();
-        if (d != null) {
-            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor(d));
-        } else {
-            // Default to 1
-            screenFrameManager.setScreenInfoScalefactor(1d);
-        }
-
         screenFrameManager.setFrameDirectory(projectSelectPanel.getScreenFrameDirectory());
         eyeFrameManager.setFrameDirectory(projectSelectPanel.getEyeFrameDirectory());
 
@@ -601,24 +592,6 @@ public class Main extends javax.swing.JFrame {
             // Start playing synchronize panel
             synchronizeJPanel.start();
 
-        } else if ("Calibrate".equals(evt.getActionCommand())) {
-            // need this to set the stat for frame playing (total frame and what not)
-            calibrateJPanel.setEyeFrameManager(eyeFrameManager);
-            calibrateJPanel.setScreenFrameManager(screenFrameManager);
-            calibrateJPanel.setProjectRoot(projectLocation);
-            calibrateJPanel.setFullScreenFrameDirectory(
-                    projectSelectPanel.getFullScreenFrameDirectory());
-            calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimension());
-            calibrateJPanel.setGazeScaleFactor(
-                    screenFrameManager.getScreenInfoScalefactor());
-            calibrateJPanel.setEyeScreenInfoDirectory(
-                    projectSelectPanel.getEyeInfoDirectory());
-
-            remove(projectSelectPanel);
-            add(calibrateJPanel);
-            pack();
-
-            calibrateJPanel.start();
         } else if ("Load Eye Images".equals(evt.getActionCommand())) {
             projectSelectPanel.setEyeLoadButtonsEnable(false);
 
@@ -757,47 +730,71 @@ public class Main extends javax.swing.JFrame {
             });
             waitThread.start();
 
-        } else if ("Clean Data".equals(evt.getActionCommand())) {
+        } else {
+            // Screen scaling must be recomputed before any of the following operations
+            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor());
 
-            // Set calibrate panel offset
-            cleanDataJPanel.setEyeGazeScaleFactor(
-                    screenFrameManager.getScreenInfoScalefactor());
+            if ("Calibrate".equals(evt.getActionCommand())) {
+                // need this to set the stat for frame playing (total frame and what not)
+                calibrateJPanel.setEyeFrameManager(eyeFrameManager);
+                calibrateJPanel.setScreenFrameManager(screenFrameManager);
+                calibrateJPanel.setProjectRoot(projectLocation);
+                calibrateJPanel.setFullScreenFrameDirectory(
+                        projectSelectPanel.getFullScreenFrameDirectory());
+                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimension());
+                calibrateJPanel.setGazeScaleFactor(
+                        screenFrameManager.getScreenInfoScalefactor());
+                calibrateJPanel.setEyeScreenInfoDirectory(
+                        projectSelectPanel.getEyeInfoDirectory());
 
-            // need this to set the stat for frame playing (total frame and what not)
-            cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
-            cleanDataJPanel.setScreenFrameManager(screenFrameManager);
-            cleanDataJPanel.setFullScreenFrameDirectory(
-                    projectSelectPanel.getFullScreenFrameDirectory());
-            cleanDataJPanel.setCornerHintDir(new File(projectLocation,CORNERHINT_DIR));
-            cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
+                remove(projectSelectPanel);
+                add(calibrateJPanel);
+                pack();
 
-            remove(projectSelectPanel);
-            add(cleanDataJPanel);
-            pack();
+                calibrateJPanel.start();
 
-            cleanDataJPanel.start();
-        } else if ("Mark Trials".equals(evt.getActionCommand())) {
+            } else if ("Clean Data".equals(evt.getActionCommand())) {
+
+                // Set calibrate panel offset
+                cleanDataJPanel.setEyeGazeScaleFactor(
+                        screenFrameManager.getScreenInfoScalefactor());
+
+                // need this to set the stat for frame playing (total frame and what not)
+                cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
+                cleanDataJPanel.setScreenFrameManager(screenFrameManager);
+                cleanDataJPanel.setFullScreenFrameDirectory(
+                        projectSelectPanel.getFullScreenFrameDirectory());
+                cleanDataJPanel.setCornerHintDir(new File(projectLocation, CORNERHINT_DIR));
+                cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
+
+                remove(projectSelectPanel);
+                add(cleanDataJPanel);
+                pack();
+
+                cleanDataJPanel.start();
+            } else if ("Mark Trials".equals(evt.getActionCommand())) {
 //            @todo remove
-            // Set calibrate panel offset
-            markTrialJPanel.setEyeGazeScaleFactor(
-                    screenFrameManager.getScreenInfoScalefactor());
+                // Set calibrate panel offset
+                markTrialJPanel.setEyeGazeScaleFactor(
+                        screenFrameManager.getScreenInfoScalefactor());
 
-            // need this to set the stat for frame playing (total frame and what not)
-            markTrialJPanel.setEyeFrameManager(eyeFrameManager);
-            markTrialJPanel.setScreenFrameManager(screenFrameManager);
-            markTrialJPanel.setProjectRoot(projectLocation);
-            markTrialJPanel.setFullScreenFrameDirectory(
-                    projectSelectPanel.getFullScreenFrameDirectory());
+                // need this to set the stat for frame playing (total frame and what not)
+                markTrialJPanel.setEyeFrameManager(eyeFrameManager);
+                markTrialJPanel.setScreenFrameManager(screenFrameManager);
+                markTrialJPanel.setProjectRoot(projectLocation);
+                markTrialJPanel.setFullScreenFrameDirectory(
+                        projectSelectPanel.getFullScreenFrameDirectory());
 
-            remove(projectSelectPanel);
-            add(markTrialJPanel);
-            pack();
+                remove(projectSelectPanel);
+                add(markTrialJPanel);
+                pack();
 
-            markTrialJPanel.start();
-        } else if ("Export Data".equals(evt.getActionCommand())) {
-            exportData();
-        } else if ("Export Movies".equals(evt.getActionCommand())) {
-            exportMovies();
+                markTrialJPanel.start();
+            } else if ("Export Data".equals(evt.getActionCommand())) {
+                exportData();
+            } else if ("Export Movies".equals(evt.getActionCommand())) {
+                exportMovies();
+            }
         }
     }
 
@@ -948,12 +945,6 @@ public class Main extends javax.swing.JFrame {
 
         // Set up scaling factor of the screen info
         Dimension d = projectSelectPanel.getFullScreenDimension();
-        if (d != null) {
-            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor(d));
-        } else {
-
-            screenFrameManager.setScreenInfoScalefactor(1d);
-        }
 
         // Assign frame manager to all panel
         synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1021,23 +1012,19 @@ public class Main extends javax.swing.JFrame {
     /**
      * Compute scaling factor
      */
-    private double computeScalingFactor(Dimension d) {
-        double scale = 1d;
+    private double computeScalingFactor() {
 
-        // Compute scaling factor
-        if (d.width > this.DISPLAY_WIDTH) {
-            if (d.height * this.DISPLAY_WIDTH / d.width <= this.DISPLAY_HEIGHT) {
-                // OK to scale by width
-                scale = (double) this.DISPLAY_WIDTH / (double) d.width;
-                // Set height
-                d.height = 1;
-            }
+        // Get fullscreen dimension
+        Dimension d = projectSelectPanel.getFullScreenDimension();
+        // Get the first image file
+        BufferedImage image = screenFrameManager.getFrame(1);
+
+        // Only do anything when there is somthing to compute
+        if (image == null || d == null) {
+            return 1d;
+        } else {
+            return ((double)image.getWidth()) / ((double) d.width);
         }
-        if (d.height > this.DISPLAY_HEIGHT) {
-            scale = (double) this.DISPLAY_HEIGHT / (double) d.height;
-        }
-        // Set scaling factor
-        return scale;
     }
 
     private void formWindowClosed() {
@@ -1291,7 +1278,7 @@ public class Main extends javax.swing.JFrame {
                                             corners[ScreenViewFrameInfo.BOTTOMLEFT],
                                             corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
 
-                                    if(fixation == null){
+                                    if (fixation == null) {
                                         fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
                                     }
                                     if ((point[j].x < 0 && point[j].y < 0) ||
@@ -1315,7 +1302,7 @@ public class Main extends javax.swing.JFrame {
                             } else {
                                 // Just put blank
                                 exportWriter.print(
-                                        ERROR_VALUE + "\t" + ERROR_VALUE+ "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                        ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
                             }
                         } else {
                             // Just put blank
@@ -1360,7 +1347,7 @@ public class Main extends javax.swing.JFrame {
                             if (calibrationName != null) {
                                 exportWriter.println(calibrationName + "\t" + calibrationNumber);
                             } else {
-                                exportWriter.println("-\t"+ERROR_VALUE);
+                                exportWriter.println("-\t" + ERROR_VALUE);
                             }
                         }
                     }
