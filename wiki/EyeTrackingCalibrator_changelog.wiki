@@ -1,3 +1,5 @@
+==1.6==
+Fix incorrect scaling when small scene image is not 512x512.
 ==1.5.1 Windows, 1.5 OS X==
 Correct alignment of image during calibration point detection progress display.
 ==1.5 Windows==
