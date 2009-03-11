@@ -299,7 +299,7 @@ public class AnimationTimer {
                     scaledImage = image.getScaledInstance(
                             displayDimension.width, -1, Image.SCALE_FAST);
                 } else {
-                    // We should scale by width
+                    // We should scale by height
                     scale = (double) displayDimension.height / (double) image.getHeight();
                     scaledImage = image.getScaledInstance(
                             -1, displayDimension.height, Image.SCALE_FAST);
