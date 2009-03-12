@@ -54,6 +54,7 @@ import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.math.EyeGazeComputing.ComputingApproach;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,6 +76,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -858,9 +860,7 @@ public class Main extends javax.swing.JFrame {
                 }
                 // Reset offset
                 setOffset(0, 0);
-
-                // Load in information
-                openProject(location);
+                createProject(location);
             } else {
                 // Does nothing
             }
@@ -868,6 +868,24 @@ public class Main extends javax.swing.JFrame {
             dialog.dispose();
             // Remove dialog
             dialog = null;
+        }
+    }
+
+    private void createProject(File location) {
+        // create project
+        switch (openProject(location, true)) {
+            case ERROR_OPENING_DATABASE:
+                // Something is wrong tell user
+                JOptionPane.showMessageDialog(this,
+                        "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
+                        "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
+                break;
+            case ERROR_OPENING_PROJECT_FILE:
+                // Something is wrong tell user
+                JOptionPane.showMessageDialog(this,
+                        "<html>There is an error creating the project file. Please check file permissions.</html>",
+                        "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
+                break;
         }
     }
 
@@ -896,15 +914,41 @@ public class Main extends javax.swing.JFrame {
                 add(projectSelectPanel);
                 pack();
                 // Switch to selected project
-                openProject(fileChooser.getSelectedFile());
+                switch (openProject(fileChooser.getSelectedFile(), false)) {
+                    case ERROR_OPENING_DATABASE:
+                        // Something is wrong tell user
+                        JOptionPane.showMessageDialog(this,
+                                "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
+                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case ERROR_OPENING_PROJECT_FILE:
+                        // Something is wrong tell user
+                        JOptionPane.showMessageDialog(this,
+                                "<html>There is an error opening the project file. Please check file permission.</html>",
+                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case PROJECT_FILE_NOT_FOUND:
+                        // Something is wrong tell user
+                        JOptionPane.showMessageDialog(this,
+                                "<html>This is not a project folder.  Please select a different folder.</html>",
+                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
+                        break;
+                }
             }
         }
     }
 
-    /** Open a project. */
-    private void openProject(File projectLocation) {
-        this.isProjectOpen = true;
+    /**
+     * Open a project.
+     * @param createNew If create is true the method create a project files when there is no project in the given directory
+     * @return true when successful
+     */
+    private enum OpenProjectError {
 
+        PROJECT_FILE_NOT_FOUND, ERROR_OPENING_PROJECT_FILE, ERROR_OPENING_DATABASE, NO_ERROR
+    }
+
+    private OpenProjectError openProject(File projectLocation, boolean create) {
         // Set project location
         this.projectLocation = projectLocation;
 
@@ -913,11 +957,18 @@ public class Main extends javax.swing.JFrame {
         try {
             p.loadFromXML(new FileInputStream(new File(projectLocation, PROJECT_PROPERTY_FILE_NAME)));
         } catch (FileNotFoundException ex) {
-            //ex.printStackTrace();
             System.err.println("Cannot load project property file.");
+            if (!create) {
+                return OpenProjectError.PROJECT_FILE_NOT_FOUND;
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
+            if (!create) {
+                return OpenProjectError.ERROR_OPENING_PROJECT_FILE;
+            }
         }
+
+        this.isProjectOpen = true;
 
         setOffset(Integer.parseInt(p.getProperty(EYE_OFFSET, "0")), Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
 
@@ -937,7 +988,7 @@ public class Main extends javax.swing.JFrame {
             screenFrameManager = new ScreenFrameManager(projectLocation.getAbsolutePath() + File.separator + "ScreenViewCacheDB", 512, 512, new ScreenViewFrameInfo());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error open project", JOptionPane.ERROR_MESSAGE);
-            return;
+            return OpenProjectError.ERROR_OPENING_DATABASE;
         }
 
         // Set up scaling factor of the screen info
@@ -1007,6 +1058,8 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setEnabled(true);
 
         pack();
+
+        return OpenProjectError.NO_ERROR;
     }
 
     /**
@@ -1023,7 +1076,7 @@ public class Main extends javax.swing.JFrame {
         if (image == null || d == null) {
             return 1d;
         } else {
-            return ((double)image.getWidth()) / ((double) d.width);
+            return ((double) image.getWidth()) / ((double) d.width);
         }
     }
 
