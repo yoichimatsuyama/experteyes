@@ -718,7 +718,9 @@ public class MovieFrameExporter {
         Point[] point = new Point[1];
         // Draw gaze point when available
         if (gazePosition != null) {
-            point[0] = gazePosition;
+            // Scale gaze point accordingly
+            point[0] = new Point((int)(gazePosition.x * scale),
+                    (int)(gazePosition.y * scale));
             drawMarks(g, Color.RED, point);
         }
 
