@@ -35,10 +35,12 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -88,6 +90,7 @@ import util.TerminationListener;
 public class FitEyeModelSetup extends javax.swing.JFrame {
 
     public static int ESTIMATE_PUPIL_SAMPLING_RATE = 10;
+    boolean notifyDiscardConfiguration = true;
     // path to the eye directory
     File eyeDir;
     // array containing all eye files
@@ -225,6 +228,62 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 triggerAutoFitEyeModelRecompute();
             }
         });
+    }
+
+    private void addConfig(int currentFrame, String frameFileName) throws HeadlessException {
+        // Construct the config
+        ConfigutationInfo grayLevelInfo = new ConfigutationInfo();
+        grayLevelInfo.background = this.colorSelectionPanel1.getBackgroundGrayValue();
+        grayLevelInfo.cr = this.colorSelectionPanel1.getCRGrayValue();
+        grayLevelInfo.pupil = this.colorSelectionPanel1.getPupilGrayValue();
+        grayLevelInfo.frameFileName = frameFileName;
+        grayLevelInfo.unsharpFactor = this.colorSelectionPanel1.getSharpeningFactor();
+        grayLevelInfo.unsharpRadious = this.colorSelectionPanel1.getSigma();
+        grayLevelInfo.isDetectingPupilAngle = this.colorSelectionPanel1.isDetectingPupilAngle();
+        grayLevelInfo.frameNum = currentFrame;
+        grayLevelInfo.point = estimatePupilFromThreshold(currentFrame);
+        // Need to use set method here to make sure that the value saved will not change
+        grayLevelInfo.setSearchArea(paintPanel1.searchRect);
+        if (grayLevelInfo.point != null) {
+            // Search if already have the info in the list
+            int index = this.configListModel.indexOf(grayLevelInfo);
+            if (index < 0) {
+                // Add new
+                this.configListModel.addElement(grayLevelInfo);
+                // Add a voronoi site
+                addVoronoiSource(grayLevelInfo.point);
+            } else {
+                // Replace old one
+                ConfigutationInfo oldInfo = (ConfigutationInfo) this.configListModel.set(index, grayLevelInfo);
+                // Check if the point changes (Make sure we add info first)
+                if (!oldInfo.point.equals(grayLevelInfo.point)) {
+                    // Reload all voronoi info if the point changes
+                    reloadVoronoiSources();
+                }
+            }
+            drawAllVoronoi();
+            repaint();
+        } else {
+            // Give warning that threshold is not set properly
+            JOptionPane.showMessageDialog(this, "Cannot estimate pupil location.  Please make adjustment to pupil threshold.", "Cannot add color config", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void changeFrame() {
+        // grab the value and load the image
+        frameNum = frameSlider.getValue();
+        setFrame(frameNum);
+        if (eyeFiles != null && eyeFiles.length > frameNum) {
+            this.fileNameTextField.setText(eyeFiles[frameNum].getName());
+            /**
+             * Try setting gray level then if nothing is set then simply signal
+             * a change.  We need this because selectGrayLevelFromDistance triggers
+             * the change in colorSelection so there is no need to signal it twice
+             * by calling colorSelectionHandleSliderStateChange
+             */
+            selectParametersFromDistance();
+            triggerAutoFitEyeModelRecompute();
+        }
     }
 
     private void estimatePupilLocations() {
@@ -649,22 +708,35 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }//GEN-LAST:event_loadImageButtonActionPerformed
 
     private void frameSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_frameSliderStateChanged
-        // grab the value and load the image 
-        frameNum = frameSlider.getValue();
-        setFrame(frameNum);
-        if (eyeFiles != null && eyeFiles.length > frameNum) {
-            this.fileNameTextField.setText(eyeFiles[frameNum].getName());
+        final int currentFrame = this.frameNum;
+        final String frameFileName = this.fileNameTextField.getText();
 
-            /**
-             * Try setting gray level then if nothing is set then simply signal
-             * a change.  We need this because selectGrayLevelFromDistance triggers
-             * the change in colorSelection so there is no need to signal it twice
-             * by calling colorSelectionHandleSliderStateChange
-             */
-            selectParametersFromDistance();
+        // Check if we have to warn user about loosing config
+        if (this.notifyDiscardConfiguration) {
+            // Check if the user made any change
+            if (this.colorSelectionPanel1.isDirty()) {
+                this.colorSelectionPanel1.setDirty(false);
+                // Show warning
+                final ConfigurationLossWarningJDialog dialog =
+                        new ConfigurationLossWarningJDialog(this, true);
+                dialog.setTitle("Warning Configuration May Be Lost");
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
-            triggerAutoFitEyeModelRecompute();
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        switch (dialog.getResult()) {
+                            case ADD:
+                                addConfig(currentFrame, frameFileName);
+                        }
+                        notifyDiscardConfiguration = !dialog.isDoNotNotify();
+                        changeFrame();
+                    }
+                });
+                dialog.setVisible(true);
+                return;
+            }
         }
+        changeFrame();
     }//GEN-LAST:event_frameSliderStateChanged
 
     private void saveSettingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveSettingButtonActionPerformed
@@ -799,6 +871,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 this.colorSelectionPanel1.setCRGrayValue(parameters.crGrayValue);
                 this.colorSelectionPanel1.setSharpeningFactor(parameters.unsharpFactor);
                 this.colorSelectionPanel1.setSigma(parameters.unsharpRadious);
+                this.colorSelectionPanel1.setDirty(false);
 
                 this.thresholdPanel1.setCrThresh(parameters.crThreshold);
                 this.thresholdPanel1.setPupilThresh(parameters.pupilThreshold);
@@ -864,53 +937,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        // Construct the config
-        ConfigutationInfo grayLevelInfo = new ConfigutationInfo();
-        grayLevelInfo.background =
-                this.colorSelectionPanel1.getBackgroundGrayValue();
-        grayLevelInfo.cr = this.colorSelectionPanel1.getCRGrayValue();
-        grayLevelInfo.pupil = this.colorSelectionPanel1.getPupilGrayValue();
-        grayLevelInfo.frameFileName = this.fileNameTextField.getText();
-        grayLevelInfo.unsharpFactor = this.colorSelectionPanel1.getSharpeningFactor();
-        grayLevelInfo.unsharpRadious = this.colorSelectionPanel1.getSigma();
-        grayLevelInfo.isDetectingPupilAngle = this.colorSelectionPanel1.isDetectingPupilAngle();
+        // Clean dirty flag
+        this.colorSelectionPanel1.setDirty(false);
 
-        grayLevelInfo.frameNum = this.frameNum;
-        grayLevelInfo.point = estimatePupilFromThreshold(this.frameNum);
-        // Need to use set method here to make sure that the value saved will not change
-        grayLevelInfo.setSearchArea(paintPanel1.searchRect);
-
-        if (grayLevelInfo.point != null) {
-            // Search if already have the info in the list
-            int index = this.configListModel.indexOf(grayLevelInfo);
-
-            if (index < 0) {
-                // Add new
-                this.configListModel.addElement(grayLevelInfo);
-                // Add a voronoi site
-                addVoronoiSource(grayLevelInfo.point);
-            } else {
-                // Replace old one
-                ConfigutationInfo oldInfo =
-                        (ConfigutationInfo) this.configListModel.set(index, grayLevelInfo);
-
-                // Check if the point changes (Make sure we add info first)
-                if (!oldInfo.point.equals(grayLevelInfo.point)) {
-                    // Reload all voronoi info if the point changes
-                    reloadVoronoiSources();
-                }
-
-            }
-
-            drawAllVoronoi();
-            repaint();
-
-        } else {
-            // Give warning that threshold is not set properly
-            JOptionPane.showMessageDialog(this,
-                    "Cannot estimate pupil location.  Please make adjustment to pupil threshold.",
-                    "Cannot add color config", JOptionPane.ERROR_MESSAGE);
-        }
+        addConfig(this.frameNum, this.fileNameTextField.getText());
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void configListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_configListMouseClicked
@@ -919,10 +949,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         if (grayLevelInfo != null) {
             // Set current parameters to the selected one
             frameSlider.setValue(grayLevelInfo.frameNum);
-            colorSelectionPanel1.setBackgroundGrayValue(grayLevelInfo.background);
-            colorSelectionPanel1.setCRGrayValue(grayLevelInfo.cr);
-            colorSelectionPanel1.setPupilGrayValue(grayLevelInfo.pupil);
-            colorSelectionPanel1.setDetectPupilAngle(grayLevelInfo.isDetectingPupilAngle);
+//            colorSelectionPanel1.setBackgroundGrayValue(grayLevelInfo.background);
+//            colorSelectionPanel1.setCRGrayValue(grayLevelInfo.cr);
+//            colorSelectionPanel1.setPupilGrayValue(grayLevelInfo.pupil);
+//            colorSelectionPanel1.setDetectPupilAngle(grayLevelInfo.isDetectingPupilAngle);
+//            colorSelectionPanel1.setDirty(false);
         }
     }//GEN-LAST:event_configListMouseClicked
 
@@ -1486,12 +1517,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 double distance = pupil.distance(currentConfig.point);
 
                 // Keep finding a closer one
-                while (elem.hasMoreElements()) {
+                while (elem.hasMoreElements() && this.frameNum != currentConfig.frameNum) {
                     ConfigutationInfo info = (ConfigutationInfo) elem.nextElement();
 
                     double newDistance = pupil.distance(info.point);
 
-                    if (newDistance < distance) {
+                    if (this.frameNum == currentConfig.frameNum ||
+                            newDistance < distance) {
                         // Take a new closer one
                         distance = newDistance;
                         currentConfig = info;
@@ -1517,6 +1549,9 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 // Set whether we have to use angle detection
                 this.colorSelectionPanel1.setDetectPupilAngle(
                         currentConfig.isDetectingPupilAngle);
+
+                // Clear dirty bit
+                this.colorSelectionPanel1.setDirty(false);
 
                 //Mark the config that we pick
                 this.configList.setSelectedValue(currentConfig, true);

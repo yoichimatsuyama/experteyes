@@ -43,6 +43,15 @@ import javax.swing.event.ChangeListener;
 public class ColorSelectionPanel extends javax.swing.JPanel
         implements ColorCaptureListener {
 
+    private boolean dirty = false;
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
     private int sigma = 0;
     private double sharpeningFactor = 0d;
     public static int SIGMA_MAX = 40;
@@ -340,6 +349,9 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         // Set the label color accordingly
         this.pupilColorTextField.setBackground(new Color(
                 grayValue, grayValue, grayValue));
+
+        // Mark data as dirty
+        this.dirty = true;
     }//GEN-LAST:event_pupilGrayLevelSliderStateChanged
 
     private void crlGrayLevelSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_crlGrayLevelSliderStateChanged
@@ -348,6 +360,9 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         // Set the label color accordingly
         this.crColorTextField.setBackground(new Color(
                 grayValue, grayValue, grayValue));
+
+        // Mark data as dirty
+        this.dirty = true;
     }//GEN-LAST:event_crlGrayLevelSliderStateChanged
 
     private void backgroundGrayLevelSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_backgroundGrayLevelSliderStateChanged
@@ -356,6 +371,9 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         // Set the label color accordingly
         this.backgroundColorTextField.setBackground(new Color(
                 grayValue, grayValue, grayValue));
+
+        // Mark data as dirty
+        this.dirty = true;
     }//GEN-LAST:event_backgroundGrayLevelSliderStateChanged
 
     private void pupilDropperToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pupilDropperToggleButtonActionPerformed
@@ -418,6 +436,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
             this.sigmaTextField.setText(String.valueOf(v));
             this.sigma = v;
         }
+        // Mark data as dirty
+        this.dirty = true;
     }//GEN-LAST:event_sigmaSliderStateChanged
 
     private void sharpeningFactorSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sharpeningFactorSliderStateChanged
@@ -436,6 +456,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
             this.shaprningFactorTextField.setText(String.valueOf(v));
             this.sharpeningFactor = v;
         }
+        // Mark data as dirty
+        this.dirty = true;
     }//GEN-LAST:event_sharpeningFactorSliderStateChanged
 
 private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unsharpCheckBoxActionPerformed
