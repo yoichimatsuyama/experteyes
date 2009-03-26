@@ -341,6 +341,11 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(commentTextPane);
 
         jButton1.setText("Advance Setup");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -359,14 +364,14 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(eyeInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
+                                .add(eyeInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseEyeInfoButton))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, fullScreenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, screenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, eyeDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE))
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, fullScreenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, screenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, eyeDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -374,7 +379,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                                         .add(browseScreenViewButton))
                                     .add(browseScreenFullViewButton)))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(screenInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
+                                .add(screenInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseScreenInfoButton))))
                     .add(layout.createSequentialGroup()
@@ -384,8 +389,8 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                             .add(jLabel7))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(screenFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
-                            .add(eyeFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
+                            .add(screenFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE)
+                            .add(eyeFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
@@ -422,7 +427,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 144, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 893, Short.MAX_VALUE)))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1087, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -512,6 +517,11 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     private void browseScreenFullViewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseScreenFullViewButtonActionPerformed
         browseDirectory(fullScreenDirectoryTextField);
 }//GEN-LAST:event_browseScreenFullViewButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // Open a dialog for advance setup
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void browseDirectory(JTextField targetField) {
         // Set text box with directory that user chose.
