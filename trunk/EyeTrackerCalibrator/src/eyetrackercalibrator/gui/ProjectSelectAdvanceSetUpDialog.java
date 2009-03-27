@@ -19,46 +19,58 @@ import javax.swing.JTextField;
  */
 public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
 
+    /** @return 0 if anything is wrong. Positive double otherwise */
     public double getDistanceFromMonitor() {
-        String text = distanceFromMonitorTextField.getText();
-        if(text.length() > 0){
-            return Double.parseDouble(text);
-        }else{
-            return 0;
-        }
+        return getTextFieldDoubleValue(distanceFromMonitorTextField);
     }
 
     public void setDistanceFromMonitor(double distanceFromMonitor) {
-        JTextField textField = distanceFromMonitorTextField;
-        double value = distanceFromMonitor;
-
-        if(distanceFromMonitor > 0){
-            JTextField.setText(String.valueOf(distanceFromMonitor));
-        }else{
-            distanceFromMonitorTextField.setText("");
-        }
+        setTextField(distanceFromMonitorTextField, distanceFromMonitor);
     }
 
+    /** @return 0 if anything is wrong. Positive double otherwise */
     public double getMonitorHeight() {
-        return monitorHeight;
+        return getTextFieldDoubleValue(monitorHeightCMTextField);
     }
 
     public void setMonitorHeight(double monitorHeight) {
-        this.monitorHeight = monitorHeight;
+        setTextField(monitorHeightCMTextField, monitorHeight);
     }
 
+    /** @return 0 if anything is wrong. Positive double otherwise */
     public double getMonitorWidth() {
-        return monitorWidth;
+        return getTextFieldDoubleValue(monitorWidthCMTextField);
     }
 
     public void setMonitorWidth(double monitorWidth) {
-        this.monitorWidth = monitorWidth;
+        setTextField(monitorWidthCMTextField, monitorWidth);
     }
 
     /** Creates new form ProjectSelectAdvanceSetUpDialog */
     public ProjectSelectAdvanceSetUpDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+    }
+
+    protected  void setTextField(JTextField textField, double value) {
+        if (value > 0) {
+            textField.setText(String.valueOf(value));
+        } else {
+            textField.setText("");
+        }
+    }
+
+    protected double getTextFieldDoubleValue(JTextField textField){
+        String text = textField.getText();
+        if (text.length() > 0) {
+            try {
+                return Double.parseDouble(text);
+            } catch (NumberFormatException numberFormatException) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
     }
 
     /** This method is called from within the constructor to
