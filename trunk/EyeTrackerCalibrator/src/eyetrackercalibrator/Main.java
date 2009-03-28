@@ -54,7 +54,6 @@ import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.math.EyeGazeComputing.ComputingApproach;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
 import java.awt.Dimension;
-import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -76,7 +75,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -123,8 +121,11 @@ public class Main extends javax.swing.JFrame {
     static final public String CALIBRATION_FILE_NAME = "calibration.xml";
     static final public String ERROR_FILE_NAME = "errors.xml";
     static final public String TRIAL_FILE_NAME = "trial.xml";
-    static final public String MONITOR_TRUE_WIDTH = "monitortruewidth";
-    static final public String MONITOR_TRUE_HEIGHT = "monitortrueheight";
+    static final public String MONITOR_TRUE_WIDTH_PX = "monitortruewidth";
+    static final public String MONITOR_TRUE_HEIGHT_PX = "monitortrueheight";
+    static final public String MONITOR_TRUE_WIDTH_CM = "monitortruewidthcm";
+    static final public String MONITOR_TRUE_HEIGHT_CM = "monitortrueheightcm";
+    static final public String DISTANCE_FROM_MONITOR_CM = "distancefrommonitorcm";
     static final public String FULL_SCREEN_WIDTH = "fullscreenwidth";
     static final public String FULL_SCREEN_HEIGHT = "fullscreenheight";
     static final public String COMMENT = "comment";
@@ -198,8 +199,8 @@ public class Main extends javax.swing.JFrame {
                 return;
             }
 
-            Dimension trueScreenDimension = projectSelectPanel.getMonitorDimension();
-            Dimension viewScreenDimension = projectSelectPanel.getFullScreenDimension();
+            Dimension trueScreenDimension = projectSelectPanel.getMonitorDimensionPX();
+            Dimension viewScreenDimension = projectSelectPanel.getFullScreenDimensionPX();
 
             // Print header
             out.println(
@@ -743,7 +744,7 @@ public class Main extends javax.swing.JFrame {
                 calibrateJPanel.setProjectRoot(projectLocation);
                 calibrateJPanel.setFullScreenFrameDirectory(
                         projectSelectPanel.getFullScreenFrameDirectory());
-                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimension());
+                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimensionPX());
                 calibrateJPanel.setGazeScaleFactor(
                         screenFrameManager.getScreenInfoScalefactor());
                 calibrateJPanel.setEyeScreenInfoDirectory(
@@ -977,9 +978,12 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setScreenFrameDirectory(p.getProperty(SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setFullScreenFrameDirectory(p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setScreenInfoDirectory(p.getProperty(SCREEN_INFO_DIRECTORY));
-        projectSelectPanel.setMonitorDimension(p.getProperty(MONITOR_TRUE_WIDTH, ""), p.getProperty(MONITOR_TRUE_HEIGHT, ""));
-        projectSelectPanel.setFullScreenDimension(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
+        projectSelectPanel.setMonitorDimensionPX(p.getProperty(MONITOR_TRUE_WIDTH_PX, ""), p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
+        projectSelectPanel.setFullScreenDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
         projectSelectPanel.setComment(p.getProperty(COMMENT, ""));
+        projectSelectPanel.setDistanceFromMonitor(p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
+        projectSelectPanel.setMonitorHeightCM(p.getProperty(MONITOR_TRUE_HEIGHT_CM, "0"));
+        projectSelectPanel.setMonitorWidthCM(p.getProperty(MONITOR_TRUE_WIDTH_CM, "0"));
 
         // Trying to determine full screen dimension
         try {
@@ -995,7 +999,7 @@ public class Main extends javax.swing.JFrame {
         updateFullScreenDimansion();
 
         // Set up scaling factor of the screen info
-        Dimension d = projectSelectPanel.getFullScreenDimension();
+        Dimension d = projectSelectPanel.getFullScreenDimensionPX();
 
         // Assign frame manager to all panel
         synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1068,7 +1072,7 @@ public class Main extends javax.swing.JFrame {
     private double computeScalingFactor() {
 
         // Get fullscreen dimension
-        Dimension d = projectSelectPanel.getFullScreenDimension();
+        Dimension d = projectSelectPanel.getFullScreenDimensionPX();
         // Get the first image file
         BufferedImage image = screenFrameManager.getFrame(1);
 
@@ -1092,7 +1096,7 @@ public class Main extends javax.swing.JFrame {
 
     private void save() {
         // Get new screen dimension
-        Dimension d = projectSelectPanel.getMonitorDimension();
+        Dimension d = projectSelectPanel.getMonitorDimensionPX();
         calibrateJPanel.setFullScreenDim(d);
 
         // Save calibration points
@@ -1117,10 +1121,16 @@ public class Main extends javax.swing.JFrame {
         p.setProperty(SCREEN_INFO_DIRECTORY, projectSelectPanel.getScreenInfoDirectory());
         p.setProperty(COMMENT, projectSelectPanel.getComment());
         if (d != null) {
-            p.setProperty(MONITOR_TRUE_HEIGHT, String.valueOf(d.height));
-            p.setProperty(MONITOR_TRUE_WIDTH, String.valueOf(d.width));
+            p.setProperty(MONITOR_TRUE_HEIGHT_PX, String.valueOf(d.height));
+            p.setProperty(MONITOR_TRUE_WIDTH_PX, String.valueOf(d.width));
         }
-        d = projectSelectPanel.getFullScreenDimension();
+        p.setProperty(MONITOR_TRUE_HEIGHT_CM, String.valueOf(
+                projectSelectPanel.getMonitorHeightCM()));
+        p.setProperty(MONITOR_TRUE_WIDTH_CM, String.valueOf(
+                projectSelectPanel.getMonitorWidthCM()));
+        p.setProperty(DISTANCE_FROM_MONITOR_CM, String.valueOf(
+                projectSelectPanel.getDistanceFromMonitor()));
+        d = projectSelectPanel.getFullScreenDimensionPX();
         if (d != null) {
             p.setProperty(FULL_SCREEN_HEIGHT, String.valueOf(d.height));
             p.setProperty(FULL_SCREEN_WIDTH, String.valueOf(d.width));
@@ -1155,8 +1165,8 @@ public class Main extends javax.swing.JFrame {
         int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
 
         // Get screen dimansion
-        Dimension realMonitorDimension = projectSelectPanel.getMonitorDimension();
-        Dimension screenViewFullSize = projectSelectPanel.getFullScreenDimension();
+        Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
+        Dimension screenViewFullSize = projectSelectPanel.getFullScreenDimensionPX();
 
         // Check for eye calibration vector
         double[][] gazeCoefficient = calibrateJPanel.getEyeGazeCoefficient(0);
@@ -1427,7 +1437,7 @@ public class Main extends javax.swing.JFrame {
             File fullScreenFile = new File(fullScreenDir, filename);
             if (fullScreenFile.exists()) {
                 BufferedImage image = ImageTools.loadImage(fullScreenFile);
-                projectSelectPanel.setFullScreenDimension(
+                projectSelectPanel.setFullScreenDimensionPX(
                         String.valueOf(image.getWidth()),
                         String.valueOf(image.getHeight()));
             }
