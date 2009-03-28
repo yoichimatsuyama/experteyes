@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * ProjectSelectPanel.java
  *
@@ -33,8 +33,11 @@ package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.framemanaging.FrameLoadingListener;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -47,6 +50,9 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
     // Storing the last directory selected by browse action
     File lastSelectedLocation = new File(".");
+    private double distanceFromMonitor;
+    private double monitorHeightCM;
+    private double monitorWidthCM;
 
     /** Creates new form ProjectSelectPanel */
     public ProjectSelectPanel() {
@@ -124,7 +130,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         exportMoviesButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         commentTextPane = new javax.swing.JTextPane();
-        jButton1 = new javax.swing.JButton();
+        advanceSetupButton = new javax.swing.JButton();
 
         jLabel2.setText("Eye view location");
 
@@ -340,10 +346,10 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         commentTextPane.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Comment"));
         jScrollPane1.setViewportView(commentTextPane);
 
-        jButton1.setText("Advance Setup");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        advanceSetupButton.setText("Advance Setup");
+        advanceSetupButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                advanceSetupButtonActionPerformed(evt);
             }
         });
 
@@ -423,7 +429,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jButton1)))
+                                .add(advanceSetupButton)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 144, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
@@ -462,7 +468,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton1))
+                    .add(advanceSetupButton))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(loadEyeImageButton)
@@ -518,10 +524,27 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         browseDirectory(fullScreenDirectoryTextField);
 }//GEN-LAST:event_browseScreenFullViewButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Open a dialog for advance setup
+    private void advanceSetupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_advanceSetupButtonActionPerformed
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+        final ProjectSelectAdvanceSetUpDialog dialog =
+                new ProjectSelectAdvanceSetUpDialog(null,"Advance Configuration",true);
+
+        dialog.setDistanceFromMonitor(this.distanceFromMonitor);
+        dialog.setMonitorHeight(this.monitorHeightCM);
+        dialog.setMonitorWidth(this.monitorWidthCM);
+        dialog.setLocationByPlatform(true);
+
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                       distanceFromMonitor = dialog.getDistanceFromMonitor();
+                       monitorHeightCM = dialog.getMonitorHeight();
+                       monitorWidthCM = dialog.getMonitorWidth();
+                    }});
+
+        dialog.setVisible(true);
+
+}//GEN-LAST:event_advanceSetupButtonActionPerformed
 
     private void browseDirectory(JTextField targetField) {
         // Set text box with directory that user chose.
@@ -542,6 +565,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton advanceSetupButton;
     private javax.swing.JButton browseEyeInfoButton;
     private javax.swing.JButton browseEyeViewButton;
     private javax.swing.JButton browseScreenFullViewButton;
@@ -560,7 +584,6 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     private javax.swing.JTextField fullScreenDirectoryTextField;
     private javax.swing.JTextField fullScreenHeightPixelTextField;
     private javax.swing.JTextField fullScreenWidthPixelTextField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -596,6 +619,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     private javax.swing.JButton synchronizeButton;
     private eyetrackercalibrator.gui.util.TextFieldEmptyPositiveIntInputVerifier textFieldEmptyPositiveIntInputVerifier1;
     // End of variables declaration//GEN-END:variables
+
     /**
      * Add listener to listen to "Load Image", "Reload Information",
      * "Synchronize", "Calibrate", "Clean data" and "Mark trials" commands
@@ -699,7 +723,8 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         return screenFrameSynchPositionLabel.getText();
     }
 
-    public Dimension getMonitorDimension() {
+    /** Get monitor dimension in pixels */
+    public Dimension getMonitorDimensionPX() {
         if (monitorWidthPixelTextField.getText().length() > 0 && monitorHeightPixelTextField.getText().length() > 0) {
             return new Dimension(
                     Integer.parseInt(monitorWidthPixelTextField.getText()),
@@ -709,17 +734,18 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         }
     }
 
-    public void setMonitorDimension(String width, String height) {
+    /** Set monitor dimension in pixels */
+    public void setMonitorDimensionPX(String width, String height) {
         monitorWidthPixelTextField.setText(width);
         monitorHeightPixelTextField.setText(height);
     }
 
-    public void setFullScreenDimension(String width, String height) {
+    public void setFullScreenDimensionPX(String width, String height) {
         fullScreenHeightPixelTextField.setText(height);
         fullScreenWidthPixelTextField.setText(width);
     }
 
-    public Dimension getFullScreenDimension() {
+    public Dimension getFullScreenDimensionPX() {
         if (fullScreenHeightPixelTextField.getText().length() > 0 && fullScreenWidthPixelTextField.getText().length() > 0) {
             return new Dimension(
                     Integer.parseInt(fullScreenWidthPixelTextField.getText()),
@@ -739,12 +765,66 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         reloadScreenInfoButton.setEnabled(b);
         computeScreenIlluminationButton.setEnabled(b);
     }
-    
-    public void setComment(String comment){
+
+    public void setComment(String comment) {
         this.commentTextPane.setText(comment);
     }
-    
-    public String getComment(){
+
+    public String getComment() {
         return this.commentTextPane.getText();
+    }
+
+    /**
+     * @return the distanceFromMonitor
+     */
+    public double getDistanceFromMonitor() {
+        return distanceFromMonitor;
+    }
+
+    /**
+     * @param distanceFromMonitor the distanceFromMonitor to set
+     */
+    public void setDistanceFromMonitor(String distanceFromMonitor) {
+        try {
+            this.distanceFromMonitor = Double.parseDouble(distanceFromMonitor);
+        } catch (NumberFormatException numberFormatException) {
+            this.distanceFromMonitor = 0;
+        }
+    }
+
+    /**
+     * @return the monitorHeightCM
+     */
+    public double getMonitorHeightCM() {
+        return monitorHeightCM;
+    }
+
+    /**
+     * @param monitorHeightCM the monitorHeightCM to set
+     */
+    public void setMonitorHeightCM(String monitorHeightCM) {
+        try {
+            this.monitorHeightCM = Double.parseDouble(monitorHeightCM);
+        } catch (NumberFormatException numberFormatException) {
+            this.monitorHeightCM = 0;
+        }
+    }
+
+    /**
+     * @return the monitorWidthCM
+     */
+    public double getMonitorWidthCM() {
+        return monitorWidthCM;
+    }
+
+    /**
+     * @param monitorWidthCM the monitorWidthCM to set
+     */
+    public void setMonitorWidthCM(String monitorWidthCM) {
+        try {
+            this.monitorWidthCM = Double.parseDouble(monitorWidthCM);
+        } catch (NumberFormatException numberFormatException) {
+            this.monitorHeightCM = 0;
+        }
     }
 }

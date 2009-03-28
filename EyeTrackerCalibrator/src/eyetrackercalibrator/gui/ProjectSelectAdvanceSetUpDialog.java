@@ -8,9 +8,13 @@
  *
  * Created on Mar 26, 2009, 4:57:45 PM
  */
-
 package eyetrackercalibrator.gui;
 
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.GraphicsConfiguration;
+import java.awt.HeadlessException;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 /**
@@ -19,40 +23,48 @@ import javax.swing.JTextField;
  */
 public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
 
+
+    double distanceFromMonitor = 0;
+    double monitorHeightCM = 0;
+    double monitorWidthCM = 0;
+
     /** @return 0 if anything is wrong. Positive double otherwise */
     public double getDistanceFromMonitor() {
-        return getTextFieldDoubleValue(distanceFromMonitorTextField);
+        return distanceFromMonitor;
     }
 
     public void setDistanceFromMonitor(double distanceFromMonitor) {
         setTextField(distanceFromMonitorTextField, distanceFromMonitor);
+        this.distanceFromMonitor = getTextFieldDoubleValue(distanceFromMonitorTextField);
     }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
     public double getMonitorHeight() {
-        return getTextFieldDoubleValue(monitorHeightCMTextField);
+        return monitorHeightCM;
     }
 
     public void setMonitorHeight(double monitorHeight) {
         setTextField(monitorHeightCMTextField, monitorHeight);
+        this.monitorHeightCM = getTextFieldDoubleValue(monitorHeightCMTextField);
     }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
     public double getMonitorWidth() {
-        return getTextFieldDoubleValue(monitorWidthCMTextField);
+        return monitorWidthCM;
     }
 
     public void setMonitorWidth(double monitorWidth) {
         setTextField(monitorWidthCMTextField, monitorWidth);
+        this.monitorWidthCM = getTextFieldDoubleValue(monitorWidthCMTextField);
     }
 
     /** Creates new form ProjectSelectAdvanceSetUpDialog */
-    public ProjectSelectAdvanceSetUpDialog(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public ProjectSelectAdvanceSetUpDialog(JFrame owner, String title, boolean modal) {
+        super(owner, title, modal);
         initComponents();
     }
 
-    protected  void setTextField(JTextField textField, double value) {
+    protected void setTextField(JTextField textField, double value) {
         if (value > 0) {
             textField.setText(String.valueOf(value));
         } else {
@@ -60,7 +72,7 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
         }
     }
 
-    protected double getTextFieldDoubleValue(JTextField textField){
+    protected double getTextFieldDoubleValue(JTextField textField) {
         String text = textField.getText();
         if (text.length() > 0) {
             try {
@@ -83,8 +95,8 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         textFieldEmptyPositiveDoubleInputVerifier1 = new eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         monitorWidthCMTextField = new javax.swing.JTextField();
@@ -97,9 +109,19 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jButton1.setText("Cancel");
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Save");
+        saveButton.setText("Save");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
 
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel9.setText("Monitor size:");
@@ -126,9 +148,9 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(326, Short.MAX_VALUE)
-                .add(jButton2)
+                .add(saveButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jButton1))
+                .add(cancelButton))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
@@ -171,34 +193,29 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
                     .add(jLabel19))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jButton1)
-                    .add(jButton2)))
+                    .add(cancelButton)
+                    .add(saveButton)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ProjectSelectAdvanceSetUpDialog dialog = new ProjectSelectAdvanceSetUpDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        distanceFromMonitor = getTextFieldDoubleValue(distanceFromMonitorTextField);
+        monitorHeightCM = getTextFieldDoubleValue(monitorHeightCMTextField);
+        monitorWidthCM = getTextFieldDoubleValue(monitorWidthCMTextField);
+        this.dispose();
+}//GEN-LAST:event_saveButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cancelButton;
     private javax.swing.JTextField distanceFromMonitorTextField;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -207,7 +224,7 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JTextField monitorHeightCMTextField;
     private javax.swing.JTextField monitorWidthCMTextField;
+    private javax.swing.JButton saveButton;
     private eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier textFieldEmptyPositiveDoubleInputVerifier1;
     // End of variables declaration//GEN-END:variables
-
 }
