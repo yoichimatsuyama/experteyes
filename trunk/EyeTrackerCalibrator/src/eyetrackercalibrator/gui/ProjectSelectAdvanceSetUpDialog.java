@@ -10,10 +10,6 @@
  */
 package eyetrackercalibrator.gui;
 
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.HeadlessException;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 

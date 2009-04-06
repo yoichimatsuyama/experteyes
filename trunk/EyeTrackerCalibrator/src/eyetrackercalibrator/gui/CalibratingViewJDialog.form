@@ -132,7 +132,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="progressBar" pref="435" max="32767" attributes="0"/>
+                      <Component id="progressBar" pref="422" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="snapShotButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -163,7 +163,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="snapShotButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Take Snap Shot"/>
+                <Property name="text" type="java.lang.String" value="Take A Snap Shot"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="snapShotButtonActionPerformed"/>
