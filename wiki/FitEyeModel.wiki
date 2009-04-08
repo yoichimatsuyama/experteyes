@@ -1,5 +1,6 @@
+#summary Video with step-by-step instruction to use this module.
 #labels Eye-ModelFit
-#Video with step-by-step instructions to use this software.
+
 
 = VIDEO =
 
