@@ -1,4 +1,6 @@
 #labels Eye-ModelFit
+#Video with step-by-step instructions to use this software.
+
 = VIDEO =
 
 http://www.youtube.com/watch?v=-j_ozTOKUIE
