@@ -415,7 +415,7 @@ public class MovieFrameExporter {
             // Wait for process
             try {
                 int exitCode = this.process.waitFor();
-                if(exitCode != 0){
+                if (exitCode != 0) {
                     return false;
                 }
             } catch (Exception ex) {
@@ -506,8 +506,10 @@ public class MovieFrameExporter {
                 this.gazeList.addLast(eyeGaze);
             }
 
-            // Pop the old one from the list
-            this.gazeList.removeFirst();
+            // Pop the old one from the list if there is any
+            if (!this.gazeList.isEmpty()) {
+                this.gazeList.removeFirst();
+            }
 
             this.gazeAverageRangeNextFrame++;
         }
@@ -719,8 +721,8 @@ public class MovieFrameExporter {
         // Draw gaze point when available
         if (gazePosition != null) {
             // Scale gaze point accordingly
-            point[0] = new Point((int)(gazePosition.x * scale),
-                    (int)(gazePosition.y * scale));
+            point[0] = new Point((int) (gazePosition.x * scale),
+                    (int) (gazePosition.y * scale));
             drawMarks(g, Color.RED, point);
         }
 
