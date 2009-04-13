@@ -710,6 +710,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     public void setSynchronizeFrames(int eyeFrameNumber, int screenFrameNumber) {
         eyeFrameSynchPositionLabel.setText(String.valueOf(eyeFrameNumber));
         screenFrameSynchPositionLabel.setText(String.valueOf(screenFrameNumber));
+        repaint();
     }
 
     public String getSynchronizedEyeFrame() {

@@ -580,8 +580,18 @@ public class Main extends javax.swing.JFrame {
 
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Set up synchronized panel
-            synchronizeJPanel.setEyeViewCurrentFrame(1);
-            synchronizeJPanel.setScreenViewCurrentFrame(1);
+            int frame = 1;
+            try {
+                frame = Integer.parseInt(projectSelectPanel.getSynchronizedEyeFrame());
+            } catch (NumberFormatException numberFormatException) {
+            }
+            synchronizeJPanel.setEyeViewCurrentFrame(frame);
+            frame = 1;
+            try {
+                frame = Integer.parseInt(projectSelectPanel.getSynchronizedScreenFrame());
+            } catch (NumberFormatException numberFormatException) {
+            }
+            synchronizeJPanel.setScreenViewCurrentFrame(frame);
 
             // need this to set the stat for frame playing (total frame and what not)
             synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
