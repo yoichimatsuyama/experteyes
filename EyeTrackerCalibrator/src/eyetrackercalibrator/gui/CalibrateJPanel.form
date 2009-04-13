@@ -61,7 +61,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="247" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="264" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -74,7 +74,7 @@
               <Component id="calibrationPointSelectorJPanel" alignment="0" min="-2" max="-2" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <Component id="calibrateButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="319" max="32767" attributes="0"/>
+                  <EmptySpace pref="348" max="32767" attributes="0"/>
                   <Component id="backButton" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -118,10 +118,10 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="displayJPanel" pref="845" max="32767" attributes="1"/>
+                      <Component id="displayJPanel" pref="861" max="32767" attributes="1"/>
                       <Group type="102" attributes="0">
                           <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                          <Component id="frameScrollingJPanel" pref="835" max="32767" attributes="1"/>
+                          <Component id="frameScrollingJPanel" pref="851" max="32767" attributes="1"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -132,7 +132,7 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="displayJPanel" pref="380" max="32767" attributes="1"/>
+                  <Component id="displayJPanel" pref="382" max="32767" attributes="1"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="frameScrollingJPanel" min="-2" max="-2" attributes="0"/>
               </Group>
@@ -153,14 +153,14 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel2" alignment="0" pref="239" max="32767" attributes="0"/>
+                  <Component id="jPanel2" alignment="0" pref="299" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="calibrationMarkingToggleButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="77" max="32767" attributes="0"/>
+                      <EmptySpace pref="87" max="32767" attributes="0"/>
                       <Component id="deleteButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jPanel3" alignment="0" min="-2" max="-2" attributes="1"/>
-                  <Component id="jScrollPane2" alignment="0" pref="239" max="32767" attributes="1"/>
+                  <Component id="jScrollPane2" alignment="0" pref="299" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">

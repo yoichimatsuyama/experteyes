@@ -939,8 +939,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                                 screenFrameInfo.getMarkedPoints()[0]);
 
                         Point2D.Double eyeVecPoint = new Point2D.Double(
-                                eyeFrameInfo.getCorniaX() - eyeFrameInfo.getReflectX(),
-                                eyeFrameInfo.getCorniaY() - eyeFrameInfo.getReflectY());
+                                eyeFrameInfo.getPupilX() - eyeFrameInfo.getReflectX(),
+                                eyeFrameInfo.getPupilY() - eyeFrameInfo.getReflectY());
 
                         switch (info.calibrationType) {
                             case Testing:

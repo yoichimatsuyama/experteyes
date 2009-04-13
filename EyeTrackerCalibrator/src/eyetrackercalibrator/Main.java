@@ -35,6 +35,7 @@
 package eyetrackercalibrator;
 
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
+import eyetrackercalibrator.framemanaging.FrameInfo;
 import eyetrackercalibrator.framemanaging.FrameLoadingListener;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
@@ -48,6 +49,7 @@ import eyetrackercalibrator.gui.NewProjectJDialog;
 import eyetrackercalibrator.gui.ProjectSelectPanel;
 import eyetrackercalibrator.gui.SynchronizeJPanel;
 import eyetrackercalibrator.gui.TrialMarkingJPanel;
+import eyetrackercalibrator.gui.util.FrameTranslator;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.ComputeIlluminationRangeThread;
 import eyetrackercalibrator.math.EyeGazeComputing;
@@ -186,6 +188,7 @@ public class Main extends javax.swing.JFrame {
         // Ask user where to put information
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             PrintWriter out = null;
             try {
@@ -199,12 +202,21 @@ public class Main extends javax.swing.JFrame {
                 return;
             }
 
-            Dimension trueScreenDimension = projectSelectPanel.getMonitorDimensionPX();
-            Dimension viewScreenDimension = projectSelectPanel.getFullScreenDimensionPX();
+            Dimension trueMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
+            Dimension sceneDimension = projectSelectPanel.getFullSceneDimensionPX();
+            double distanceFromMeasuredScene = projectSelectPanel.getDistanceFromMeasuredScene();
+            double sceneHeight = projectSelectPanel.getSceneHeightCM();
+            double sceneWidth = projectSelectPanel.getSceneWidthCM();
+
+            // Get offset
+            FrameTranslator frameTranslator = new FrameTranslator();
+            frameTranslator.setSynchronizePoint(
+                    Integer.parseInt(this.projectSelectPanel.getSynchronizedEyeFrame()),
+                    Integer.parseInt(this.projectSelectPanel.getSynchronizedScreenFrame()));
 
             // Print header
             out.println(
-                    "Screen Frame\t" +
+                    "Scene Frame\t" +
                     "Scene X\t" +
                     "Scene Y\t" +
                     "Top Left X\t" +
@@ -215,8 +227,9 @@ public class Main extends javax.swing.JFrame {
                     "Bottom Left Y\t" +
                     "Bottom Right X\t" +
                     "Bottom Right Y\t" +
-                    "Screen X\t" +
-                    "Screen Y");
+                    "Eye Gaze X\t" +
+                    "Eye Gaze Y\t" +
+                    "Error Angle");
 
             int totalFrame = 0;
             if (screenFrameManager != null) {
@@ -234,7 +247,6 @@ public class Main extends javax.swing.JFrame {
                     ScreenViewFrameInfo info =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
 
-
                     out.print(i);
 
                     Point[] point = info.getMarkedPoints();
@@ -247,32 +259,52 @@ public class Main extends javax.swing.JFrame {
                     Point p = null;
                     Point[] corners = info.getCorners();
                     if (corners != null) {
-                        p = corners[ScreenViewFrameInfo.TOPLEFT];
-                        printPointHelper(p, out);
-                        p = corners[ScreenViewFrameInfo.TOPRIGHT];
-                        printPointHelper(p, out);
-                        p = corners[ScreenViewFrameInfo.BOTTOMLEFT];
-                        printPointHelper(p, out);
-                        p = corners[ScreenViewFrameInfo.BOTTOMRIGHT];
-                        printPointHelper(p, out);
+                        printCorners(corners, p, out);
 
-                        // Estimate true screnn position
+                        // Estimate true screen position
                         Point2D pos = Computation.ComputeScreenPositionProjective(
-                                trueScreenDimension,
+                                trueMonitorDimension,
                                 scenePos,
                                 corners[ScreenViewFrameInfo.TOPLEFT],
                                 corners[ScreenViewFrameInfo.TOPRIGHT],
                                 corners[ScreenViewFrameInfo.BOTTOMLEFT],
                                 corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
                         printPointHelper(pos, out);
-
-                        out.println();
                     } else {
                         // Print error
                         for (int j = 0; j < 10; i++) {
-                            out.println("\t" + ERROR_VALUE);
+                            out.print("\t" + ERROR_VALUE);
                         }
                     }
+
+                    // Get eyeGaze
+                    if (this.eyeFrameManager != null) {
+                        EyeViewFrameInfo eyeInfo = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
+                                frameTranslator.getEyeFrameFromSceneFrame(i));
+
+                        if (eyeInfo != null) {
+                            Point2D.Double gazeVec = Computation.computeEyeVector(
+                                    eyeInfo.getPupilX(), eyeInfo.getPupilY(),
+                                    eyeInfo.getReflectX(), eyeInfo.getReflectY());
+                            // Computer eye gaze point
+                            Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
+                                    frameTranslator.getUniversalFrameFromSceneFrame(i),
+                                    gazeVec.x, gazeVec.y);
+
+                            // Compute error angel
+                            double errorAngle = Computation.ComputeEyeCalibrationErrorAngle(
+                                    scenePos, gazePoint, sceneDimension,
+                                    distanceFromMeasuredScene,
+                                    sceneWidth, sceneHeight);
+
+                            if (errorAngle >= 0) {
+                                out.print("\t" + errorAngle);
+                            } else {
+                                out.print("\t" + ERROR_VALUE);
+                            }
+                        }
+                    }
+                    out.println();
                 }
             }
             out.close();
@@ -318,6 +350,7 @@ public class Main extends javax.swing.JFrame {
                 this.eyeGazeComputing,
                 eyeFrame, screenFrame,
                 eyeFrameManager, screenFrameManager);
+        exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
     }
 
@@ -529,6 +562,18 @@ public class Main extends javax.swing.JFrame {
             add(projectSelectPanel);
             pack();
         }
+    }
+
+    /** Helper for printing corners to output */
+    private void printCorners(Point[] corners, Point p, PrintWriter out) {
+        p = corners[ScreenViewFrameInfo.TOPLEFT];
+        printPointHelper(p, out);
+        p = corners[ScreenViewFrameInfo.TOPRIGHT];
+        printPointHelper(p, out);
+        p = corners[ScreenViewFrameInfo.BOTTOMLEFT];
+        printPointHelper(p, out);
+        p = corners[ScreenViewFrameInfo.BOTTOMRIGHT];
+        printPointHelper(p, out);
     }
 
     private void printPointHelper(Point2D p, PrintWriter out) {
@@ -754,7 +799,7 @@ public class Main extends javax.swing.JFrame {
                 calibrateJPanel.setProjectRoot(projectLocation);
                 calibrateJPanel.setFullScreenFrameDirectory(
                         projectSelectPanel.getFullScreenFrameDirectory());
-                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimensionPX());
+                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullSceneDimensionPX());
                 calibrateJPanel.setGazeScaleFactor(
                         screenFrameManager.getScreenInfoScalefactor());
                 calibrateJPanel.setEyeScreenInfoDirectory(
@@ -989,11 +1034,11 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setFullScreenFrameDirectory(p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setScreenInfoDirectory(p.getProperty(SCREEN_INFO_DIRECTORY));
         projectSelectPanel.setMonitorDimensionPX(p.getProperty(MONITOR_TRUE_WIDTH_PX, ""), p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
-        projectSelectPanel.setFullScreenDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
+        projectSelectPanel.setFullSceneDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
         projectSelectPanel.setComment(p.getProperty(COMMENT, ""));
-        projectSelectPanel.setDistanceFromMonitor(p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
-        projectSelectPanel.setMonitorHeightCM(p.getProperty(MONITOR_TRUE_HEIGHT_CM, "0"));
-        projectSelectPanel.setMonitorWidthCM(p.getProperty(MONITOR_TRUE_WIDTH_CM, "0"));
+        projectSelectPanel.setDistanceFromMeasuredScene(p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
+        projectSelectPanel.setSceneHeightCM(p.getProperty(MONITOR_TRUE_HEIGHT_CM, "0"));
+        projectSelectPanel.setSceneWidthCM(p.getProperty(MONITOR_TRUE_WIDTH_CM, "0"));
 
         // Trying to determine full screen dimension
         try {
@@ -1009,7 +1054,7 @@ public class Main extends javax.swing.JFrame {
         updateFullScreenDimansion();
 
         // Set up scaling factor of the screen info
-        Dimension d = projectSelectPanel.getFullScreenDimensionPX();
+        Dimension d = projectSelectPanel.getFullSceneDimensionPX();
 
         // Assign frame manager to all panel
         synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1082,7 +1127,7 @@ public class Main extends javax.swing.JFrame {
     private double computeScalingFactor() {
 
         // Get fullscreen dimension
-        Dimension d = projectSelectPanel.getFullScreenDimensionPX();
+        Dimension d = projectSelectPanel.getFullSceneDimensionPX();
         // Get the first image file
         BufferedImage image = screenFrameManager.getFrame(1);
 
@@ -1135,12 +1180,12 @@ public class Main extends javax.swing.JFrame {
             p.setProperty(MONITOR_TRUE_WIDTH_PX, String.valueOf(d.width));
         }
         p.setProperty(MONITOR_TRUE_HEIGHT_CM, String.valueOf(
-                projectSelectPanel.getMonitorHeightCM()));
+                projectSelectPanel.getSceneHeightCM()));
         p.setProperty(MONITOR_TRUE_WIDTH_CM, String.valueOf(
-                projectSelectPanel.getMonitorWidthCM()));
+                projectSelectPanel.getSceneWidthCM()));
         p.setProperty(DISTANCE_FROM_MONITOR_CM, String.valueOf(
-                projectSelectPanel.getDistanceFromMonitor()));
-        d = projectSelectPanel.getFullScreenDimensionPX();
+                projectSelectPanel.getDistanceFromMeasuredScene()));
+        d = projectSelectPanel.getFullSceneDimensionPX();
         if (d != null) {
             p.setProperty(FULL_SCREEN_HEIGHT, String.valueOf(d.height));
             p.setProperty(FULL_SCREEN_WIDTH, String.valueOf(d.width));
@@ -1176,7 +1221,7 @@ public class Main extends javax.swing.JFrame {
 
         // Get screen dimansion
         Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
-        Dimension screenViewFullSize = projectSelectPanel.getFullScreenDimensionPX();
+        Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
 
         // Check for eye calibration vector
         double[][] gazeCoefficient = calibrateJPanel.getEyeGazeCoefficient(0);
@@ -1297,8 +1342,8 @@ public class Main extends javax.swing.JFrame {
 
                         // Write Screen Frame, Pupil(x,y)
                         exportWriter.print((i + eyeToScreen) + "\t" +
-                                eyeInfo.getCorniaX() + "\t" +
-                                eyeInfo.getCorniaY() + "\t");
+                                eyeInfo.getPupilX() + "\t" +
+                                eyeInfo.getPupilY() + "\t");
 
                         // Write Pupil fit topleft x,y bottom right (x,y)
                         for (int j = 0; j < pupilFit.length; j++) {
@@ -1311,7 +1356,7 @@ public class Main extends javax.swing.JFrame {
 
                         // Compute eye vector
                         Point2D.Double vector = Computation.computeEyeVector(
-                                eyeInfo.getCorniaX(), eyeInfo.getCorniaY(),
+                                eyeInfo.getPupilX(), eyeInfo.getPupilY(),
                                 eyeInfo.getReflectX(), eyeInfo.getReflectY());
 
                         EyeGazeComputing.ComputingApproach approach =
@@ -1447,7 +1492,7 @@ public class Main extends javax.swing.JFrame {
             File fullScreenFile = new File(fullScreenDir, filename);
             if (fullScreenFile.exists()) {
                 BufferedImage image = ImageTools.loadImage(fullScreenFile);
-                projectSelectPanel.setFullScreenDimensionPX(
+                projectSelectPanel.setFullSceneDimensionPX(
                         String.valueOf(image.getWidth()),
                         String.valueOf(image.getHeight()));
             }
