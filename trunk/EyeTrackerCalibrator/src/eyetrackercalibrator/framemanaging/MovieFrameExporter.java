@@ -546,7 +546,7 @@ public class MovieFrameExporter {
         Point[] eyePoints = new Point[2];
         eyePoints[0] = new Point();
         eyePoints[1] = new Point();
-        eyePoints[0].setLocation(info.getCorniaX(), info.getCorniaY());
+        eyePoints[0].setLocation(info.getPupilX(), info.getPupilY());
         eyePoints[1].setLocation(info.getReflectX(), info.getReflectY());
 
         Point.Double eyeVector = new Point2D.Double(eyePoints[0].x - eyePoints[1].x, eyePoints[0].y - eyePoints[1].y);
@@ -638,7 +638,7 @@ public class MovieFrameExporter {
             Point[] eyePoints = new Point[2];
             eyePoints[0] = new Point();
             eyePoints[1] = new Point();
-            eyePoints[0].setLocation(info.getCorniaX() * scale, info.getCorniaY() * scale);
+            eyePoints[0].setLocation(info.getPupilX() * scale, info.getPupilY() * scale);
             eyePoints[1].setLocation(info.getReflectX() * scale, info.getReflectY() * scale);
 
             Point[] ellisp = makeBoundingBox(info.getCorniaFit(), scale);

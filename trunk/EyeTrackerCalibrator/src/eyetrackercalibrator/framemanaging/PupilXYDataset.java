@@ -69,10 +69,10 @@ public class PupilXYDataset extends TwoSeriesXYDataSet{
         if(info != null){
             switch(series){
                 case 0: // This is X value of pupil
-                    result = info.getCorniaX();
+                    result = info.getPupilX();
                     break;
                 case 1: // This is Y value pf pupil
-                    result = info.getCorniaY();
+                    result = info.getPupilY();
             }
         }
         return result;

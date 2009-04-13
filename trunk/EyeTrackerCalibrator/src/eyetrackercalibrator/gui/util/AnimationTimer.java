@@ -151,15 +151,15 @@ public class AnimationTimer {
                 // Set pupil and cornia reflection marking rendering
                 EyeViewFrameInfo info = (EyeViewFrameInfo) eyeFrameManager.getFrameInfo(new Integer(frameDBLocation));
                 if (info != null) {
-                    eyePoints[0].x = (int) (info.getCorniaX() * scale);
-                    eyePoints[0].y = (int) (info.getCorniaY() * scale);
+                    eyePoints[0].x = (int) (info.getPupilX() * scale);
+                    eyePoints[0].y = (int) (info.getPupilY() * scale);
                     eyePoints[1].x = (int) (info.getReflectX() * scale);
                     eyePoints[1].y = (int) (info.getReflectY() * scale);
 
                     displayJPanel.setEyeMarkedPoints(eyePoints);
                     eyeVec = new Point2D.Double(
-                            info.getCorniaX() - info.getReflectX(),
-                            info.getCorniaY() - info.getReflectY());
+                            info.getPupilX() - info.getReflectX(),
+                            info.getPupilY() - info.getReflectY());
 
                     double[] box = info.getCorniaFit();
                     for (int i = 0; i < box.length; i++) {

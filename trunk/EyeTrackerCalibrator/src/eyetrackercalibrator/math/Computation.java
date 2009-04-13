@@ -68,19 +68,26 @@ public class Computation {
      * </ul>
      */
     public static double ComputeEyeCalibrationErrorAngle(
-            double[][] calibrationCoeff,
-            Point2D[] calibrationPoints, Point2D[] eyeGaze,
+            Point2D calibrationPoint, Point2D eyeGazePoint,
             Dimension screendDimensionPixel, double distanceFromSceneCM,
             double sceneWidthCM, double sceneHeightCM) {
         // Sanity check
-        if (calibrationPoints == null || eyeGaze == null ||
-                calibrationPoints.length != eyeGaze.length ||
+        if (calibrationPoint == null || eyeGazePoint == null ||
                 screendDimensionPixel.height <= 0 ||
                 screendDimensionPixel.width <= 0 ||
                 distanceFromSceneCM <= 0 ||
                 sceneWidthCM <= 0 || sceneHeightCM <= 0) {
             return -1;
         }
+
+        // First find cm length per pixel in scene
+        double cmPerPixWidth = sceneWidthCM / screendDimensionPixel.getWidth();
+        double cmPerPixHeight = sceneHeightCM / screendDimensionPixel.getHeight();
+
+        // Compute error in cm
+        double widthError = (eyeGazePoint.getX() - calibrationPoint.getX()) * cmPerPixWidth;
+        double heightError = (eyeGazePoint.getY() - calibrationPoint.getY()) * cmPerPixHeight;
+        double distanceError = Math.sqrt(widthError * widthError + heightError * heightError);
 
         /**
          *        /| Projected point
@@ -91,15 +98,7 @@ public class Computation {
          *
          *  Trying to estimate the angle a.
          */
-        // First find the width of the screen
-
-
-        for (int i = 0; i < eyeGaze.length; i++) {
-            Point2D point = Computation.computeEyeGazePoint(eyeGaze[i].getX(),
-                    eyeGaze[i].getY(), calibrationCoeff);
-        }
-
-        return 1;
+        return Math.toDegrees(Math.atan2(distanceError, distanceFromSceneCM));
     }
 
     /**

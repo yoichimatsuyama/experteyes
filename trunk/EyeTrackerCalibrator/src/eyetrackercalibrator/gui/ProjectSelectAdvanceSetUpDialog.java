@@ -20,38 +20,38 @@ import javax.swing.JTextField;
 public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
 
 
-    double distanceFromMonitor = 0;
-    double monitorHeightCM = 0;
-    double monitorWidthCM = 0;
+    double distanceFromScene = 0;
+    double sceneHeightCM = 0;
+    double sceneWidthCM = 0;
 
     /** @return 0 if anything is wrong. Positive double otherwise */
     public double getDistanceFromMonitor() {
-        return distanceFromMonitor;
+        return distanceFromScene;
     }
 
     public void setDistanceFromMonitor(double distanceFromMonitor) {
-        setTextField(distanceFromMonitorTextField, distanceFromMonitor);
-        this.distanceFromMonitor = getTextFieldDoubleValue(distanceFromMonitorTextField);
+        setTextField(distanceFromSceneTextField, distanceFromMonitor);
+        this.distanceFromScene = getTextFieldDoubleValue(distanceFromSceneTextField);
     }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
-    public double getMonitorHeight() {
-        return monitorHeightCM;
+    public double getSceneHeight() {
+        return sceneHeightCM;
     }
 
-    public void setMonitorHeight(double monitorHeight) {
-        setTextField(monitorHeightCMTextField, monitorHeight);
-        this.monitorHeightCM = getTextFieldDoubleValue(monitorHeightCMTextField);
+    public void setSceneHeight(double monitorHeight) {
+        setTextField(sceneHeightCMTextField, monitorHeight);
+        this.sceneHeightCM = getTextFieldDoubleValue(sceneHeightCMTextField);
     }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
-    public double getMonitorWidth() {
-        return monitorWidthCM;
+    public double getSceneWidth() {
+        return sceneWidthCM;
     }
 
-    public void setMonitorWidth(double monitorWidth) {
-        setTextField(monitorWidthCMTextField, monitorWidth);
-        this.monitorWidthCM = getTextFieldDoubleValue(monitorWidthCMTextField);
+    public void setSceneWidth(double monitorWidth) {
+        setTextField(sceneWidthCMTextField, monitorWidth);
+        this.sceneWidthCM = getTextFieldDoubleValue(sceneWidthCMTextField);
     }
 
     /** Creates new form ProjectSelectAdvanceSetUpDialog */
@@ -91,19 +91,83 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         textFieldEmptyPositiveDoubleInputVerifier1 = new eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        sceneHeightCMTextField = new javax.swing.JTextField();
+        distanceFromSceneTextField = new javax.swing.JTextField();
+        sceneWidthCMTextField = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        monitorWidthCMTextField = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        monitorHeightCMTextField = new javax.swing.JTextField();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        distanceFromMonitorTextField = new javax.swing.JTextField();
-        jLabel19 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("For Calibation Error Computation"));
+
+        jLabel19.setText("cm");
+
+        jLabel18.setText("cm");
+
+        sceneHeightCMTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
+
+        distanceFromSceneTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
+
+        sceneWidthCMTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
+
+        jLabel11.setText("Width");
+
+        jLabel1.setText("Distance from the scene:");
+
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel9.setText("Measured scene size:");
+
+        jLabel10.setText("x Height");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel9, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel1))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel11)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(sceneWidthCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(distanceFromSceneTextField))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel10)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(sceneHeightCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 68, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jLabel18))
+                    .add(jLabel19)))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel9)
+                    .add(jLabel11)
+                    .add(sceneWidthCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel10)
+                    .add(sceneHeightCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel18))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(distanceFromSceneTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel19)))
+        );
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -119,74 +183,21 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel9.setText("Monitor size:");
-
-        jLabel11.setText("Width");
-
-        monitorWidthCMTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
-
-        jLabel10.setText("x Height");
-
-        monitorHeightCMTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
-
-        jLabel18.setText("cm");
-
-        jLabel1.setText("Distance from the monitor:");
-
-        distanceFromMonitorTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
-
-        jLabel19.setText("cm");
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(326, Short.MAX_VALUE)
+                .addContainerGap()
                 .add(saveButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(cancelButton))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jLabel1))
-                    .add(jLabel9, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel11)
-                        .add(2, 2, 2)
-                        .add(monitorWidthCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 50, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(distanceFromMonitorTextField))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel10)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(monitorHeightCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 50, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel18))
-                    .add(jLabel19))
-                .add(45, 45, 45))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel11)
-                    .add(jLabel10)
-                    .add(monitorWidthCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel9)
-                    .add(jLabel18)
-                    .add(monitorHeightCMTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(distanceFromMonitorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel19))
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(cancelButton)
@@ -197,9 +208,9 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        distanceFromMonitor = getTextFieldDoubleValue(distanceFromMonitorTextField);
-        monitorHeightCM = getTextFieldDoubleValue(monitorHeightCMTextField);
-        monitorWidthCM = getTextFieldDoubleValue(monitorWidthCMTextField);
+        distanceFromScene = getTextFieldDoubleValue(distanceFromSceneTextField);
+        sceneHeightCM = getTextFieldDoubleValue(sceneHeightCMTextField);
+        sceneWidthCM = getTextFieldDoubleValue(sceneWidthCMTextField);
         this.dispose();
 }//GEN-LAST:event_saveButtonActionPerformed
 
@@ -211,16 +222,17 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JTextField distanceFromMonitorTextField;
+    private javax.swing.JTextField distanceFromSceneTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JTextField monitorHeightCMTextField;
-    private javax.swing.JTextField monitorWidthCMTextField;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton saveButton;
+    private javax.swing.JTextField sceneHeightCMTextField;
+    private javax.swing.JTextField sceneWidthCMTextField;
     private eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier textFieldEmptyPositiveDoubleInputVerifier1;
     // End of variables declaration//GEN-END:variables
 }

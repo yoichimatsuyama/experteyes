@@ -48,9 +48,11 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
     // Storing the last directory selected by browse action
     File lastSelectedLocation = new File(".");
-    private double distanceFromMonitor;
-    private double monitorHeightCM;
-    private double monitorWidthCM;
+    private double distanceFromMeasuredScene;
+    private double sceneHeightCM;
+    private double sceneWidthCM;
+    private int synchronizedEyeFrame = 1;
+    private int synchronizedSceneFrame = 1;
 
     /** Creates new form ProjectSelectPanel */
     public ProjectSelectPanel() {
@@ -525,20 +527,22 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     private void advanceSetupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_advanceSetupButtonActionPerformed
 
         final ProjectSelectAdvanceSetUpDialog dialog =
-                new ProjectSelectAdvanceSetUpDialog(null,"Advance Configuration",true);
+                new ProjectSelectAdvanceSetUpDialog(null, "Advance Configuration", true);
 
-        dialog.setDistanceFromMonitor(this.distanceFromMonitor);
-        dialog.setMonitorHeight(this.monitorHeightCM);
-        dialog.setMonitorWidth(this.monitorWidthCM);
+        dialog.setDistanceFromMonitor(this.distanceFromMeasuredScene);
+        dialog.setSceneHeight(this.sceneHeightCM);
+        dialog.setSceneWidth(this.sceneWidthCM);
         dialog.setLocationByPlatform(true);
 
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosed(WindowEvent e) {
-                       distanceFromMonitor = dialog.getDistanceFromMonitor();
-                       monitorHeightCM = dialog.getMonitorHeight();
-                       monitorWidthCM = dialog.getMonitorWidth();
-                    }});
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                distanceFromMeasuredScene = dialog.getDistanceFromMonitor();
+                sceneHeightCM = dialog.getSceneHeight();
+                sceneWidthCM = dialog.getSceneWidth();
+            }
+        });
 
         dialog.setVisible(true);
 
@@ -739,12 +743,12 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         monitorHeightPixelTextField.setText(height);
     }
 
-    public void setFullScreenDimensionPX(String width, String height) {
+    public void setFullSceneDimensionPX(String width, String height) {
         fullScreenHeightPixelTextField.setText(height);
         fullScreenWidthPixelTextField.setText(width);
     }
 
-    public Dimension getFullScreenDimensionPX() {
+    public Dimension getFullSceneDimensionPX() {
         if (fullScreenHeightPixelTextField.getText().length() > 0 && fullScreenWidthPixelTextField.getText().length() > 0) {
             return new Dimension(
                     Integer.parseInt(fullScreenWidthPixelTextField.getText()),
@@ -776,54 +780,54 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     /**
      * @return the distanceFromMonitor
      */
-    public double getDistanceFromMonitor() {
-        return distanceFromMonitor;
+    public double getDistanceFromMeasuredScene() {
+        return distanceFromMeasuredScene;
     }
 
     /**
      * @param distanceFromMonitor the distanceFromMonitor to set
      */
-    public void setDistanceFromMonitor(String distanceFromMonitor) {
+    public void setDistanceFromMeasuredScene(String distanceFromMonitor) {
         try {
-            this.distanceFromMonitor = Double.parseDouble(distanceFromMonitor);
+            this.distanceFromMeasuredScene = Double.parseDouble(distanceFromMonitor);
         } catch (NumberFormatException numberFormatException) {
-            this.distanceFromMonitor = 0;
+            this.distanceFromMeasuredScene = 0;
         }
     }
 
     /**
      * @return the monitorHeightCM
      */
-    public double getMonitorHeightCM() {
-        return monitorHeightCM;
+    public double getSceneHeightCM() {
+        return sceneHeightCM;
     }
 
     /**
      * @param monitorHeightCM the monitorHeightCM to set
      */
-    public void setMonitorHeightCM(String monitorHeightCM) {
+    public void setSceneHeightCM(String monitorHeightCM) {
         try {
-            this.monitorHeightCM = Double.parseDouble(monitorHeightCM);
+            this.sceneHeightCM = Double.parseDouble(monitorHeightCM);
         } catch (NumberFormatException numberFormatException) {
-            this.monitorHeightCM = 0;
+            this.sceneHeightCM = 0;
         }
     }
 
     /**
      * @return the monitorWidthCM
      */
-    public double getMonitorWidthCM() {
-        return monitorWidthCM;
+    public double getSceneWidthCM() {
+        return sceneWidthCM;
     }
 
     /**
      * @param monitorWidthCM the monitorWidthCM to set
      */
-    public void setMonitorWidthCM(String monitorWidthCM) {
+    public void setSceneWidthCM(String monitorWidthCM) {
         try {
-            this.monitorWidthCM = Double.parseDouble(monitorWidthCM);
+            this.sceneWidthCM = Double.parseDouble(monitorWidthCM);
         } catch (NumberFormatException numberFormatException) {
-            this.monitorHeightCM = 0;
+            this.sceneHeightCM = 0;
         }
     }
 }

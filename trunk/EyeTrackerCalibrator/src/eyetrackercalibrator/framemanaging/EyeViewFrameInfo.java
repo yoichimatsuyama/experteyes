@@ -158,7 +158,7 @@ public class EyeViewFrameInfo implements FrameInfo {
         return info;
     }
 
-    public double getCorniaX() {
+    public double getPupilX() {
         return corniaX;
     }
 
@@ -166,7 +166,7 @@ public class EyeViewFrameInfo implements FrameInfo {
         this.corniaX = corniaX;
     }
 
-    public double getCorniaY() {
+    public double getPupilY() {
         return corniaY;
     }
 
@@ -201,7 +201,7 @@ public class EyeViewFrameInfo implements FrameInfo {
     public String toString() {
         String retValue;
 
-        retValue = "<html>" + getCorniaX() + " " + getCorniaY() + "<p>Hello</html>";
+        retValue = "<html>" + getPupilX() + " " + getPupilY() + "<p>Hello</html>";
         return retValue;
     }
 
