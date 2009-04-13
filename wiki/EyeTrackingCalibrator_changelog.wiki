@@ -1,3 +1,6 @@
+==1.8==
+-Fix export movie crashes when there is not enough eye gaze to do median.
+-Add error angle to export of calibration point info.
 ==1.7==
 Fix incorrect scaling for Movie export when small scene image is not 512x512.
 ==1.6==
