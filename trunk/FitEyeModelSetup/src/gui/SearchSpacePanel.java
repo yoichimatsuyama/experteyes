@@ -209,36 +209,36 @@ public class SearchSpacePanel extends javax.swing.JPanel {
     private void avgButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avgButtonActionPerformed
         // save the old image
         if (oldImg == null) {
-            oldImg = parent.getPaintPanel().getImage();
+            oldImg = parent.getInteractivePanel().getImage();
         }
         BufferedImage newImg = parent.getImageProcessor().getAvgImg();
-        parent.getPaintPanel().setImage(newImg);
+        parent.getInteractivePanel().setImage(newImg);
 
     }//GEN-LAST:event_avgButtonActionPerformed
 
     private void maxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxButtonActionPerformed
         // save the old image
         if (oldImg == null) {
-            oldImg = parent.getPaintPanel().getImage();
+            oldImg = parent.getInteractivePanel().getImage();
         }
         BufferedImage newImg = parent.getImageProcessor().getMaxImg();
-        parent.getPaintPanel().setImage(newImg);
+        parent.getInteractivePanel().setImage(newImg);
 
     }//GEN-LAST:event_maxButtonActionPerformed
 
     private void minButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minButtonActionPerformed
         // save the old image
         if (oldImg == null) {
-            oldImg = parent.getPaintPanel().getImage();
+            oldImg = parent.getInteractivePanel().getImage();
         }
         BufferedImage newImg = parent.getImageProcessor().getMinImg();
-        parent.getPaintPanel().setImage(newImg);
+        parent.getInteractivePanel().setImage(newImg);
     }//GEN-LAST:event_minButtonActionPerformed
 
     private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
         if (oldImg != null) {
             // set back to the old img
-            parent.getPaintPanel().setImage(oldImg);
+            parent.getInteractivePanel().setImage(oldImg);
             oldImg = null;
         } else {
             oldImg = null;
@@ -247,16 +247,16 @@ public class SearchSpacePanel extends javax.swing.JPanel {
 
     private void widthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_widthSliderStateChanged
         // set the rect to it's old location with new width/height
-        Rectangle oldSearchRect = parent.getPaintPanel().getSearchRect();
+        Rectangle oldSearchRect = parent.getInteractivePanel().getSearchRect();
         Rectangle newSearchRect = new Rectangle((int) oldSearchRect.getX(), (int) oldSearchRect.getY(), widthSlider.getValue(), heightSlider.getValue());
-        parent.getPaintPanel().setSearchRect(newSearchRect);
+        parent.getInteractivePanel().setSearchRect(newSearchRect);
     }//GEN-LAST:event_widthSliderStateChanged
 
     private void heightSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_heightSliderStateChanged
         // set the rect to it's old location with new width/height
-        Rectangle oldSearchRect = parent.getPaintPanel().getSearchRect();
+        Rectangle oldSearchRect = parent.getInteractivePanel().getSearchRect();
         Rectangle newSearchRect = new Rectangle((int) oldSearchRect.getX(), (int) oldSearchRect.getY(), widthSlider.getValue(), heightSlider.getValue());
-        parent.getPaintPanel().setSearchRect(newSearchRect);
+        parent.getInteractivePanel().setSearchRect(newSearchRect);
     }//GEN-LAST:event_heightSliderStateChanged
 
 private void computeMinMaxAvgButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeMinMaxAvgButtonActionPerformed
