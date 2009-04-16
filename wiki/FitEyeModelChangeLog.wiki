@@ -1,7 +1,7 @@
 ==1.7==
 
--Allow a bigger picture to show in a scrollable manner instead of clipping.
--Add support for mouse wheel
+#Allow a bigger picture to show in a scrollable manner instead of clipping.
+#Add support for mouse wheel
 
 ==1.6==
 
