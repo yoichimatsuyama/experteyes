@@ -1,3 +1,8 @@
+==1.7==
+
+-Allow a bigger picture to show in a scrollable manner instead of clipping.
+-Add support for mouse wheel
+
 ==1.6==
 
 Add proper warning to a user when frame is changed without adding configuration change to the list.
