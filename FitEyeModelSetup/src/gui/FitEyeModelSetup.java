@@ -40,6 +40,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -141,14 +142,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 if (colorSelectionPanel1.isDropperSelected()) {
-                    paintPanel1.setColorCaptureListener(colorSelectionPanel1);
+                    interactivePanel.setColorCaptureListener(colorSelectionPanel1);
                     // Switch to hand icon
-                    paintPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     // Remove listener
-                    paintPanel1.setColorCaptureListener(null);
+                    interactivePanel.setColorCaptureListener(null);
                     // Switch to cross hair
-                    paintPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                    interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 }
             }
         });
@@ -171,7 +172,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 }
                 triggerAutoFitEyeModelRecompute();
                 setHighlight();
-                paintPanel1.repaint();
+                interactivePanel.repaint();
             }
         });
 
@@ -181,7 +182,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 setFrame(frameNum);
                 triggerAutoFitEyeModelRecompute();
                 setHighlight();
-                paintPanel1.repaint();
+                interactivePanel.repaint();
             }
         });
 
@@ -189,7 +190,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 setHighlight();
-                paintPanel1.repaint();
+                interactivePanel.repaint();
             }
         });
 
@@ -222,7 +223,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
 
-        this.paintPanel1.setSearchAreaChangeListener(new ChangeListener() {
+        this.interactivePanel.setSearchAreaChangeListener(new ChangeListener() {
 
             public void stateChanged(ChangeEvent e) {
                 triggerAutoFitEyeModelRecompute();
@@ -243,7 +244,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         grayLevelInfo.frameNum = currentFrame;
         grayLevelInfo.point = estimatePupilFromThreshold(currentFrame);
         // Need to use set method here to make sure that the value saved will not change
-        grayLevelInfo.setSearchArea(paintPanel1.searchRect);
+        grayLevelInfo.setSearchArea(interactivePanel.searchRect);
         if (grayLevelInfo.point != null) {
             // Search if already have the info in the list
             int index = this.configListModel.indexOf(grayLevelInfo);
@@ -315,7 +316,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 public void run() {
                     pointToFrameByEstimatedPupilLocation.loadFrames(eyeFiles,
                             thresholdPanel1.getPupilThresh(),
-                            paintPanel1.getSearchRect(), ESTIMATE_PUPIL_SAMPLING_RATE);
+                            interactivePanel.getSearchRect(), ESTIMATE_PUPIL_SAMPLING_RATE);
                     try {
                         pointToFrameByEstimatedPupilLocation.save(saveFile);
                     } catch (FileNotFoundException ex) {
@@ -325,6 +326,16 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             });
 
             t.start();
+        }
+    }
+
+    private void handleInteractivePanelMouseClicked(MouseEvent evt) {
+        // Do not move frame when dropper is activated
+        if (!colorSelectionPanel1.isDropperSelected()) {
+            int frame = this.pointToFrameByEstimatedPupilLocation.getNearestFrame(this.frameNum, evt.getPoint());
+            if (frame >= 0) {
+                this.frameSlider.setValue(frame);
+            }
         }
     }
 
@@ -354,8 +365,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     new FittingListener() {
 
                         public void setFit(RotatedEllipse2D crFit, RotatedEllipse2D pupilFit) {
-                            paintPanel1.setCR(crFit);
-                            paintPanel1.setPupil(pupilFit);
+                            interactivePanel.setCR(crFit);
+                            interactivePanel.setPupil(pupilFit);
                             repaint();
                         }
                     });
@@ -374,8 +385,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 } catch (InterruptedException ex) {
                 }
                 this.fitEyeModelRunner = null;
-                paintPanel1.setCR(null);
-                paintPanel1.setPupil(null);
+                interactivePanel.setCR(null);
+                interactivePanel.setPupil(null);
             }
         }
     }
@@ -391,7 +402,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
      * Create parameters by reading from all panels values.
      */
     private Parameters createParameters() {
-        Rectangle searchRect = new Rectangle(paintPanel1.getSearchRect());
+        Rectangle searchRect = new Rectangle(interactivePanel.getSearchRect());
 
         Parameters parameters = new Parameters(
                 thresholdPanel1.getCRThresh(), thresholdPanel1.getPupilThresh(),
@@ -434,13 +445,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         colorSelectionPanel1 = new gui.ColorSelectionPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commentTextPane = new javax.swing.JTextPane();
-        paintPanel1 = new gui.PaintPanel();
         eyeDirTextField = new javax.swing.JTextField();
         eyeDirLabel = new javax.swing.JLabel();
         frameSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
         frameTextField = new javax.swing.JTextField();
         fileNameTextField = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        interactivePanel = new gui.InteractivePanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -524,7 +536,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(68, Short.MAX_VALUE)
+                .addContainerGap(17, Short.MAX_VALUE)
                 .add(saveSettingButton)
                 .add(18, 18, 18)
                 .add(loadSettingButton)
@@ -539,12 +551,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, Short.MAX_VALUE)
+                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 179, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(deleteButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -554,7 +566,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(deleteButton)
@@ -583,7 +595,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 468, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+            .add(loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -594,23 +606,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-
-        paintPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                paintPanel1MouseClicked(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout paintPanel1Layout = new org.jdesktop.layout.GroupLayout(paintPanel1);
-        paintPanel1.setLayout(paintPanel1Layout);
-        paintPanel1Layout.setHorizontalGroup(
-            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 524, Short.MAX_VALUE)
-        );
-        paintPanel1Layout.setVerticalGroup(
-            paintPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 548, Short.MAX_VALUE)
         );
 
         eyeDirTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -632,6 +627,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 frameSliderKeyPressed(evt);
             }
         });
+        frameSlider.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                frameSliderMouseWheelMoved(evt);
+            }
+        });
 
         jLabel1.setText("Image file name"); // NOI18N
 
@@ -643,14 +643,20 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         fileNameTextField.setEditable(false);
 
+        interactivePanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                interactivePanelMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(interactivePanel);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(paintPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, frameSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, frameSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(frameLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -662,9 +668,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     .add(layout.createSequentialGroup()
                         .add(eyeDirLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(loadImageButton)))
+                        .add(loadImageButton))
+                    .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -676,8 +683,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     .add(eyeDirLabel)
                     .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(paintPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(frameLabel)
                     .add(frameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -826,14 +833,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             // repaint image with new info
             setFrame(getFrame());
 
-            this.paintPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         } else {
             // Make sure that all droppers are off
             this.colorSelectionPanel1.unselectAllDropperButtons();
             if (this.jTabbedPane1.getSelectedComponent().equals(this.searchSpacePanel1)) {
-                this.paintPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } else {
-                this.paintPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             }
 
         }
@@ -863,7 +870,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             Parameters parameters = parameterList.getFirstParameters();
             if (parameters != null) {
                 // Set all parameters accordingly
-                this.paintPanel1.setSearchRect(parameters.searchArea);
+                this.interactivePanel.setSearchRect(parameters.searchArea);
                 this.searchSpacePanel1.setArea(parameters.searchArea.width,
                         parameters.searchArea.height);
                 this.colorSelectionPanel1.setBackgroundGrayValue(parameters.backgroundGrayValue);
@@ -1021,19 +1028,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_runEyeModelFittingButtonActionPerformed
 
-    private void paintPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paintPanel1MouseClicked
-        // Do not move frame when dropper is activated
-        if (!colorSelectionPanel1.isDropperSelected()) {
-            int frame = this.pointToFrameByEstimatedPupilLocation.getNearestFrame(
-                    this.frameNum, evt.getPoint());
-
-            if (frame >= 0) {
-                this.frameSlider.setValue(frame);
-            }
-
-        }
-    }//GEN-LAST:event_paintPanel1MouseClicked
-
     private void frameSliderKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_frameSliderKeyPressed
         int step = 1;
         // Set up modifier
@@ -1074,9 +1068,9 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private void showVoronoiCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showVoronoiCheckBoxActionPerformed
         if (this.showVoronoiCheckBox.isSelected()) {
             // Add voronoi to picture
-            this.paintPanel1.addHighlight(this.voronoiBufferedImage);
+            this.interactivePanel.addHighlight(this.voronoiBufferedImage);
         } else {
-            this.paintPanel1.removeHighlight(this.voronoiBufferedImage);
+            this.interactivePanel.removeHighlight(this.voronoiBufferedImage);
         }
 
         repaint();
@@ -1089,6 +1083,16 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private void eyeDirTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eyeDirTextFieldActionPerformed
         initProject();
     }//GEN-LAST:event_eyeDirTextFieldActionPerformed
+
+    private void interactivePanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_interactivePanelMouseClicked
+        handleInteractivePanelMouseClicked(evt);
+    }//GEN-LAST:event_interactivePanelMouseClicked
+
+    private void frameSliderMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_frameSliderMouseWheelMoved
+        int step = evt.getWheelRotation();
+
+        this.frameSlider.setValue(this.frameSlider.getValue() - step);
+    }//GEN-LAST:event_frameSliderMouseWheelMoved
 
     private void initProject() {
         JFileChooser chooser = new JFileChooser();
@@ -1249,8 +1253,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     // subcomponenets need to know what to paint to
-    public PaintPanel getPaintPanel() {
-        return paintPanel1;
+    public InteractivePanel getInteractivePanel() {
+        return interactivePanel;
     }
 
     // searchSpacePanel needs to use the ImageProcessor to get min/max/avg images
@@ -1286,7 +1290,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     // it cannot load some tiff compression
 
                     // Limit sharpen to the search space area to increase the speed
-                    Rectangle r = this.paintPanel1.searchRect;
+                    Rectangle r = this.interactivePanel.searchRect;
                     BufferedImage img = paintedImg.getSubimage(r.x, r.y, r.width, r.height);
 
                     ImagePlus imagePlus = new ImagePlus("", img);
@@ -1304,13 +1308,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 // so check to see what kind of threshold is set in the thresh panel
                 switch (thresholdPanel1.getThresholdType()) {
                     case NO_THRESH_TYPE:
-                        paintPanel1.setImage(paintedImg);
+                        interactivePanel.setImage(paintedImg);
                         setHighlight();
                         break;
                     case CR_THRESH_TYPE:
                         // find the cr
                         RotatedEllipse2D foundCR = FitEyeModel.findCR(paintedImg,
-                                this.paintPanel1.searchRect,
+                                this.interactivePanel.searchRect,
                                 this.thresholdPanel1.getCRThresh());
 
                         // draw into the image
@@ -1321,7 +1325,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     case PUPIL_THRESH_TYPE:
 
                         RotatedEllipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
-                                this.paintPanel1.searchRect,
+                                this.interactivePanel.searchRect,
                                 this.thresholdPanel1.getPupilThresh(),
                                 false);
 
@@ -1340,11 +1344,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
      * This method help with setting highlight
      */
     private void setHighlight() {
-        paintPanel1.clearHighlight();
+        interactivePanel.clearHighlight();
         if (this.showVoronoiCheckBox.isSelected()) {
-            paintPanel1.addHighlight(this.voronoiBufferedImage);
+            interactivePanel.addHighlight(this.voronoiBufferedImage);
         }
-        BufferedImage img = paintPanel1.getImage();
+        BufferedImage img = interactivePanel.getImage();
         if (img != null) {
             int[] pixels = logic.ImageUtils.RGBtoGray(ImageUtils.getPixels(img));
             if (this.colorSelectionPanel1.isCRColorHeighlighted()) {
@@ -1360,7 +1364,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                         img.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 highLight.setRGB(0, 0, img.getWidth(), img.getHeight(), highPix,
                         0, img.getWidth());
-                this.paintPanel1.addHighlight(highLight);
+                this.interactivePanel.addHighlight(highLight);
             }
 
             if (this.colorSelectionPanel1.isPupilColorHeighlighted()) {
@@ -1378,7 +1382,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 highLight.setRGB(0, 0, img.getWidth(), img.getHeight(), highPix,
                         0, img.getWidth());
 
-                this.paintPanel1.addHighlight(highLight);
+                this.interactivePanel.addHighlight(highLight);
             }
         }
     }
@@ -1414,7 +1418,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         g2d.setTransform(oldTransform);
 
-        paintPanel1.setImage(paintedImg);
+        interactivePanel.setImage(paintedImg);
     }
 
     /**
@@ -1460,7 +1464,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                         (ConfigutationInfo) this.configListModel.firstElement();
                 searchArea = info.getSearchArea();
             } else {
-                searchArea = this.paintPanel1.getSearchRect();
+                searchArea = this.interactivePanel.getSearchRect();
             }
             // Get pupil estimate
             Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
@@ -1541,7 +1545,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 this.colorSelectionPanel1.setSharpeningFactor(currentConfig.unsharpFactor);
 
                 // Set search space
-                this.paintPanel1.setSearchRect(currentConfig.getSearchArea());
+                this.interactivePanel.setSearchRect(currentConfig.getSearchArea());
                 this.searchSpacePanel1.setArea(
                         currentConfig.getSearchArea().width,
                         currentConfig.getSearchArea().height);
@@ -1565,8 +1569,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     /** Clear all voronoi information */
     private void clearVoronoiInfo() {
         // Init voronoid computation
-        int size = Math.max(this.paintPanel1.getWidth(),
-                this.paintPanel1.getHeight()) * 3;
+        int size = Math.max(this.interactivePanel.getWidth(),
+                this.interactivePanel.getHeight()) * 3;
         Simplex<Pnt> initialTriangle = new Simplex<Pnt>(
                 new Pnt(-size, -size),
                 new Pnt(size, -size),
@@ -1626,17 +1630,18 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private javax.swing.JLabel frameLabel;
     private javax.swing.JSlider frameSlider;
     private javax.swing.JTextField frameTextField;
+    private gui.InteractivePanel interactivePanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton loadImageButton;
     private javax.swing.JButton loadSettingButton;
     private javax.swing.JProgressBar loadingProgress;
-    private gui.PaintPanel paintPanel1;
     private javax.swing.JButton runEyeModelFittingButton;
     private javax.swing.JButton saveSettingButton;
     private gui.SearchSpacePanel searchSpacePanel1;
