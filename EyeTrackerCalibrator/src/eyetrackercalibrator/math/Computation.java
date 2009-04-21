@@ -52,56 +52,6 @@ public class Computation {
     }
 
     /**
-     * Compute average calibration angle error of the all calibration points
-     * You must make sure that
-     * @param calibrationPoints
-     * @param eyeGaze
-     * @param screendDimensionPixel 
-     * @param screenWidthCM
-     * @param distanceFromScreenCM
-     * @param screenHeightCM
-     * @return nonnegative average error.  -1 if there is any error.
-     * Possible cause for an error are:
-     * <ul>
-     * <li>Providing none positive values to any of screendDimensionPixel, distanceFromScreenCM, screenWidthCM and screenHeightCM</li>
-     * <li>The length of the array are not equal.</li>
-     * </ul>
-     */
-    public static double ComputeEyeCalibrationErrorAngle(
-            Point2D calibrationPoint, Point2D eyeGazePoint,
-            Dimension screendDimensionPixel, double distanceFromSceneCM,
-            double sceneWidthCM, double sceneHeightCM) {
-        // Sanity check
-        if (calibrationPoint == null || eyeGazePoint == null ||
-                screendDimensionPixel.height <= 0 ||
-                screendDimensionPixel.width <= 0 ||
-                distanceFromSceneCM <= 0 ||
-                sceneWidthCM <= 0 || sceneHeightCM <= 0) {
-            return -1;
-        }
-
-        // First find cm length per pixel in scene
-        double cmPerPixWidth = sceneWidthCM / screendDimensionPixel.getWidth();
-        double cmPerPixHeight = sceneHeightCM / screendDimensionPixel.getHeight();
-
-        // Compute error in cm
-        double widthError = (eyeGazePoint.getX() - calibrationPoint.getX()) * cmPerPixWidth;
-        double heightError = (eyeGazePoint.getY() - calibrationPoint.getY()) * cmPerPixHeight;
-        double distanceError = Math.sqrt(widthError * widthError + heightError * heightError);
-
-        /**
-         *        /| Projected point
-         *       / |
-         *      /  |
-         *     /a  |
-         * eye ---- Correct point
-         *
-         *  Trying to estimate the angle a.
-         */
-        return Math.toDegrees(Math.atan2(distanceError, distanceFromSceneCM));
-    }
-
-    /**
      * Use projective translation to find real screen position.  This assume that
      * barrel correction is already run.
      * @param trueScreenDimension
