@@ -35,7 +35,6 @@
 package eyetrackercalibrator;
 
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
-import eyetrackercalibrator.framemanaging.FrameInfo;
 import eyetrackercalibrator.framemanaging.FrameLoadingListener;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
@@ -52,6 +51,7 @@ import eyetrackercalibrator.gui.TrialMarkingJPanel;
 import eyetrackercalibrator.gui.util.FrameTranslator;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.ComputeIlluminationRangeThread;
+import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.math.EyeGazeComputing.ComputingApproach;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
@@ -238,6 +238,11 @@ public class Main extends javax.swing.JFrame {
                 return;
             }
 
+            // Prepare degree error computer
+            DegreeErrorComputer dec = new DegreeErrorComputer(sceneDimension,
+                                    distanceFromMeasuredScene,
+                                    sceneWidth, sceneHeight);
+
             // Scan through each frame
             for (int i = 1; i <= totalFrame; i++) {
                 Point calibrationPoint =
@@ -292,10 +297,8 @@ public class Main extends javax.swing.JFrame {
                                     gazeVec.x, gazeVec.y);
 
                             // Compute error angel
-                            double errorAngle = Computation.ComputeEyeCalibrationErrorAngle(
-                                    scenePos, gazePoint, sceneDimension,
-                                    distanceFromMeasuredScene,
-                                    sceneWidth, sceneHeight);
+                            double errorAngle = dec.degreeError(
+                                    scenePos, gazePoint);
 
                             if (errorAngle >= 0) {
                                 out.print("\t" + errorAngle);
@@ -804,6 +807,11 @@ public class Main extends javax.swing.JFrame {
                         screenFrameManager.getScreenInfoScalefactor());
                 calibrateJPanel.setEyeScreenInfoDirectory(
                         projectSelectPanel.getEyeInfoDirectory());
+                calibrateJPanel.setDegreeErrorComputer(new DegreeErrorComputer(
+                        projectSelectPanel.getFullSceneDimensionPX(),
+                        projectSelectPanel.getDistanceFromMeasuredScene(),
+                        projectSelectPanel.getSceneWidthCM(),
+                        projectSelectPanel.getSceneHeightCM()));
 
                 remove(projectSelectPanel);
                 add(calibrateJPanel);

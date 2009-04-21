@@ -43,9 +43,11 @@ import eyetrackercalibrator.gui.util.GUIUtil;
 import eyetrackercalibrator.gui.util.IntervalMarkerManager;
 import eyetrackercalibrator.math.CalibrateEyeGaze;
 import eyetrackercalibrator.math.CalibrateEyeGazeQR;
+import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -118,6 +120,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      */
     private CalibrationPointPositionFinderRunner calibrationPointPositionFinderRunner = null;
     private CalibrationType currentCalibrationType = CalibrationInfo.CalibrationType.Primary;
+    private DegreeErrorComputer degreeErrorComputer;
 
     /** Creates new form NewJPanel */
     public CalibrateJPanel() {
@@ -990,6 +993,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         //final CalibratingViewPanel panel = new CalibratingViewPanel();
         final CalibratingViewJDialog panel =
                 new CalibratingViewJDialog(new JFrame(), true);
+        panel.setDegreeErrorComputer(this.degreeErrorComputer);
 
         final CalibrateEyeGaze primaryCalibrator = new CalibrateEyeGazeQR();
         final CalibrateEyeGaze secondaryCalibrator = new CalibrateEyeGazeQR();
@@ -1108,6 +1112,10 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
     public void setEyeGazeComputing(EyeGazeComputing eyeGazeComputing) {
         this.timer.setEyeGazeComputing(eyeGazeComputing);
+    }
+
+    public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer){
+        this.degreeErrorComputer = degreeErrorComputer;
     }
 
     /** This method is called from within the constructor to
