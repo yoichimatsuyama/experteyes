@@ -532,11 +532,11 @@ public class CalibratingViewJDialog
                     Point2D.Double point = Computation.computeEyeGazePoint(
                             eyeVector[i][j].x, eyeVector[i][j].y, coeff[pos]);
                     estimatedTestPoints[pos][m].setLocation(point);
-                    m++;
                     if (this.degreeErrorComputer != null) {
                         totalTestDegreeError += this.degreeErrorComputer.degreeError(
-                                this.combinedTestPoints[pos][i], point);
+                                this.combinedTestPoints[pos][m], point);
                     }
+                    m++;
                 }
             }
         }
@@ -549,7 +549,7 @@ public class CalibratingViewJDialog
         }
 
         if (totalPoints > 0) {
-            result.x = totalCalibrateDegreeError / (double)totalPoints;
+            result.x = totalCalibrateDegreeError / (double) totalPoints;
         }
 
         // Compute overall accuracy
