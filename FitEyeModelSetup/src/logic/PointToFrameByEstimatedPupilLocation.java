@@ -286,7 +286,7 @@ public class PointToFrameByEstimatedPupilLocation {
         return frame;
     }
 
-    public void addLoadingListener(ChangeListener listener) {
+    public void setLoadingListener(ChangeListener listener) {
         this.listener = listener;
     }
 
