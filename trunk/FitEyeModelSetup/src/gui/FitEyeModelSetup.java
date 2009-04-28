@@ -125,18 +125,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         this.pointToFrameByEstimatedPupilLocation =
                 new PointToFrameByEstimatedPupilLocation();
-        this.pointToFrameByEstimatedPupilLocation.addLoadingListener(new ChangeListener() {
-
-            private int progress = 0;
-
-            public void stateChanged(ChangeEvent e) {
-                progress++;
-                loadingProgress.setMaximum(eyeFiles.length);
-                loadingProgress.setValue(progress);
-                loadingProgress.setString("Estimating pupil location: " +
-                        progress + "/" + eyeFiles.length);
-            }
-        });
 
         this.colorSelectionPanel1.addDropperActionListener(new ActionListener() {
 
@@ -310,6 +298,19 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             if (eyeFiles == null) {
                 return;
             }
+
+            this.pointToFrameByEstimatedPupilLocation.setLoadingListener(new ChangeListener() {
+
+                private int progress = 0;
+
+                public void stateChanged(ChangeEvent e) {
+                    progress++;
+                    loadingProgress.setMaximum(eyeFiles.length);
+                    loadingProgress.setValue(progress);
+                    loadingProgress.setString("Estimating pupil location: " +
+                            progress + "/" + eyeFiles.length);
+                }
+            });
 
             Thread t = new Thread(new Runnable() {
 
