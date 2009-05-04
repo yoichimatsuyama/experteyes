@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package logic;
 
 import ij.ImagePlus;
@@ -61,6 +61,7 @@ import util.Parameters;
  *****************************************************************************///class to drive the minimization
 class ImgDiffErr implements CostFunction, ConvergenceChecker {
 
+    public boolean isCRCircle = false;
     public boolean isAlive = true;
     private FittingListener listener;
     // pupil/cr search space
@@ -114,7 +115,10 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
         eyeModelGraphics2D = (Graphics2D) eyeModelGraphics;
     }
 
-    // evaluation function
+    /*
+     * evaluation function if isCircle is true the cost only care for 7 elements
+     * in parames instead of all 8
+     */
     public double cost(double[] params) throws CostException {
         // save params
         this.params = params;
@@ -147,9 +151,12 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
 
         eyeModelGraphics2D.setColor(new Color(crGray, crGray, crGray));
 
-        cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
-//        eyeModelGraphics2D.setTransform(AffineTransform.getRotateInstance(
-//                cr.getAngle(), cr.getCenterX(), cr.getCenterY()));
+        if (this.isCRCircle) {
+            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5]+params[4]-params[6]);
+        } else {
+            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
+        }
+
         eyeModelGraphics2D.fill(cr);
 
         eyeModelPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(
@@ -232,6 +239,8 @@ public class FitEyeModel implements Runnable {
     final static String GAZE_ROOT = "Gaze";    // filenames
     File imageFile;
     File outputFile;
+    /** Flag for determining whether we consider CR as a circle and not an elisp*/
+    public boolean isCRCircle = true;
 
     public void setOutputFile(File outputFile) {
         this.outputFile = outputFile;
@@ -413,15 +422,32 @@ public class FitEyeModel implements Runnable {
             funct.initModel(eyeImg);
 
             // set up starts and ends for each iteration
-            double[] start = {
-                pupil.getX(), pupil.getY(), pupil.getMaxX(), pupil.getMaxY(),
-                cr.getX(), cr.getY(), cr.getMaxX(), cr.getMaxY()
-            };
+            double[] start;
+            if (isCRCircle) {
+                start = new double[7];
+            } else {
+                start = new double[8];
+            }
+
+            start[0] = pupil.getX();
+            start[1] = pupil.getY();
+            start[2] = pupil.getMaxX();
+            start[3] = pupil.getMaxY();
+            start[4] = cr.getX();
+            start[5] = cr.getY();
+            start[6] = cr.getMaxX();
+            if (!isCRCircle) {
+                start[7] = cr.getMaxY();
+            }
+
 
             double[] end = new double[start.length];
             for (int j = 0; j < end.length; j++) {
                 end[j] = start[j] + STEP_SIZE;
             }
+
+            // Set if we are considering CR as circle
+            funct.isCRCircle = isCRCircle;
 
             // nelder-mead minimization
             nm.minimizes(funct, 1000, funct, start, end);
@@ -431,7 +457,11 @@ public class FitEyeModel implements Runnable {
             pupilCenterX = params[0] + ((params[2] - params[0]) / 2.0);
             pupilCenterY = params[1] + ((params[3] - params[1]) / 2.0);
             crCenterX = params[4] + ((params[6] - params[4]) / 2.0);
-            crCenterY = params[5] + ((params[7] - params[5]) / 2.0);
+            if (isCRCircle) {
+                crCenterY = params[5] + ((params[6] - params[5]) / 2.0);
+            } else {
+                crCenterY = params[5] + ((params[7] - params[5]) / 2.0);
+            }
 
             // Write out when there is an output file
             if (this.outputFile != null) {
