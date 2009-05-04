@@ -47,7 +47,6 @@ import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1032,8 +1031,12 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             public void run() {
                 // Start computation
-                eyeGazeCoefficient[0] =
-                        primaryCalibrator.calibrate(primeEyeVecArray, calArray[0]);
+                try {
+                    eyeGazeCoefficient[0] =
+                            primaryCalibrator.calibrate(primeEyeVecArray, calArray[0]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }, "Primary Calibration Thread");
 
@@ -1043,8 +1046,12 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             public void run() {
                 // Start computation
-                eyeGazeCoefficient[1] =
-                        secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
+               try {
+                    eyeGazeCoefficient[1] =
+                            secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }, "Secondary Calibration Thread");
 
