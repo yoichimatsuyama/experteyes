@@ -358,7 +358,12 @@ public class FrameManager {
                 e.printStackTrace();
                 return null;
             }
-            return op.getAsBufferedImage();
+            try {
+                return op.getAsBufferedImage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         //long newtime = System.currentTimeMillis();
         //System.out.println(newtime-time);
         //time=newtime;

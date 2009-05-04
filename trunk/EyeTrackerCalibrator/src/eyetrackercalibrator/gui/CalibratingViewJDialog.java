@@ -46,7 +46,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
-import javax.vecmath.Tuple2d;
 
 /**
  * For viewing calibrating result as it runs
@@ -98,10 +97,10 @@ public class CalibratingViewJDialog
         public void update(double[][] c, double cost) {
             coeff[this.calibrationType] = c;
             Point2D accuracy = estimatingPoints(this.calibrationType);
-            this.display.setText("<html><pre>Calibratin Accuracy: " +
+            this.display.setText("<html><pre>Calibration Accuracy: " +
                     formatter.format(accuracy.getX()) +
-                    "\n   Overall Accuract: " +
-                    formatter.format(accuracy.getY()) + "</pre></html>");
+                    " degrees of visual angle\n    Overall Accuracy: " +
+                    formatter.format(accuracy.getY()) + " degrees of visual angle</pre></html>");
             // Advance progress
             progress[this.calibrationType] += progressStep;
 
