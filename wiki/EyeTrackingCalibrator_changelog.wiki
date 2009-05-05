@@ -1,3 +1,7 @@
+==1.10==
+- Fix display keeps enlarging
+==1.9==
+- Fix crash when an image file is corrupt (The file can be open but has error in data)
 ==1.8==
 -Fix export movie crashes when there is not enough eye gaze to do median.
 -Add error angle to export of calibration point info.
