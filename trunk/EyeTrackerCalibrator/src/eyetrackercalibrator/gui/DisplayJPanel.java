@@ -38,7 +38,7 @@ import java.awt.event.MouseAdapter;
 import javax.swing.ImageIcon;
 
 /**
- *
+ * Note: When you use this class make sure that minimum size and preferrred size are the same or strange behavior will happen
  * @author  eeglab
  */
 public class DisplayJPanel extends javax.swing.JPanel {
