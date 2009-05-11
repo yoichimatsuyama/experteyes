@@ -1536,7 +1536,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
                     double newDistance = pupil.distance(info.point);
 
-                    if (this.frameNum == info.frameNum ||
+                    if (this.frameNum == currentConfig.frameNum ||
                             newDistance < distance) {
                         // Take a new closer one
                         distance = newDistance;
