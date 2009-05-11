@@ -1,3 +1,10 @@
+==1.9==
+   Add detecting a cornea reflection as a circle.
+
+==1.8==
+
+    Fix incorrect package build 
+
 ==1.7==
 
  *  Allow a bigger picture to show in a scrollable manner instead of clipping.
