@@ -97,7 +97,7 @@ public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
         /** Find (Q^T)V */
         RealMatrix qT = qRDecomposition.getQ().transpose();
         RealMatrix qTVx = qT.multiply(vectorVx).getSubMatrix(0, TOTAL_COEFF-1, 0, 0);
-        RealMatrix qTVy = qT.multiply(vectorVy).getSubMatrix(0, TOTAL_COEFF-1, 0, 0);
+        RealMatrix qTVy = qT.multiply(vectorVy).getSubMatrix(0, TOTAL_COEFF-1, 0, 0);;
 
         /** Solve system Rc = (Q^T)v*/
         RealMatrix r = qRDecomposition.getR().getSubMatrix(

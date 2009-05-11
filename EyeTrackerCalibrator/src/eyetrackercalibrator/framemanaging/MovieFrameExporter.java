@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -32,7 +32,6 @@
  */
 package eyetrackercalibrator.framemanaging;
 
-import eyetrackercalibrator.gui.util.StreamGobbler;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Color;
@@ -51,9 +50,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.media.jai.JAI;
 
 /**
@@ -84,10 +80,6 @@ public class MovieFrameExporter {
     ScreenFrameManager screenFrameManager;
     int eyeOffset;
     int screenOffset;
-    private File ffmpegExecutable;
-    private ReentrantLock processLock = new ReentrantLock();
-    Process process = null;
-    private float frameRate;
 
     /**
      * 
@@ -105,15 +97,13 @@ public class MovieFrameExporter {
     public MovieFrameExporter(int width, int height, double smallImageScale,
             EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
-            File ffmpegExecutable, float frameRate, PropertyChangeListener listener) {
+            PropertyChangeListener listener) {
         this.width = width;
         this.height = height;
         this.smallImageScale = smallImageScale;
         this.eyeGazeComputing = eyeGazeComputing;
         this.eyeFrameManager = eyeFrameManager;
         this.screenFrameManager = screenFrameManager;
-        this.ffmpegExecutable = ffmpegExecutable;
-        this.frameRate = frameRate;
 
         // Compute the real offset
         if (eyeOffset > screenOffset) {
@@ -127,14 +117,6 @@ public class MovieFrameExporter {
         this.listener = listener;
     }
 
-    public File getFfmpegExecutable() {
-        return ffmpegExecutable;
-    }
-
-    public void setFfmpegExecutable(File ffmpegExecutable) {
-        this.ffmpegExecutable = ffmpegExecutable;
-    }
-
     /**
      * None blocking version of export.  The thread spawned can be stopped through
      * cancel method call.
@@ -142,14 +124,12 @@ public class MovieFrameExporter {
     public void exportThread(final File exportDirectory, final int start, final int end,
             final boolean withCorners, final boolean eyeOnly, final boolean screenOnly,
             final boolean sideBySide, final boolean eyeInCorner, final boolean screenInCorner,
-            final boolean createMovieFile, final boolean deleteMoviePictureFile,
             final int averageFrames) {
         Thread t = new Thread(new Runnable() {
 
             public void run() {
                 export(exportDirectory, start, end, withCorners, eyeOnly,
                         screenOnly, sideBySide, eyeInCorner, screenInCorner,
-                        createMovieFile, deleteMoviePictureFile,
                         averageFrames);
             }
         });
@@ -159,7 +139,6 @@ public class MovieFrameExporter {
     public void export(File exportDirectory, int start, int end,
             boolean withCorners, boolean eyeOnly, boolean screenOnly,
             boolean sideBySide, boolean eyeInCorner, boolean screenInCorner,
-            boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
         this.alive = true;
         Point2D.Double eyeVector = new Point2D.Double();
@@ -204,15 +183,14 @@ public class MovieFrameExporter {
         // loop for all frames
         for (int i = start; i <= end && alive; i++) {
             // Create file name
-            String fileName = numberFormat.format(i - start + 1) + ".tiff";
+            String fileName = numberFormat.format(i) + ".tiff";
 
             // Get eye frame
             BufferedImage eyeImage = renderEyeImage(
                     i + eyeOffset, eyeFrameManager);
 
             // Get average eye gaze
-            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset,
-                    averageFrames, scaleFactor);
+            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset, averageFrames, scaleFactor);
             if (point != null) {
                 gazePoint.setLocation(point);
             } else {
@@ -220,235 +198,42 @@ public class MovieFrameExporter {
             }
 
             // Get screen frame
-            BufferedImage screenImage = renderScreenImage(i + screenOffset,
-                    screenFrameManager, withCorners, gazePoint);
+            BufferedImage screenImage = renderScreenImage(i, screenFrameManager,
+                    withCorners, gazePoint);
 
             // Writing out information
             if (eyeOnly) {
                 writeImage(eyeImage,
-                        new File(eyeOnlyDir, fileName));
+                        new File(eyeOnlyDir, EYE_ONLY_FILE_NAME + fileName));
             }
 
             // Writing out information
             if (screenOnly) {
                 writeImage(screenImage,
-                        new File(screenOnlyDir, fileName));
+                        new File(screenOnlyDir, SCREEN_ONLY_FILE_NAME + fileName));
             }
 
             if (sideBySide) {
                 writeImage(renderSideBySideImage(eyeImage, screenImage),
-                        new File(sideBySideDir, fileName));
+                        new File(sideBySideDir, SIDE_BY_SIDE_FILE_NAME + fileName));
             }
 
             if (eyeInCorner) {
                 writeImage(renderInCornerImage(eyeImage, screenImage),
-                        new File(eyeInCornerDir, fileName));
+                        new File(eyeInCornerDir, EYE_IN_CORNER_FILE_NAME + fileName));
             }
 
             if (screenInCorner) {
                 writeImage(renderInCornerImage(screenImage, eyeImage),
-                        new File(screenInCornerDir, fileName));
+                        new File(screenInCornerDir, SCREEN_IN_CORNER_FILE_NAME + fileName));
             }
 
             // Update property
             if (this.listener != null) {
                 this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "Creating Images", i - 1, i));
+                        "progress", i - 1, i));
             }
         }
-
-        // Run ffmpeg
-        // Check if FFMPEG exists
-        boolean movieCreatedSuccessfully = true;
-        if (createMovieFile && this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
-
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(eyeOnly, "Creating eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
-
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(screenOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
-
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(sideBySide, "Creating side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
-
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
-
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(screenInCorner, "Creating screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
-
-            this.processLock.lock();
-            this.process = null;
-            this.processLock.unlock();
-        }
-
-
-        // Handle temp files accordingly
-        for (int i = start; i <= end; i++) {
-            // Create file name
-            String fileName = numberFormat.format(i - start + 1) + ".tiff";
-
-            String newFileName = numberFormat.format(i) + ".tiff";
-
-            // Handle file
-            File file = null;
-            if (eyeOnly) {
-                file = new File(eyeOnlyDir, fileName);
-                if (deleteMoviePictureFile) {
-                    file.delete();
-                } else {
-                    //Remove old file if any
-                    File outFile = new File(eyeOnlyDir,
-                            EYE_ONLY_FILE_NAME + newFileName);
-                    if (outFile.exists()) {
-                        outFile.delete();
-                    }
-                    file.renameTo(outFile);
-                }
-            }
-
-            // Writing out information
-            if (screenOnly) {
-                file = new File(screenOnlyDir, fileName);
-                if (deleteMoviePictureFile) {
-                    file.delete();
-                } else {
-                    //Remove old file if any
-                    File outFile = new File(screenOnlyDir,
-                            SCREEN_ONLY_FILE_NAME + newFileName);
-                    if (outFile.exists()) {
-                        outFile.delete();
-                    }
-                    file.renameTo(outFile);
-                }
-            }
-
-            if (sideBySide) {
-                file = new File(sideBySideDir, fileName);
-                if (deleteMoviePictureFile) {
-                    file.delete();
-                } else {
-                    //Remove old file if any
-                    File outFile = new File(sideBySideDir,
-                            SIDE_BY_SIDE_FILE_NAME + newFileName);
-                    if (outFile.exists()) {
-                        outFile.delete();
-                    }
-                    file.renameTo(outFile);
-                }
-            }
-
-            if (eyeInCorner) {
-                file = new File(eyeInCornerDir, fileName);
-                if (deleteMoviePictureFile) {
-                    file.delete();
-                } else {
-                    //Remove old file if any
-                    File outFile = new File(eyeInCornerDir,
-                            EYE_IN_CORNER_FILE_NAME + newFileName);
-                    if (outFile.exists()) {
-                        outFile.delete();
-                    }
-                    file.renameTo(outFile);
-                }
-            }
-
-            if (screenInCorner) {
-                file = new File(screenInCornerDir, fileName);
-                if (deleteMoviePictureFile) {
-                    file.delete();
-                } else {
-                    //Remove old file if any
-                    File outFile = new File(screenInCornerDir,
-                            SCREEN_IN_CORNER_FILE_NAME + newFileName);
-                    if (outFile.exists()) {
-                        outFile.delete();
-                    }
-                    file.renameTo(outFile);
-                }
-            }
-
-            // Update property
-            if (this.listener != null) {
-                this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "Clean Up Temp Files", i - 1, i));
-            }
-        }
-
-        // Update property
-        if (this.listener != null) {
-            if (movieCreatedSuccessfully) {
-                this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "Completed successfully", end, end));
-            } else {
-                this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "Completed with errors increating movies", end, end));
-            }
-        }
-    }
-
-    protected boolean createMovie(boolean eyeOnly, String propertyChangeString, String inputFilePrefix, int digit, File outputdir) {
-        if (eyeOnly && alive) {
-            // Update property
-            if (this.listener != null) {
-                this.listener.propertyChange(new PropertyChangeEvent(this, propertyChangeString, -1, -1));
-            }
-            ProcessBuilder processBuilder = new ProcessBuilder(constructFFMPEGCommandList(inputFilePrefix, digit));
-            processBuilder = processBuilder.directory(outputdir);
-            this.processLock.lock();
-            try {
-                process = processBuilder.start();
-                StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "Output");
-                StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "Error");
-                outputGobbler.start();
-                errorGobbler.start();
-            } catch (Exception ex) {
-                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                this.processLock.unlock();
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this, "Error: " + propertyChangeString, -1, -1));
-                }
-                return false;
-            }
-            this.processLock.unlock();
-
-            // Wait for process
-            try {
-                int exitCode = this.process.waitFor();
-                if (exitCode != 0) {
-                    return false;
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                if (this.listener != null) {
-                    this.listener.propertyChange(new PropertyChangeEvent(this, "Error: " + propertyChangeString, -1, -1));
-                }
-
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
-        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r " +
-                this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff " +
-                "-y " + name.trim() + ".mov";
-    }
-
-    private LinkedList<String> constructFFMPEGCommandList(String name, int totalDigitInFileName) {
-        LinkedList<String> list = new LinkedList<String>();
-
-        list.add(this.ffmpegExecutable.getAbsolutePath());
-        list.add("-sameq");
-        list.add("-r");
-        list.add(String.valueOf(this.frameRate));
-        list.add("-i");
-        list.add("%0" + totalDigitInFileName + "d.tiff");
-        list.add("-y");
-        list.add(name.trim() + ".mov");
-
-        return list;
     }
 
     /**
@@ -506,10 +291,8 @@ public class MovieFrameExporter {
                 this.gazeList.addLast(eyeGaze);
             }
 
-            // Pop the old one from the list if there is any
-            if (!this.gazeList.isEmpty()) {
-                this.gazeList.removeFirst();
-            }
+            // Pop the old one from the list
+            this.gazeList.removeFirst();
 
             this.gazeAverageRangeNextFrame++;
         }
@@ -546,7 +329,7 @@ public class MovieFrameExporter {
         Point[] eyePoints = new Point[2];
         eyePoints[0] = new Point();
         eyePoints[1] = new Point();
-        eyePoints[0].setLocation(info.getPupilX(), info.getPupilY());
+        eyePoints[0].setLocation(info.getCorniaX(), info.getCorniaY());
         eyePoints[1].setLocation(info.getReflectX(), info.getReflectY());
 
         Point.Double eyeVector = new Point2D.Double(eyePoints[0].x - eyePoints[1].x, eyePoints[0].y - eyePoints[1].y);
@@ -567,6 +350,14 @@ public class MovieFrameExporter {
     private void writeImage(BufferedImage image, File outputFile) {
         // Store the image in the TIFF format.
         JAI.create("filestore", image, outputFile.getAbsolutePath(), "TIFF", null);
+//                //Store image in jpg format
+//                try {
+//                    ImageIO.write(eyeImage, "jpg",
+//                            new File(exportDirectory, EYE_ONLY_FILE_NAME + fileName));
+//                } catch (IOException ex) {
+//                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+//                    return;
+//                }
     }
 
     /**
@@ -574,12 +365,6 @@ public class MovieFrameExporter {
      */
     public void cancel() {
         this.alive = false;
-        processLock.lock();
-        if (this.process != null) {
-            // Terminate the ffmpeg
-            this.process.destroy();
-        }
-        processLock.unlock();
     }
 
     /**
@@ -591,9 +376,13 @@ public class MovieFrameExporter {
     private BufferedImage renderEyeImage(
             int i, FrameManager eyeFrameManager) {
 
-        BufferedImage eyeImage = null;
+        BufferedImage eyeImage = new BufferedImage(
+                this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
-        Graphics2D g = null;
+        Graphics2D g = eyeImage.createGraphics();
+        // Fill with black    
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, width, height);
 
         BufferedImage image = eyeFrameManager.getFrame(i);
         double scale = 1d;
@@ -616,20 +405,7 @@ public class MovieFrameExporter {
             }
 
             // Put picture in
-            eyeImage = new BufferedImage(
-                    scaledImage.getWidth(null), scaledImage.getHeight(null),
-                    BufferedImage.TYPE_INT_RGB);
-
-            g = eyeImage.createGraphics();
             g.drawImage(scaledImage, 0, 0, null);
-        } else {
-            eyeImage = new BufferedImage(
-                    this.width, this.height,
-                    BufferedImage.TYPE_INT_RGB);
-            g = eyeImage.createGraphics();
-            // Fill with black
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, width, height);
         }
 
         EyeViewFrameInfo info =
@@ -638,7 +414,7 @@ public class MovieFrameExporter {
             Point[] eyePoints = new Point[2];
             eyePoints[0] = new Point();
             eyePoints[1] = new Point();
-            eyePoints[0].setLocation(info.getPupilX() * scale, info.getPupilY() * scale);
+            eyePoints[0].setLocation(info.getCorniaX() * scale, info.getCorniaY() * scale);
             eyePoints[1].setLocation(info.getReflectX() * scale, info.getReflectY() * scale);
 
             Point[] ellisp = makeBoundingBox(info.getCorniaFit(), scale);
@@ -647,10 +423,9 @@ public class MovieFrameExporter {
                 if (info.getPupilAngle() > 0) {
                     Graphics2D g2d = (Graphics2D) g;
                     AffineTransform oldTransform = g2d.getTransform();
-                    AffineTransform aff = AffineTransform.getTranslateInstance(
-                            oldTransform.getTranslateX(), oldTransform.getTranslateY());
-                    Ellipse2D.Double e = new Ellipse2D.Double(
-                            ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
+                    AffineTransform aff = AffineTransform.getTranslateInstance(oldTransform.getTranslateX(), oldTransform.getTranslateY());
+                    Ellipse2D.Double e = new Ellipse2D.Double();
+                    e.setFrameFromDiagonal(ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);
                     aff.rotate(info.getPupilAngle(), e.getCenterX(), e.getCenterY());
                     g2d.setTransform(aff);
                     g2d.draw(e);
@@ -676,53 +451,24 @@ public class MovieFrameExporter {
             int i, ScreenFrameManager screenFrameManager, boolean withCorners,
             Point gazePosition) {
 
-        BufferedImage screenImage = null;
+        BufferedImage screenImage = new BufferedImage(
+                this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
-        Graphics2D g = null;
+        Graphics2D g = screenImage.createGraphics();
+        // Fill with black    
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, width, height);
 
-        BufferedImage image = screenFrameManager.getFrame(i);
-        double scale = 1d;
-        if (image != null) {
-
-            // Scale image
-            int widthDiff = image.getWidth() - this.width;
-            int heightDiff = image.getHeight() - this.height;
-            Image scaledImage = null;
-            if (widthDiff > heightDiff) {
-                // We should scale by width
-                scale = (double) this.width / (double) image.getWidth();
-                scaledImage = image.getScaledInstance(
-                        this.width, -1, Image.SCALE_FAST);
-            } else {
-                // We should scale by width
-                scale = (double) this.height / (double) image.getHeight();
-                scaledImage = image.getScaledInstance(
-                        -1, this.height, Image.SCALE_FAST);
-            }
-
+        BufferedImage buffer = screenFrameManager.getFrame(i);
+        if (buffer != null) {
             // Put picture in
-            screenImage = new BufferedImage(
-                    scaledImage.getWidth(null), scaledImage.getHeight(null),
-                    BufferedImage.TYPE_INT_RGB);
-
-            g = screenImage.createGraphics();
-            g.drawImage(scaledImage, 0, 0, null);
-        } else {
-            screenImage = new BufferedImage(
-                    this.width, this.height,
-                    BufferedImage.TYPE_INT_RGB);
-            g = screenImage.createGraphics();
-            // Fill with black
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, width, height);
+            g.drawImage(buffer, 0, 0, null);
         }
 
         Point[] point = new Point[1];
         // Draw gaze point when available
         if (gazePosition != null) {
-            // Scale gaze point accordingly
-            point[0] = new Point((int) (gazePosition.x * scale),
-                    (int) (gazePosition.y * scale));
+            point[0] = gazePosition;
             drawMarks(g, Color.RED, point);
         }
 
@@ -850,15 +596,13 @@ public class MovieFrameExporter {
     private BufferedImage renderSideBySideImage(
             BufferedImage eyeImage, BufferedImage screenImage) {
         BufferedImage image = new BufferedImage(
-                eyeImage.getWidth() + screenImage.getWidth(),
-                Math.max(eyeImage.getHeight(), screenImage.getHeight()),
-                BufferedImage.TYPE_INT_RGB);
+                width * 2, height, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
 
         // Draw eyeImage
         g.drawImage(eyeImage, null, 0, 0);
-        g.drawImage(screenImage, null, eyeImage.getWidth(), 0);
+        g.drawImage(screenImage, null, width, 0);
 
         return image;
     }
@@ -867,8 +611,7 @@ public class MovieFrameExporter {
             BufferedImage cornerImage, BufferedImage mainImage) {
 
         BufferedImage image = new BufferedImage(
-                mainImage.getWidth(), mainImage.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
+                width, height, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
 
@@ -882,8 +625,8 @@ public class MovieFrameExporter {
 
         // Draw a box around corner image
         g.setColor(Color.WHITE);
-        g.drawRect(0, 0, (int) (cornerImage.getWidth() * this.smallImageScale),
-                (int) (cornerImage.getHeight() * this.smallImageScale));
+        g.drawRect(0, 0, (int) (this.width * this.smallImageScale),
+                (int) (this.height * this.smallImageScale));
 
         return image;
     }

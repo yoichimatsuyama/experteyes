@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package cornerselector;
 
 /*
@@ -34,6 +34,7 @@ package cornerselector;
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
+
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -54,40 +55,35 @@ import javax.swing.ImageIcon;
  * @author eeglab
  */
 public class ImageTools {
-
+    
     /** Creates a new instance of ImageTools */
     public ImageTools() {
     }
-
-    public static BufferedImage loadImage(File inputFile) {
+    
+    public static BufferedImage loadImage(File inputFile){
         RenderedOp op = null;
-        try {
-            op = JAI.create("fileload", inputFile.getAbsolutePath());
-        } catch (java.lang.IllegalArgumentException e) {
-            e.printStackTrace();
-            return null;
-        }
-        try {
+            try {
+                op = JAI.create("fileload", inputFile.getAbsolutePath());
+            } catch (java.lang.IllegalArgumentException e) {
+                e.printStackTrace();
+                return null;
+            }
             return op.getAsBufferedImage();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
-
+    
     /*Obtained from The Java Developers Almanac 1.4*/
     public static BufferedImage toBufferedImage(Image image) {
         if (image instanceof BufferedImage) {
-            return (BufferedImage) image;
+            return (BufferedImage)image;
         }
-
+        
         // This code ensures that all the pixels in the image are loaded
         image = new ImageIcon(image).getImage();
-
+        
         // Determine if the image has transparent pixels; for this method's
         // implementation, see e661 Determining If an Image Has Transparent Pixels
         boolean hasAlpha = hasAlpha(image);
-
+        
         // Create a buffered image with a format that's compatible with the screen
         BufferedImage bimage = null;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -97,7 +93,7 @@ public class ImageTools {
             if (hasAlpha) {
                 transparency = Transparency.BITMASK;
             }
-
+            
             // Create the buffered image
             GraphicsDevice gs = ge.getDefaultScreenDevice();
             GraphicsConfiguration gc = gs.getDefaultConfiguration();
@@ -106,7 +102,7 @@ public class ImageTools {
         } catch (HeadlessException e) {
             // The system does not have a screen
         }
-
+        
         if (bimage == null) {
             // Create a buffered image using the default color model
             int type = BufferedImage.TYPE_INT_RGB;
@@ -115,17 +111,17 @@ public class ImageTools {
             }
             bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
         }
-
+        
         // Copy image to buffered image
         Graphics g = bimage.createGraphics();
-
+        
         // Paint the image onto the buffered image
         g.drawImage(image, 0, 0, null);
         g.dispose();
-
+        
         return bimage;
     }
-
+    
     /**
      * Obtained from The Java Developers Almanac 1.4
      * This method returns true if the specified image has transparent pixels
@@ -133,18 +129,18 @@ public class ImageTools {
     public static boolean hasAlpha(Image image) {
         // If buffered image, the color model is readily available
         if (image instanceof BufferedImage) {
-            BufferedImage bimage = (BufferedImage) image;
+            BufferedImage bimage = (BufferedImage)image;
             return bimage.getColorModel().hasAlpha();
         }
-
+    
         // Use a pixel grabber to retrieve the image's color model;
         // grabbing a single pixel is usually sufficient
-        PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
+         PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
         try {
             pg.grabPixels();
         } catch (InterruptedException e) {
         }
-
+    
         // Get the image's color model
         ColorModel cm = pg.getColorModel();
         return cm.hasAlpha();

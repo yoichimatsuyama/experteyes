@@ -46,7 +46,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
+import org.apache.sanselan.ImageReadException;
+import org.apache.sanselan.Sanselan;
 
 /**
  * 
@@ -134,7 +135,8 @@ public class PointToFrameByEstimatedPupilLocation {
      * frames array position % frameSampling = 0
      */
     public void loadFrames(File[] frames, int pupilThreshold,
-            Rectangle searchRect, int frameSampling){
+            Rectangle searchRect, int frameSampling)
+            throws ImageReadException, IOException {
         
         double[] size = new double[frames.length];
         Point2D.Double[] pupil = new Double[frames.length];
@@ -146,7 +148,8 @@ public class PointToFrameByEstimatedPupilLocation {
         double totalForAverageCount = 0d;
         for (int i = 0; i < frames.length; i++) {
             if (i % frameSampling == 0) {
-                BufferedImage paintedImg = ImageUtils.loadRGBImage(frames[i]);
+                BufferedImage paintedImg =
+                        Sanselan.getBufferedImage(frames[i]);
 
                 // Get pupil estimate
                 Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
@@ -286,7 +289,7 @@ public class PointToFrameByEstimatedPupilLocation {
         return frame;
     }
 
-    public void setLoadingListener(ChangeListener listener) {
+    public void addLoadingListener(ChangeListener listener) {
         this.listener = listener;
     }
 

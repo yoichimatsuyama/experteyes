@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package logic;
 
 import java.awt.image.BufferedImage;
@@ -35,6 +35,8 @@ import java.io.File;
  */
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.JProgressBar;
+import org.apache.sanselan.Sanselan;
 
 /**
  *
@@ -51,7 +53,6 @@ import javax.imageio.ImageIO;
  */
 public class ThreadedImageProcessor implements Runnable {
     // don't process every frame
-
     int FRAME_SKIP = 30;
     // all of the image files
     File[] imgFiles;
@@ -59,6 +60,7 @@ public class ThreadedImageProcessor implements Runnable {
     int[] pixels, maxImgPixels, minImgPixels, avgImgPixels;
     // images composed of said pixels
     BufferedImage img, maxImg, minImg, avgImg;
+
     private boolean alive;
     private ThreadedImageProcessorListener listener;
 
@@ -89,7 +91,7 @@ public class ThreadedImageProcessor implements Runnable {
             BufferedImage oldAvgImg = avgImg;
 
             // get the initial img and pixels
-            img = ImageUtils.loadRGBImage(imgFiles[0]);
+            img = Sanselan.getBufferedImage(imgFiles[0]);
 
             minImg = new BufferedImage(img.getWidth(), img.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
@@ -105,16 +107,15 @@ public class ThreadedImageProcessor implements Runnable {
 
             // now do this for all files
             for (int i = 0; i < imgFiles.length && alive; i += FRAME_SKIP) {
-                img = ImageUtils.loadRGBImage(imgFiles[i]);
-                if (img != null) {
-                    pixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(img));
-                    for (int j = 0; j < pixels.length; j++) {
-                        minImgPixels[j] = Math.min(minImgPixels[j], pixels[j]);
-                        maxImgPixels[j] = Math.max(maxImgPixels[j], pixels[j]);
-                    }
+                img = Sanselan.getBufferedImage(imgFiles[i]);
+                pixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(img));
+                for (int j = 0; j < pixels.length; j++) {
+                    minImgPixels[j] = Math.min(minImgPixels[j], pixels[j]);
+                    maxImgPixels[j] = Math.max(maxImgPixels[j], pixels[j]);
                 }
 
                 listener.progress(i);
+                
             }
 
             // average min and max eyes
@@ -172,15 +173,15 @@ public class ThreadedImageProcessor implements Runnable {
 
         File inputFile = new File(directory, bundle.getString("minImageFile"));
         if (inputFile.exists()) {
-            minImg = ImageUtils.loadRGBImage(inputFile);
+            minImg = ImageUtils.loadImage(inputFile);
         }
         inputFile = new File(directory, bundle.getString("maxImageFile"));
         if (inputFile.exists()) {
-            maxImg = ImageUtils.loadRGBImage(inputFile);
+            maxImg = ImageUtils.loadImage(inputFile);
         }
         inputFile = new File(directory, bundle.getString("avgImageFile"));
         if (inputFile.exists()) {
-            avgImg = ImageUtils.loadRGBImage(inputFile);
+            avgImg = ImageUtils.loadImage(inputFile);
         }
     }
 

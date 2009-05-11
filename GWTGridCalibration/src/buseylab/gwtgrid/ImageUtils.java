@@ -50,14 +50,8 @@ public class ImageUtils {
             return null;
         } 
 
-        BufferedImage img = null;
-        try {
-            img = op.getAsBufferedImage();
-            op.dispose();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        BufferedImage img = op.getAsBufferedImage();
+        op.dispose();
         return img;
     //return op.getAsBufferedImage();
     }

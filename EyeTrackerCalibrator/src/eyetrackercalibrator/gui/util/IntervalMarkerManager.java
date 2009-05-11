@@ -51,7 +51,7 @@ public class IntervalMarkerManager {
 
     /**
      *  Helper to help recycle intervalmarker
-     * @return IntergalMarker 
+     * @return 
      */
     public IntervalMarker getNewIntervalMarker() {
         IntervalMarker marker;

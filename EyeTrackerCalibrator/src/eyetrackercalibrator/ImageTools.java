@@ -83,12 +83,7 @@ public class ImageTools {
             e.printStackTrace();
             return null;
         }
-        try {
-            return op.getAsBufferedImage();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return op.getAsBufferedImage();
     }
 
     /*Obtained from The Java Developers Almanac 1.4*/

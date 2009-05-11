@@ -103,9 +103,9 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         // JGraphPanel from displaying properly
         GroupLayout layout = (GroupLayout) getLayout();
         graphTabPanel = new IlluminationGraphTabPanel();
-        graphTabPanel.setFixVerticalSize(247);
+        graphTabPanel.setFixVerticalSize(188);
         layout.replace(graphHolder, graphTabPanel);
-        
+
         // Add listener to mouse click on graph
         graphTabPanel.addChartProgressListener(new ChartProgressListener() {
 
@@ -280,24 +280,21 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         markTrialPanel = new javax.swing.JPanel();
         trialMarkCancelButton = new javax.swing.JButton();
         markButton = new javax.swing.JButton();
         trialRangeMarkLabel = new javax.swing.JLabel();
-        graphHolder = new javax.swing.JPanel();
-        topPanel = new javax.swing.JPanel();
-        frameScrollingJPanel = new eyetrackercalibrator.gui.FrameScrollingJPanel();
         displayJPanel = new eyetrackercalibrator.gui.DisplayJPanel();
-        bottomPanel = new javax.swing.JPanel();
+        frameScrollingJPanel = new eyetrackercalibrator.gui.FrameScrollingJPanel();
+        graphHolder = new javax.swing.JPanel();
+        backButton = new javax.swing.JButton();
         trialInfoPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         trialList = new javax.swing.JList();
         removeButton = new javax.swing.JButton();
         fixEndFrameButton = new javax.swing.JButton();
         fixStartFrameButton = new javax.swing.JButton();
-        backButton = new javax.swing.JButton();
         operationPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         trialLabelTextField = new javax.swing.JTextField();
@@ -350,38 +347,19 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         );
 
         graphHolder.setBackground(new java.awt.Color(51, 255, 0));
-        graphHolder.setMaximumSize(new java.awt.Dimension(32767, 247));
-        graphHolder.setPreferredSize(new java.awt.Dimension(862, 247));
 
         org.jdesktop.layout.GroupLayout graphHolderLayout = new org.jdesktop.layout.GroupLayout(graphHolder);
         graphHolder.setLayout(graphHolderLayout);
         graphHolderLayout.setHorizontalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 693, Short.MAX_VALUE)
+            .add(0, 717, Short.MAX_VALUE)
         );
         graphHolderLayout.setVerticalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 247, Short.MAX_VALUE)
+            .add(0, 188, Short.MAX_VALUE)
         );
 
-        displayJPanel.setMinimumSize(new java.awt.Dimension(200, 100));
-
-        org.jdesktop.layout.GroupLayout topPanelLayout = new org.jdesktop.layout.GroupLayout(topPanel);
-        topPanel.setLayout(topPanelLayout);
-        topPanelLayout.setHorizontalGroup(
-            topPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-            .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-        );
-        topPanelLayout.setVerticalGroup(
-            topPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, topPanelLayout.createSequentialGroup()
-                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-
-        bottomPanel.setPreferredSize(new java.awt.Dimension(285, 264));
+        backButton.setText("Back");
 
         trialInfoPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -430,20 +408,13 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         trialInfoPanelLayout.setVerticalGroup(
             trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, trialInfoPanelLayout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(fixStartFrameButton)
                     .add(removeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(fixEndFrameButton)))
         );
-
-        backButton.setText("Back");
-        backButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backButtonActionPerformed(evt);
-            }
-        });
 
         jLabel1.setText("Label:");
 
@@ -499,44 +470,35 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 .add(loadTrialPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        org.jdesktop.layout.GroupLayout bottomPanelLayout = new org.jdesktop.layout.GroupLayout(bottomPanel);
-        bottomPanel.setLayout(bottomPanelLayout);
-        bottomPanelLayout.setHorizontalGroup(
-            bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                .add(backButton)
-                .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, trialInfoPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, operationPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-        );
-        bottomPanelLayout.setVerticalGroup(
-            bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(bottomPanelLayout.createSequentialGroup()
-                .add(trialInfoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(operationPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(backButton))
-        );
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(graphHolder, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-                    .add(topPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
+                    .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, graphHolder, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(bottomPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 340, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(trialInfoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, backButton)
+                    .add(operationPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(topPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(trialInfoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(operationPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(backButton))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(graphHolder, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(bottomPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     private void loadTrialInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadTrialInfoButtonActionPerformed
@@ -760,10 +722,6 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_fixEndFrameButtonActionPerformed
 
-    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_backButtonActionPerformed
-
     /** 
      * Load trial info making sure that only one of 
      * skip button or complete Illumination completion thread can access this
@@ -839,7 +797,6 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
-    private javax.swing.JPanel bottomPanel;
     private eyetrackercalibrator.gui.DisplayJPanel displayJPanel;
     private javax.swing.JButton estimateTrialButton;
     private javax.swing.JButton fixEndFrameButton;
@@ -855,7 +812,6 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     private javax.swing.JPanel markTrialPanel;
     private javax.swing.JPanel operationPanel;
     private javax.swing.JButton removeButton;
-    private javax.swing.JPanel topPanel;
     private javax.swing.JPanel trialInfoPanel;
     private javax.swing.JTextField trialLabelTextField;
     private javax.swing.JList trialList;

@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 /*
  * Main.java
  *
@@ -48,10 +48,8 @@ import eyetrackercalibrator.gui.NewProjectJDialog;
 import eyetrackercalibrator.gui.ProjectSelectPanel;
 import eyetrackercalibrator.gui.SynchronizeJPanel;
 import eyetrackercalibrator.gui.TrialMarkingJPanel;
-import eyetrackercalibrator.gui.util.FrameTranslator;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.ComputeIlluminationRangeThread;
-import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.math.EyeGazeComputing.ComputingApproach;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
@@ -123,15 +121,11 @@ public class Main extends javax.swing.JFrame {
     static final public String CALIBRATION_FILE_NAME = "calibration.xml";
     static final public String ERROR_FILE_NAME = "errors.xml";
     static final public String TRIAL_FILE_NAME = "trial.xml";
-    static final public String MONITOR_TRUE_WIDTH_PX = "monitortruewidth";
-    static final public String MONITOR_TRUE_HEIGHT_PX = "monitortrueheight";
-    static final public String MONITOR_TRUE_WIDTH_CM = "monitortruewidthcm";
-    static final public String MONITOR_TRUE_HEIGHT_CM = "monitortrueheightcm";
-    static final public String DISTANCE_FROM_MONITOR_CM = "distancefrommonitorcm";
+    static final public String MONITOR_TRUE_WIDTH = "monitortruewidth";
+    static final public String MONITOR_TRUE_HEIGHT = "monitortrueheight";
     static final public String FULL_SCREEN_WIDTH = "fullscreenwidth";
     static final public String FULL_SCREEN_HEIGHT = "fullscreenheight";
     static final public String COMMENT = "comment";
-    static final public String PROPERTY_FILE = "eyetrackercalibrator.properties";
     static final public int ERROR_VALUE = -666;
     private static String DATABASE_NAME = "IlluminationDb";
     static final public String CORNERHINT_DIR = "CornerHints";
@@ -188,7 +182,6 @@ public class Main extends javax.swing.JFrame {
         // Ask user where to put information
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             PrintWriter out = null;
             try {
@@ -202,21 +195,12 @@ public class Main extends javax.swing.JFrame {
                 return;
             }
 
-            Dimension trueMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
-            Dimension sceneDimension = projectSelectPanel.getFullSceneDimensionPX();
-            double distanceFromMeasuredScene = projectSelectPanel.getDistanceFromMeasuredScene();
-            double sceneHeight = projectSelectPanel.getSceneHeightCM();
-            double sceneWidth = projectSelectPanel.getSceneWidthCM();
-
-            // Get offset
-            FrameTranslator frameTranslator = new FrameTranslator();
-            frameTranslator.setSynchronizePoint(
-                    Integer.parseInt(this.projectSelectPanel.getSynchronizedEyeFrame()),
-                    Integer.parseInt(this.projectSelectPanel.getSynchronizedScreenFrame()));
+            Dimension trueScreenDimension = projectSelectPanel.getMonitorDimension();
+            Dimension viewScreenDimension = projectSelectPanel.getFullScreenDimension();
 
             // Print header
             out.println(
-                    "Scene Frame\t" +
+                    "Screen Frame\t" +
                     "Scene X\t" +
                     "Scene Y\t" +
                     "Top Left X\t" +
@@ -227,9 +211,8 @@ public class Main extends javax.swing.JFrame {
                     "Bottom Left Y\t" +
                     "Bottom Right X\t" +
                     "Bottom Right Y\t" +
-                    "Eye Gaze X\t" +
-                    "Eye Gaze Y\t" +
-                    "Error Angle");
+                    "Screen X\t" +
+                    "Screen Y");
 
             int totalFrame = 0;
             if (screenFrameManager != null) {
@@ -237,11 +220,6 @@ public class Main extends javax.swing.JFrame {
             } else {
                 return;
             }
-
-            // Prepare degree error computer
-            DegreeErrorComputer dec = new DegreeErrorComputer(sceneDimension,
-                                    distanceFromMeasuredScene,
-                                    sceneWidth, sceneHeight);
 
             // Scan through each frame
             for (int i = 1; i <= totalFrame; i++) {
@@ -251,6 +229,7 @@ public class Main extends javax.swing.JFrame {
                     // Found calibration points so output info
                     ScreenViewFrameInfo info =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
+                    
 
                     out.print(i);
 
@@ -264,50 +243,32 @@ public class Main extends javax.swing.JFrame {
                     Point p = null;
                     Point[] corners = info.getCorners();
                     if (corners != null) {
-                        printCorners(corners, p, out);
+                        p = corners[ScreenViewFrameInfo.TOPLEFT];
+                        printPointHelper(p, out);
+                        p = corners[ScreenViewFrameInfo.TOPRIGHT];
+                        printPointHelper(p, out);
+                        p = corners[ScreenViewFrameInfo.BOTTOMLEFT];
+                        printPointHelper(p, out);
+                        p = corners[ScreenViewFrameInfo.BOTTOMRIGHT];
+                        printPointHelper(p, out);
 
-                        // Estimate true screen position
+                        // Estimate true screnn position
                         Point2D pos = Computation.ComputeScreenPositionProjective(
-                                trueMonitorDimension,
+                                trueScreenDimension,
                                 scenePos,
                                 corners[ScreenViewFrameInfo.TOPLEFT],
                                 corners[ScreenViewFrameInfo.TOPRIGHT],
                                 corners[ScreenViewFrameInfo.BOTTOMLEFT],
                                 corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
                         printPointHelper(pos, out);
+
+                        out.println();
                     } else {
                         // Print error
                         for (int j = 0; j < 10; i++) {
-                            out.print("\t" + ERROR_VALUE);
+                            out.println("\t" + ERROR_VALUE);
                         }
                     }
-
-                    // Get eyeGaze
-                    if (this.eyeFrameManager != null) {
-                        EyeViewFrameInfo eyeInfo = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
-                                frameTranslator.getEyeFrameFromSceneFrame(i));
-
-                        if (eyeInfo != null) {
-                            Point2D.Double gazeVec = Computation.computeEyeVector(
-                                    eyeInfo.getPupilX(), eyeInfo.getPupilY(),
-                                    eyeInfo.getReflectX(), eyeInfo.getReflectY());
-                            // Computer eye gaze point
-                            Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
-                                    frameTranslator.getUniversalFrameFromSceneFrame(i),
-                                    gazeVec.x, gazeVec.y);
-
-                            // Compute error angel
-                            double errorAngle = dec.degreeError(
-                                    scenePos, gazePoint);
-
-                            if (errorAngle >= 0) {
-                                out.print("\t" + errorAngle);
-                            } else {
-                                out.print("\t" + ERROR_VALUE);
-                            }
-                        }
-                    }
-                    out.println();
                 }
             }
             out.close();
@@ -353,7 +314,6 @@ public class Main extends javax.swing.JFrame {
                 this.eyeGazeComputing,
                 eyeFrame, screenFrame,
                 eyeFrameManager, screenFrameManager);
-        exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
     }
 
@@ -567,18 +527,6 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    /** Helper for printing corners to output */
-    private void printCorners(Point[] corners, Point p, PrintWriter out) {
-        p = corners[ScreenViewFrameInfo.TOPLEFT];
-        printPointHelper(p, out);
-        p = corners[ScreenViewFrameInfo.TOPRIGHT];
-        printPointHelper(p, out);
-        p = corners[ScreenViewFrameInfo.BOTTOMLEFT];
-        printPointHelper(p, out);
-        p = corners[ScreenViewFrameInfo.BOTTOMRIGHT];
-        printPointHelper(p, out);
-    }
-
     private void printPointHelper(Point2D p, PrintWriter out) {
         // Show corners
         if (p != null) {
@@ -623,23 +571,22 @@ public class Main extends javax.swing.JFrame {
      * are pressed.
      */
     public void projectSelectPanelActionPerformed(java.awt.event.ActionEvent evt) {
+        // Set up scaling factor of the screen info
+        Dimension d = projectSelectPanel.getFullScreenDimension();
+        if (d != null) {
+            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor(d));
+        } else {
+            // Default to 1
+            screenFrameManager.setScreenInfoScalefactor(1d);
+        }
+
         screenFrameManager.setFrameDirectory(projectSelectPanel.getScreenFrameDirectory());
         eyeFrameManager.setFrameDirectory(projectSelectPanel.getEyeFrameDirectory());
 
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Set up synchronized panel
-            int frame = 1;
-            try {
-                frame = Integer.parseInt(projectSelectPanel.getSynchronizedEyeFrame());
-            } catch (NumberFormatException numberFormatException) {
-            }
-            synchronizeJPanel.setEyeViewCurrentFrame(frame);
-            frame = 1;
-            try {
-                frame = Integer.parseInt(projectSelectPanel.getSynchronizedScreenFrame());
-            } catch (NumberFormatException numberFormatException) {
-            }
-            synchronizeJPanel.setScreenViewCurrentFrame(frame);
+            synchronizeJPanel.setEyeViewCurrentFrame(1);
+            synchronizeJPanel.setScreenViewCurrentFrame(1);
 
             // need this to set the stat for frame playing (total frame and what not)
             synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -653,6 +600,24 @@ public class Main extends javax.swing.JFrame {
             // Start playing synchronize panel
             synchronizeJPanel.start();
 
+        } else if ("Calibrate".equals(evt.getActionCommand())) {
+            // need this to set the stat for frame playing (total frame and what not)
+            calibrateJPanel.setEyeFrameManager(eyeFrameManager);
+            calibrateJPanel.setScreenFrameManager(screenFrameManager);
+            calibrateJPanel.setProjectRoot(projectLocation);
+            calibrateJPanel.setFullScreenFrameDirectory(
+                    projectSelectPanel.getFullScreenFrameDirectory());
+            calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullScreenDimension());
+            calibrateJPanel.setGazeScaleFactor(
+                    screenFrameManager.getScreenInfoScalefactor());
+            calibrateJPanel.setEyeScreenInfoDirectory(
+                    projectSelectPanel.getEyeInfoDirectory());
+
+            remove(projectSelectPanel);
+            add(calibrateJPanel);
+            pack();
+
+            calibrateJPanel.start();
         } else if ("Load Eye Images".equals(evt.getActionCommand())) {
             projectSelectPanel.setEyeLoadButtonsEnable(false);
 
@@ -791,76 +756,47 @@ public class Main extends javax.swing.JFrame {
             });
             waitThread.start();
 
-        } else {
-            // Screen scaling must be recomputed before any of the following operations
-            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor());
+        } else if ("Clean Data".equals(evt.getActionCommand())) {
 
-            if ("Calibrate".equals(evt.getActionCommand())) {
-                // need this to set the stat for frame playing (total frame and what not)
-                calibrateJPanel.setEyeFrameManager(eyeFrameManager);
-                calibrateJPanel.setScreenFrameManager(screenFrameManager);
-                calibrateJPanel.setProjectRoot(projectLocation);
-                calibrateJPanel.setFullScreenFrameDirectory(
-                        projectSelectPanel.getFullScreenFrameDirectory());
-                calibrateJPanel.setFullScreenDim(projectSelectPanel.getFullSceneDimensionPX());
-                calibrateJPanel.setGazeScaleFactor(
-                        screenFrameManager.getScreenInfoScalefactor());
-                calibrateJPanel.setEyeScreenInfoDirectory(
-                        projectSelectPanel.getEyeInfoDirectory());
-                calibrateJPanel.setDegreeErrorComputer(new DegreeErrorComputer(
-                        projectSelectPanel.getFullSceneDimensionPX(),
-                        projectSelectPanel.getDistanceFromMeasuredScene(),
-                        projectSelectPanel.getSceneWidthCM(),
-                        projectSelectPanel.getSceneHeightCM()));
+            // Set calibrate panel offset
+            cleanDataJPanel.setEyeGazeScaleFactor(
+                    screenFrameManager.getScreenInfoScalefactor());
 
-                remove(projectSelectPanel);
-                add(calibrateJPanel);
-                pack();
+            // need this to set the stat for frame playing (total frame and what not)
+            cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
+            cleanDataJPanel.setScreenFrameManager(screenFrameManager);
+            cleanDataJPanel.setFullScreenFrameDirectory(
+                    projectSelectPanel.getFullScreenFrameDirectory());
+            cleanDataJPanel.setCornerHintDir(new File(projectLocation,CORNERHINT_DIR));
+            cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
 
-                calibrateJPanel.start();
+            remove(projectSelectPanel);
+            add(cleanDataJPanel);
+            pack();
 
-            } else if ("Clean Data".equals(evt.getActionCommand())) {
-
-                // Set calibrate panel offset
-                cleanDataJPanel.setEyeGazeScaleFactor(
-                        screenFrameManager.getScreenInfoScalefactor());
-
-                // need this to set the stat for frame playing (total frame and what not)
-                cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
-                cleanDataJPanel.setScreenFrameManager(screenFrameManager);
-                cleanDataJPanel.setFullScreenFrameDirectory(
-                        projectSelectPanel.getFullScreenFrameDirectory());
-                cleanDataJPanel.setCornerHintDir(new File(projectLocation, CORNERHINT_DIR));
-                cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
-
-                remove(projectSelectPanel);
-                add(cleanDataJPanel);
-                pack();
-
-                cleanDataJPanel.start();
-            } else if ("Mark Trials".equals(evt.getActionCommand())) {
+            cleanDataJPanel.start();
+        } else if ("Mark Trials".equals(evt.getActionCommand())) {
 //            @todo remove
-                // Set calibrate panel offset
-                markTrialJPanel.setEyeGazeScaleFactor(
-                        screenFrameManager.getScreenInfoScalefactor());
+            // Set calibrate panel offset
+            markTrialJPanel.setEyeGazeScaleFactor(
+                    screenFrameManager.getScreenInfoScalefactor());
 
-                // need this to set the stat for frame playing (total frame and what not)
-                markTrialJPanel.setEyeFrameManager(eyeFrameManager);
-                markTrialJPanel.setScreenFrameManager(screenFrameManager);
-                markTrialJPanel.setProjectRoot(projectLocation);
-                markTrialJPanel.setFullScreenFrameDirectory(
-                        projectSelectPanel.getFullScreenFrameDirectory());
+            // need this to set the stat for frame playing (total frame and what not)
+            markTrialJPanel.setEyeFrameManager(eyeFrameManager);
+            markTrialJPanel.setScreenFrameManager(screenFrameManager);
+            markTrialJPanel.setProjectRoot(projectLocation);
+            markTrialJPanel.setFullScreenFrameDirectory(
+                    projectSelectPanel.getFullScreenFrameDirectory());
 
-                remove(projectSelectPanel);
-                add(markTrialJPanel);
-                pack();
+            remove(projectSelectPanel);
+            add(markTrialJPanel);
+            pack();
 
-                markTrialJPanel.start();
-            } else if ("Export Data".equals(evt.getActionCommand())) {
-                exportData();
-            } else if ("Export Movies".equals(evt.getActionCommand())) {
-                exportMovies();
-            }
+            markTrialJPanel.start();
+        } else if ("Export Data".equals(evt.getActionCommand())) {
+            exportData();
+        } else if ("Export Movies".equals(evt.getActionCommand())) {
+            exportMovies();
         }
     }
 
@@ -924,7 +860,9 @@ public class Main extends javax.swing.JFrame {
                 }
                 // Reset offset
                 setOffset(0, 0);
-                createProject(location);
+
+                // Load in information
+                openProject(location);
             } else {
                 // Does nothing
             }
@@ -932,24 +870,6 @@ public class Main extends javax.swing.JFrame {
             dialog.dispose();
             // Remove dialog
             dialog = null;
-        }
-    }
-
-    private void createProject(File location) {
-        // create project
-        switch (openProject(location, true)) {
-            case ERROR_OPENING_DATABASE:
-                // Something is wrong tell user
-                JOptionPane.showMessageDialog(this,
-                        "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
-                        "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
-                break;
-            case ERROR_OPENING_PROJECT_FILE:
-                // Something is wrong tell user
-                JOptionPane.showMessageDialog(this,
-                        "<html>There is an error creating the project file. Please check file permissions.</html>",
-                        "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
-                break;
         }
     }
 
@@ -978,41 +898,15 @@ public class Main extends javax.swing.JFrame {
                 add(projectSelectPanel);
                 pack();
                 // Switch to selected project
-                switch (openProject(fileChooser.getSelectedFile(), false)) {
-                    case ERROR_OPENING_DATABASE:
-                        // Something is wrong tell user
-                        JOptionPane.showMessageDialog(this,
-                                "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
-                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
-                        break;
-                    case ERROR_OPENING_PROJECT_FILE:
-                        // Something is wrong tell user
-                        JOptionPane.showMessageDialog(this,
-                                "<html>There is an error opening the project file. Please check file permission.</html>",
-                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
-                        break;
-                    case PROJECT_FILE_NOT_FOUND:
-                        // Something is wrong tell user
-                        JOptionPane.showMessageDialog(this,
-                                "<html>This is not a project folder.  Please select a different folder.</html>",
-                                "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
-                        break;
-                }
+                openProject(fileChooser.getSelectedFile());
             }
         }
     }
 
-    /**
-     * Open a project.
-     * @param createNew If create is true the method create a project files when there is no project in the given directory
-     * @return true when successful
-     */
-    private enum OpenProjectError {
+    /** Open a project. */
+    private void openProject(File projectLocation) {
+        this.isProjectOpen = true;
 
-        PROJECT_FILE_NOT_FOUND, ERROR_OPENING_PROJECT_FILE, ERROR_OPENING_DATABASE, NO_ERROR
-    }
-
-    private OpenProjectError openProject(File projectLocation, boolean create) {
         // Set project location
         this.projectLocation = projectLocation;
 
@@ -1021,18 +915,11 @@ public class Main extends javax.swing.JFrame {
         try {
             p.loadFromXML(new FileInputStream(new File(projectLocation, PROJECT_PROPERTY_FILE_NAME)));
         } catch (FileNotFoundException ex) {
+            //ex.printStackTrace();
             System.err.println("Cannot load project property file.");
-            if (!create) {
-                return OpenProjectError.PROJECT_FILE_NOT_FOUND;
-            }
         } catch (IOException ex) {
             ex.printStackTrace();
-            if (!create) {
-                return OpenProjectError.ERROR_OPENING_PROJECT_FILE;
-            }
         }
-
-        this.isProjectOpen = true;
 
         setOffset(Integer.parseInt(p.getProperty(EYE_OFFSET, "0")), Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
 
@@ -1041,12 +928,9 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setScreenFrameDirectory(p.getProperty(SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setFullScreenFrameDirectory(p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setScreenInfoDirectory(p.getProperty(SCREEN_INFO_DIRECTORY));
-        projectSelectPanel.setMonitorDimensionPX(p.getProperty(MONITOR_TRUE_WIDTH_PX, ""), p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
-        projectSelectPanel.setFullSceneDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
+        projectSelectPanel.setMonitorDimension(p.getProperty(MONITOR_TRUE_WIDTH, ""), p.getProperty(MONITOR_TRUE_HEIGHT, ""));
+        projectSelectPanel.setFullScreenDimension(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
         projectSelectPanel.setComment(p.getProperty(COMMENT, ""));
-        projectSelectPanel.setDistanceFromMeasuredScene(p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
-        projectSelectPanel.setSceneHeightCM(p.getProperty(MONITOR_TRUE_HEIGHT_CM, "0"));
-        projectSelectPanel.setSceneWidthCM(p.getProperty(MONITOR_TRUE_WIDTH_CM, "0"));
 
         // Trying to determine full screen dimension
         try {
@@ -1055,14 +939,20 @@ public class Main extends javax.swing.JFrame {
             screenFrameManager = new ScreenFrameManager(projectLocation.getAbsolutePath() + File.separator + "ScreenViewCacheDB", 512, 512, new ScreenViewFrameInfo());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error open project", JOptionPane.ERROR_MESSAGE);
-            return OpenProjectError.ERROR_OPENING_DATABASE;
+            return;
         }
 
         // Set up scaling factor of the screen info
         updateFullScreenDimansion();
 
         // Set up scaling factor of the screen info
-        Dimension d = projectSelectPanel.getFullSceneDimensionPX();
+        Dimension d = projectSelectPanel.getFullScreenDimension();
+        if (d != null) {
+            screenFrameManager.setScreenInfoScalefactor(computeScalingFactor(d));
+        } else {
+
+            screenFrameManager.setScreenInfoScalefactor(1d);
+        }
 
         // Assign frame manager to all panel
         synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1125,26 +1015,28 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setEnabled(true);
 
         pack();
-
-        return OpenProjectError.NO_ERROR;
     }
 
     /**
      * Compute scaling factor
      */
-    private double computeScalingFactor() {
+    private double computeScalingFactor(Dimension d) {
+        double scale = 1d;
 
-        // Get fullscreen dimension
-        Dimension d = projectSelectPanel.getFullSceneDimensionPX();
-        // Get the first image file
-        BufferedImage image = screenFrameManager.getFrame(1);
-
-        // Only do anything when there is somthing to compute
-        if (image == null || d == null) {
-            return 1d;
-        } else {
-            return ((double) image.getWidth()) / ((double) d.width);
+        // Compute scaling factor
+        if (d.width > this.DISPLAY_WIDTH) {
+            if (d.height * this.DISPLAY_WIDTH / d.width <= this.DISPLAY_HEIGHT) {
+                // OK to scale by width
+                scale = (double) this.DISPLAY_WIDTH / (double) d.width;
+                // Set height
+                d.height = 1;
+            }
         }
+        if (d.height > this.DISPLAY_HEIGHT) {
+            scale = (double) this.DISPLAY_HEIGHT / (double) d.height;
+        }
+        // Set scaling factor
+        return scale;
     }
 
     private void formWindowClosed() {
@@ -1159,7 +1051,7 @@ public class Main extends javax.swing.JFrame {
 
     private void save() {
         // Get new screen dimension
-        Dimension d = projectSelectPanel.getMonitorDimensionPX();
+        Dimension d = projectSelectPanel.getMonitorDimension();
         calibrateJPanel.setFullScreenDim(d);
 
         // Save calibration points
@@ -1184,16 +1076,10 @@ public class Main extends javax.swing.JFrame {
         p.setProperty(SCREEN_INFO_DIRECTORY, projectSelectPanel.getScreenInfoDirectory());
         p.setProperty(COMMENT, projectSelectPanel.getComment());
         if (d != null) {
-            p.setProperty(MONITOR_TRUE_HEIGHT_PX, String.valueOf(d.height));
-            p.setProperty(MONITOR_TRUE_WIDTH_PX, String.valueOf(d.width));
+            p.setProperty(MONITOR_TRUE_HEIGHT, String.valueOf(d.height));
+            p.setProperty(MONITOR_TRUE_WIDTH, String.valueOf(d.width));
         }
-        p.setProperty(MONITOR_TRUE_HEIGHT_CM, String.valueOf(
-                projectSelectPanel.getSceneHeightCM()));
-        p.setProperty(MONITOR_TRUE_WIDTH_CM, String.valueOf(
-                projectSelectPanel.getSceneWidthCM()));
-        p.setProperty(DISTANCE_FROM_MONITOR_CM, String.valueOf(
-                projectSelectPanel.getDistanceFromMeasuredScene()));
-        d = projectSelectPanel.getFullSceneDimensionPX();
+        d = projectSelectPanel.getFullScreenDimension();
         if (d != null) {
             p.setProperty(FULL_SCREEN_HEIGHT, String.valueOf(d.height));
             p.setProperty(FULL_SCREEN_WIDTH, String.valueOf(d.width));
@@ -1228,8 +1114,8 @@ public class Main extends javax.swing.JFrame {
         int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
 
         // Get screen dimansion
-        Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
-        Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
+        Dimension realMonitorDimension = projectSelectPanel.getMonitorDimension();
+        Dimension screenViewFullSize = projectSelectPanel.getFullScreenDimension();
 
         // Check for eye calibration vector
         double[][] gazeCoefficient = calibrateJPanel.getEyeGazeCoefficient(0);
@@ -1350,8 +1236,8 @@ public class Main extends javax.swing.JFrame {
 
                         // Write Screen Frame, Pupil(x,y)
                         exportWriter.print((i + eyeToScreen) + "\t" +
-                                eyeInfo.getPupilX() + "\t" +
-                                eyeInfo.getPupilY() + "\t");
+                                eyeInfo.getCorniaX() + "\t" +
+                                eyeInfo.getCorniaY() + "\t");
 
                         // Write Pupil fit topleft x,y bottom right (x,y)
                         for (int j = 0; j < pupilFit.length; j++) {
@@ -1364,7 +1250,7 @@ public class Main extends javax.swing.JFrame {
 
                         // Compute eye vector
                         Point2D.Double vector = Computation.computeEyeVector(
-                                eyeInfo.getPupilX(), eyeInfo.getPupilY(),
+                                eyeInfo.getCorniaX(), eyeInfo.getCorniaY(),
                                 eyeInfo.getReflectX(), eyeInfo.getReflectY());
 
                         EyeGazeComputing.ComputingApproach approach =
@@ -1404,7 +1290,7 @@ public class Main extends javax.swing.JFrame {
                                             corners[ScreenViewFrameInfo.BOTTOMLEFT],
                                             corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
 
-                                    if (fixation == null) {
+                                    if(fixation == null){
                                         fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
                                     }
                                     if ((point[j].x < 0 && point[j].y < 0) ||
@@ -1428,7 +1314,7 @@ public class Main extends javax.swing.JFrame {
                             } else {
                                 // Just put blank
                                 exportWriter.print(
-                                        ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                        ERROR_VALUE + "\t" + ERROR_VALUE+ "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
                             }
                         } else {
                             // Just put blank
@@ -1473,7 +1359,7 @@ public class Main extends javax.swing.JFrame {
                             if (calibrationName != null) {
                                 exportWriter.println(calibrationName + "\t" + calibrationNumber);
                             } else {
-                                exportWriter.println("-\t" + ERROR_VALUE);
+                                exportWriter.println("-\t"+ERROR_VALUE);
                             }
                         }
                     }
@@ -1500,7 +1386,7 @@ public class Main extends javax.swing.JFrame {
             File fullScreenFile = new File(fullScreenDir, filename);
             if (fullScreenFile.exists()) {
                 BufferedImage image = ImageTools.loadImage(fullScreenFile);
-                projectSelectPanel.setFullSceneDimensionPX(
+                projectSelectPanel.setFullScreenDimension(
                         String.valueOf(image.getWidth()),
                         String.valueOf(image.getHeight()));
             }

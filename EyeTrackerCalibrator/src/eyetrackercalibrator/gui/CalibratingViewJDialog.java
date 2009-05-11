@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 /*
  * CalibratingViewJDialog.java
  *
@@ -33,18 +33,14 @@ package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.math.CalibrateEyeGazeListener;
 import eyetrackercalibrator.math.Computation;
-import eyetrackercalibrator.math.DegreeErrorComputer;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.text.DecimalFormat;
 import javax.media.jai.JAI;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -76,77 +72,76 @@ public class CalibratingViewJDialog
     private CalibrateEyeGazeListener[] listener = null;
     private int snapShotWidth = 0;
     private int snapShotHeight = 0;
-    private DegreeErrorComputer degreeErrorComputer = null;
-    private Point[][] combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][0];
-
-    /** Listener for progress */
-    private class MyCalibrateEyeGazeListener implements CalibrateEyeGazeListener {
-
-        int calibrationType;
-        double stageProgress;
-        MarkableJLabel display;
-        private DecimalFormat formatter;
-
-        public MyCalibrateEyeGazeListener(MarkableJLabel diaplay,
-                int calibrationType, double stageProgress) {
-            this.calibrationType = calibrationType;
-            this.display = diaplay;
-            formatter = new DecimalFormat("0.000");
-        }
-
-        public void update(double[][] c, double cost) {
-            coeff[this.calibrationType] = c;
-            Point2D accuracy = estimatingPoints(this.calibrationType);
-            this.display.setText("<html><pre>Calibration Accuracy: " +
-                    formatter.format(accuracy.getX()) +
-                    " degrees of visual angle\n    Overall Accuracy: " +
-                    formatter.format(accuracy.getY()) + " degrees of visual angle</pre></html>");
-            // Advance progress
-            progress[this.calibrationType] += progressStep;
-
-            // Set progress
-            double totalProgress = 0;
-            for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
-                totalProgress += progress[i];
-            }
-            progressBar.setValue((int) totalProgress);
-            this.display.repaint();
-            progressBar.repaint();
-        }
-
-        public void completeStage(int stage) {
-            progress[this.calibrationType] = (double) stage * this.stageProgress;
-            double totalProgress = 0;
-            for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
-                totalProgress += progress[i];
-            }
-            progressBar.setValue((int) totalProgress);
-            getParent().repaint();
-        }
-    }
 
     /** Creates new form CalibratingViewJDialog */
     public CalibratingViewJDialog(java.awt.Frame parent, boolean modal) {
-
         super(parent, modal);
 
         progress = new double[TOTAL_CALIBRATION_TYPE];
-        double stageProgress = (double) MAX_PROGRESS / (double) this.totalStages;
-
-        initComponents();
-
-        // For displaying the accuracy text
-        primaryMarkableJLabel.setVerticalTextPosition(JLabel.TOP);
-        primaryMarkableJLabel.setHorizontalTextPosition(JLabel.LEFT);
-        secondaryMarkableJLabel.setVerticalTextPosition(JLabel.TOP);
-        secondaryMarkableJLabel.setHorizontalTextPosition(JLabel.LEFT);
+        final double stageProgress = (double) MAX_PROGRESS / (double) this.totalStages;
 
         listener = new CalibrateEyeGazeListener[2];
-        listener[PRIMARY] = new MyCalibrateEyeGazeListener(
-                primaryMarkableJLabel, PRIMARY, stageProgress);
-        listener[SECONDARY] = new MyCalibrateEyeGazeListener(
-                secondaryMarkableJLabel, SECONDARY, stageProgress);
+        listener[PRIMARY] = new CalibrateEyeGazeListener() {
 
+            public void completeStage(int stage) {
+                progress[PRIMARY] = (double) stage * stageProgress;
+                double totalProgress = 0;
+                for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+                    totalProgress += progress[i];
+                }
+                progressBar.setValue((int) totalProgress);
+                getParent().repaint();
+            }
+
+            public void update(double[][] v, double cost) {
+                coeff[PRIMARY] = v;
+                estimatingPoints(PRIMARY);
+
+                // Advance progress
+                progress[PRIMARY] += progressStep;
+
+                // Set progress
+                double totalProgress = 0;
+                for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+                    totalProgress += progress[i];
+                }
+                progressBar.setValue((int) totalProgress);
+                primaryMarkableJLabel.repaint();
+                progressBar.repaint();
+            }
+        };
+
+        listener[SECONDARY] = new CalibrateEyeGazeListener() {
+
+            public void completeStage(int stage) {
+                progress[SECONDARY] = (double) stage * stageProgress;
+                double totalProgress = 0;
+                for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+                    totalProgress += progress[i];
+                }
+                progressBar.setValue((int) totalProgress);
+                getParent().repaint();
+            }
+
+            public void update(double[][] v, double cost) {
+                coeff[SECONDARY] = v;
+                estimatingPoints(SECONDARY);
+
+                // Advance progress
+                progress[SECONDARY] += progressStep;
+
+                // Set progress
+                double totalProgress = 0;
+                for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+                    totalProgress += progress[i];
+                }
+                progressBar.setValue((int) totalProgress);
+                secondaryMarkableJLabel.repaint();
+                progressBar.repaint();
+            }
+        };
+
+        initComponents();
         progressBar.setMaximum(MAX_PROGRESS);
     }
 
@@ -162,19 +157,37 @@ public class CalibratingViewJDialog
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel2 = new javax.swing.JPanel();
-        closeButton = new javax.swing.JButton();
-        snapShotButton = new javax.swing.JButton();
-        showDegreeErrorCheckBox = new javax.swing.JCheckBox();
-        progressBar = new javax.swing.JProgressBar();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         primaryMarkableJLabel = new eyetrackercalibrator.gui.MarkableJLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         secondaryMarkableJLabel = new eyetrackercalibrator.gui.MarkableJLabel();
+        jPanel2 = new javax.swing.JPanel();
+        progressBar = new javax.swing.JProgressBar();
+        closeButton = new javax.swing.JButton();
+        snapShotButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jScrollPane1.setBackground(new java.awt.Color(0, 0, 0));
+
+        primaryMarkableJLabel.setBackground(new java.awt.Color(0, 0, 0));
+        primaryMarkableJLabel.setOpaque(true);
+        jScrollPane1.setViewportView(primaryMarkableJLabel);
+
+        jTabbedPane1.addTab("Primary Calibration", jScrollPane1);
+
+        jScrollPane2.setBackground(new java.awt.Color(0, 0, 0));
+
+        secondaryMarkableJLabel.setBackground(new java.awt.Color(0, 0, 0));
+        secondaryMarkableJLabel.setOpaque(true);
+        jScrollPane2.setViewportView(secondaryMarkableJLabel);
+
+        jTabbedPane1.addTab("Secondary Calibration", jScrollPane2);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -185,18 +198,10 @@ public class CalibratingViewJDialog
             }
         });
 
-        snapShotButton.setText("Take A Snap Shot");
+        snapShotButton.setText("Take Snap Shot");
         snapShotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 snapShotButtonActionPerformed(evt);
-            }
-        });
-
-        showDegreeErrorCheckBox.setSelected(true);
-        showDegreeErrorCheckBox.setText("Show average degree error");
-        showDegreeErrorCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showDegreeErrorCheckBoxActionPerformed(evt);
             }
         });
 
@@ -205,77 +210,45 @@ public class CalibratingViewJDialog
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                .add(showDegreeErrorCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 464, Short.MAX_VALUE)
+                .addContainerGap()
+                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(snapShotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(closeButton))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE)
-                .add(18, 18, 18))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
-                    .add(snapShotButton)
-                    .add(closeButton)
-                    .add(showDegreeErrorCheckBox))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+            .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .add(snapShotButton)
+                .add(closeButton))
         );
-
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jScrollPane1.setBackground(new java.awt.Color(0, 0, 0));
-
-        primaryMarkableJLabel.setBackground(new java.awt.Color(0, 0, 0));
-        primaryMarkableJLabel.setForeground(new java.awt.Color(255, 255, 255));
-        primaryMarkableJLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        primaryMarkableJLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        primaryMarkableJLabel.setOpaque(true);
-        jScrollPane1.setViewportView(primaryMarkableJLabel);
-
-        jTabbedPane1.addTab("Primary Calibration", jScrollPane1);
-
-        jScrollPane2.setBackground(new java.awt.Color(0, 0, 0));
-
-        secondaryMarkableJLabel.setBackground(new java.awt.Color(0, 0, 0));
-        secondaryMarkableJLabel.setForeground(new java.awt.Color(255, 255, 255));
-        secondaryMarkableJLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        secondaryMarkableJLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        secondaryMarkableJLabel.setOpaque(true);
-        jScrollPane2.setViewportView(secondaryMarkableJLabel);
-
-        jTabbedPane1.addTab("Secondary Calibration", jScrollPane2);
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 895, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -341,18 +314,6 @@ public class CalibratingViewJDialog
 
     }//GEN-LAST:event_snapShotButtonActionPerformed
 
-    private void showDegreeErrorCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showDegreeErrorCheckBoxActionPerformed
-        if (showDegreeErrorCheckBox.isSelected()) {
-            // change forground color to hide text
-            primaryMarkableJLabel.setForeground(Color.WHITE);
-            secondaryMarkableJLabel.setForeground(Color.WHITE);
-        } else {
-            primaryMarkableJLabel.setForeground(Color.BLACK);
-            secondaryMarkableJLabel.setForeground(Color.BLACK);
-        }
-        repaint();
-}//GEN-LAST:event_showDegreeErrorCheckBoxActionPerformed
-
     /**
      * @param pos Position defined by the constant (PRIMARY, SECONDARY, TEST)
      */
@@ -380,8 +341,6 @@ public class CalibratingViewJDialog
     /**
      * Make sure that all correctPoints contains has number of row equals to
      * TOTAL_CALIBRATION_TYPE.  No null is accepted
-     * The points have to be in the same order as the gaze point for degree error
-     * to be computed correctly
      */
     public void setCorrectPoints(Point2D[][] correctPoints, Point2D[] testPoints) {
         this.correctPoints = new Point[TOTAL_INFO_TYPE][];
@@ -398,7 +357,7 @@ public class CalibratingViewJDialog
                     p.setLocation(correctPoints[i][j]);
                     this.correctPoints[i][j] = p;
                 }
-            } else {
+            }else{
                 // Give zero length if nothing exists in the input
                 this.correctPoints[i] = new Point[0];
             }
@@ -411,7 +370,7 @@ public class CalibratingViewJDialog
         }
 
         // Create combind test point
-        this.combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][];
+        Point[][] combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][];
         for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
             int total = 0;
             for (int j = 0; j < TOTAL_CALIBRATION_TYPE; j++) {
@@ -421,12 +380,12 @@ public class CalibratingViewJDialog
             }
 
             total += testPoints.length;
-            this.combinedTestPoints[i] = new Point[total];
+            combinedTestPoints[i] = new Point[total];
             int m = 0;
             for (int j = 0; j < TOTAL_CALIBRATION_TYPE; j++) {
                 if (j != i) {
                     for (int k = 0; k < correctPoints[j].length; k++) {
-                        this.combinedTestPoints[i][m] = this.correctPoints[j][k];
+                        combinedTestPoints[i][m] = this.correctPoints[j][k];
                         m++;
                     }
                 }
@@ -461,13 +420,13 @@ public class CalibratingViewJDialog
         if (this.correctPoints[PRIMARY] != null) {
             primaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN);
             primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[PRIMARY], MarkableJLabel.MarkColor.RED);
-            primaryMarkableJLabel.setMarkedPoints(this.combinedTestPoints[PRIMARY], MarkableJLabel.MarkColor.BLUE);
+            primaryMarkableJLabel.setMarkedPoints(combinedTestPoints[PRIMARY], MarkableJLabel.MarkColor.BLUE);
             primaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[PRIMARY], MarkableJLabel.MarkColor.YELLOW);
         }
         if (this.correctPoints[SECONDARY] != null) {
             secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.GREEN);
             secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[SECONDARY], MarkableJLabel.MarkColor.RED);
-            secondaryMarkableJLabel.setMarkedPoints(this.combinedTestPoints[SECONDARY], MarkableJLabel.MarkColor.BLUE);
+            secondaryMarkableJLabel.setMarkedPoints(combinedTestPoints[SECONDARY], MarkableJLabel.MarkColor.BLUE);
             secondaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
         }
 
@@ -503,23 +462,15 @@ public class CalibratingViewJDialog
     }
 
     /**
-     * Compute point estimation
-     * @return Point2D where x is accuracy for calibration and y is overall calibration -1 indicates that it cannot be computed
+     *  Compute point estimation
      */
-    private Point2D estimatingPoints(int pos) {
-        double totalCalibrateDegreeError = 0;
-        double totalTestDegreeError = 0;
-
+    private void estimatingPoints(int pos) {
         // Compute calibration point
         if (eyeVector[pos] != null) {
             for (int i = 0; i < eyeVector[pos].length; i++) {
                 Point2D.Double point = Computation.computeEyeGazePoint(
                         eyeVector[pos][i].x, eyeVector[pos][i].y, coeff[pos]);
                 estimatedPoints[pos][i].setLocation(point);
-                if (this.degreeErrorComputer != null) {
-                    totalCalibrateDegreeError += this.degreeErrorComputer.degreeError(
-                            this.correctPoints[pos][i], point);
-                }
             }
         }
 
@@ -531,35 +482,10 @@ public class CalibratingViewJDialog
                     Point2D.Double point = Computation.computeEyeGazePoint(
                             eyeVector[i][j].x, eyeVector[i][j].y, coeff[pos]);
                     estimatedTestPoints[pos][m].setLocation(point);
-                    if (this.degreeErrorComputer != null) {
-                        totalTestDegreeError += this.degreeErrorComputer.degreeError(
-                                this.combinedTestPoints[pos][m], point);
-                    }
                     m++;
                 }
             }
         }
-
-        // Compute calibration accuracy
-        int totalPoints = 0;
-        Point2D.Double result = new Point2D.Double(-1, -1);
-        if (this.correctPoints[pos] != null) {
-            totalPoints = this.correctPoints[pos].length;
-        }
-
-        if (totalPoints > 0) {
-            result.x = totalCalibrateDegreeError / (double) totalPoints;
-        }
-
-        // Compute overall accuracy
-        if (this.combinedTestPoints[pos] != null) {
-            totalPoints += this.combinedTestPoints[pos].length;
-        }
-        if (totalPoints > 0) {
-            result.y = (totalCalibrateDegreeError + totalTestDegreeError) / (double) totalPoints;
-        }
-
-        return result;
     }
 
     public int getTotalStages() {
@@ -577,12 +503,6 @@ public class CalibratingViewJDialog
         primaryMarkableJLabel.setIcon(new ImageIcon(image));
         pack();
     }
-
-    /**  If degreeErrorComputer is set to null, no */
-    public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer) {
-        this.degreeErrorComputer = degreeErrorComputer;
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel jPanel1;
@@ -593,7 +513,6 @@ public class CalibratingViewJDialog
     private eyetrackercalibrator.gui.MarkableJLabel primaryMarkableJLabel;
     private javax.swing.JProgressBar progressBar;
     private eyetrackercalibrator.gui.MarkableJLabel secondaryMarkableJLabel;
-    private javax.swing.JCheckBox showDegreeErrorCheckBox;
     private javax.swing.JButton snapShotButton;
     // End of variables declaration//GEN-END:variables
 }

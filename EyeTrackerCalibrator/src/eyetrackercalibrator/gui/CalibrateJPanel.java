@@ -43,7 +43,6 @@ import eyetrackercalibrator.gui.util.GUIUtil;
 import eyetrackercalibrator.gui.util.IntervalMarkerManager;
 import eyetrackercalibrator.math.CalibrateEyeGaze;
 import eyetrackercalibrator.math.CalibrateEyeGazeQR;
-import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Component;
 import java.awt.Container;
@@ -119,7 +118,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      */
     private CalibrationPointPositionFinderRunner calibrationPointPositionFinderRunner = null;
     private CalibrationType currentCalibrationType = CalibrationInfo.CalibrationType.Primary;
-    private DegreeErrorComputer degreeErrorComputer;
 
     /** Creates new form NewJPanel */
     public CalibrateJPanel() {
@@ -941,8 +939,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                                 screenFrameInfo.getMarkedPoints()[0]);
 
                         Point2D.Double eyeVecPoint = new Point2D.Double(
-                                eyeFrameInfo.getPupilX() - eyeFrameInfo.getReflectX(),
-                                eyeFrameInfo.getPupilY() - eyeFrameInfo.getReflectY());
+                                eyeFrameInfo.getCorniaX() - eyeFrameInfo.getReflectX(),
+                                eyeFrameInfo.getCorniaY() - eyeFrameInfo.getReflectY());
 
                         switch (info.calibrationType) {
                             case Testing:
@@ -992,7 +990,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         //final CalibratingViewPanel panel = new CalibratingViewPanel();
         final CalibratingViewJDialog panel =
                 new CalibratingViewJDialog(new JFrame(), true);
-        panel.setDegreeErrorComputer(this.degreeErrorComputer);
 
         final CalibrateEyeGaze primaryCalibrator = new CalibrateEyeGazeQR();
         final CalibrateEyeGaze secondaryCalibrator = new CalibrateEyeGazeQR();
@@ -1031,12 +1028,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             public void run() {
                 // Start computation
-                try {
-                    eyeGazeCoefficient[0] =
-                            primaryCalibrator.calibrate(primeEyeVecArray, calArray[0]);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                eyeGazeCoefficient[0] =
+                        primaryCalibrator.calibrate(primeEyeVecArray, calArray[0]);
             }
         }, "Primary Calibration Thread");
 
@@ -1046,12 +1039,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             public void run() {
                 // Start computation
-               try {
-                    eyeGazeCoefficient[1] =
-                            secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                eyeGazeCoefficient[1] =
+                        secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
             }
         }, "Secondary Calibration Thread");
 
@@ -1119,10 +1108,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
     public void setEyeGazeComputing(EyeGazeComputing eyeGazeComputing) {
         this.timer.setEyeGazeComputing(eyeGazeComputing);
-    }
-
-    public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer){
-        this.degreeErrorComputer = degreeErrorComputer;
     }
 
     /** This method is called from within the constructor to

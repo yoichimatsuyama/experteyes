@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Experteyes nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Experteyes nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 /*
  * Computation.java
  *
@@ -54,7 +54,6 @@ public class Computation {
     /**
      * Use projective translation to find real screen position.  This assume that
      * barrel correction is already run.
-     * @param trueScreenDimension
      * @return null if there is an error
      */
     public static Point2D ComputeScreenPositionProjective(
@@ -63,8 +62,8 @@ public class Computation {
             Point2D topLeft, Point2D topRight,
             Point2D bottomLeft, Point2D bottomRight) {
         // Sanity check
-        if (trueScreenDimension == null || pos == null || topLeft == null ||
-                topRight == null || bottomLeft == null || bottomRight == null) {
+        if(trueScreenDimension == null || pos == null || topLeft == null ||
+                topRight == null || bottomLeft == null || bottomRight  == null){
             return null;
         }
 
@@ -107,14 +106,14 @@ public class Computation {
 
         // Check devider
         double devider = ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
-        if (devider == 0) {
+        if(devider == 0){
             return null;
         }
         A[3][1] = ((x[1] - x[2] + x[3] - x[4]) * (y[4] - y[3]) - (y[1] - y[2] + y[3] - y[4]) * (x[4] - x[3])) /
                 ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
 
         devider = ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
-        if (devider == 0) {
+        if(devider == 0){
             return null;
         }
         A[3][2] = ((y[1] - y[2] + y[3] - y[4]) * (x[2] - x[3]) - (x[1] - x[2] + x[3] - x[4]) * (y[2] - y[3])) /
@@ -132,7 +131,7 @@ public class Computation {
          */
         double unitX = (A[2][2] * A[3][3] - A[2][3] * A[3][2]) * pos.getX() + (A[1][3] * A[3][2] - A[1][2] * A[3][3]) * pos.getY() + (A[1][2] * A[2][3] - A[1][3] * A[2][2]);
         double unitY = (A[2][3] * A[3][1] - A[2][1] * A[3][3]) * pos.getX() + (A[1][1] * A[3][3] - A[1][3] * A[3][1]) * pos.getY() + (A[1][3] * A[2][1] - A[1][1] * A[2][3]);
-        double h = (A[2][1] * A[3][2] - A[2][2] * A[3][1]) * pos.getX() + (A[1][2] * A[3][1] - A[1][1] * A[3][2]) * pos.getY() + (A[1][1] * A[2][2] - A[1][2] * A[2][1]);
+        double h =     (A[2][1] * A[3][2] - A[2][2] * A[3][1]) * pos.getX() + (A[1][2] * A[3][1] - A[1][1] * A[3][2]) * pos.getY() + (A[1][1] * A[2][2] - A[1][2] * A[2][1]);
 
         // Sanity check
         if (h == 0) {
@@ -511,11 +510,11 @@ public class Computation {
         System.out.println(correct);
         System.out.println(ComputeScreenPositionProjective(new Dimension(1280, 1024),
                 //new Dimension(2048, 1536),
-                new Point2D.Double(421, 129.5)//1044, 893)//900,448)
-                , new Point2D.Double(74, 38)//325, 164)/*topLeft*/
-                , new Point2D.Double(436, 22)//1317, 142)//topRight
-                , new Point2D.Double(97, 226)//291, 952)//bottomLeft
-                , new Point2D.Double(428, 227)//1272, 1043)/*bottomRight*/
+                new Point2D.Double(421,129.5)//1044, 893)//900,448)
+                ,new Point2D.Double(74,38)//325, 164)/*topLeft*/
+                ,new Point2D.Double(436,22)//1317, 142)//topRight
+                ,new Point2D.Double(97,226)//291, 952)//bottomLeft
+                ,new Point2D.Double(428,227)//1272, 1043)/*bottomRight*/
                 ));
     }
 }

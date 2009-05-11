@@ -114,10 +114,8 @@ public class EyeGazeComputing {
 
     /**
      * Compute eyegaze using the method specified by parameters
-     * @param x x component of an eye vector
-     * @param y y component of an eye vector
-     * @param currentFrame Current frame number used by calibration.
-     * Make sure the
+     * param x x component of an eye vector
+     * param y y component of an eye vector
      */
     public Point2D computeEyeGaze(int currentFrame, double x, double y,
             ComputingApproach approach) {

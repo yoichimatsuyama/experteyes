@@ -50,7 +50,6 @@ public class ConfigutationInfo implements Comparable {
     public int unsharpRadious;
     public double unsharpFactor;
     public boolean isDetectingPupilAngle;
-    public boolean isCRCircle;
     
     private Rectangle searchArea = new Rectangle();
     /**

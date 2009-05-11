@@ -30,21 +30,10 @@ import java.io.File;
 import java.io.FileFilter;
 
 
-public class NotHiddenPictureFilter implements FileFilter {
+public class NotHiddenTiffFilter implements FileFilter {
 
 	public boolean accept(File f) {
-		if(!f.isHidden()){
-            // Get extension
-            String string = f.getName();
-            string = string.substring(string.lastIndexOf('.'), string.length());
-            if(string.equalsIgnoreCase(".jpg") || string.equalsIgnoreCase(".gif") ||
-                    string.equalsIgnoreCase(".tif") || string.equalsIgnoreCase(".tiff") ||
-                    string.equalsIgnoreCase(".png")){
-                return true;
-            }
-        }
-        
-        return(false);
+		return(!f.isHidden() && f.getName().indexOf("tif") > -1);
 	}
 
 }
