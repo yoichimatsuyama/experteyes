@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * ColorSelectionPanel.java
  *
@@ -44,6 +44,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         implements ColorCaptureListener {
 
     private boolean dirty = false;
+    private static final int DEFAULT_SIGMA = 11;
+    private static final double DEFAULT_SHARPENINGFACTOR = 0.9;
 
     public boolean isDirty() {
         return dirty;
@@ -217,7 +219,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setPreferredSize(new java.awt.Dimension(200, 58));
 
-        jLabel4.setText("Sigma:");
+        jLabel4.setText("Radius:");
 
         jLabel5.setText("Sharpening:");
 
@@ -488,6 +490,12 @@ public class ColorSelectionPanel extends javax.swing.JPanel
 private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unsharpCheckBoxActionPerformed
     boolean enable = this.unsharpCheckBox.isSelected();
     setUnshrapenConfigEnable(enable);
+    if (enable) {
+        // Set default values
+        setSigma(DEFAULT_SIGMA);
+        setSharpeningFactor(DEFAULT_SHARPENINGFACTOR);
+    }
+
     // Trigger change
     ChangeListener[] l =
             this.sharpeningFactorSlider.getChangeListeners();
@@ -600,12 +608,12 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
         this.pupilColorHighlightedCheckBox.addActionListener(listener);
         this.crColorHighlightedCheckBox.addActionListener(listener);
     }
-    
-    public void addDetectPupilAngleChangeListener(ChangeListener listener){
+
+    public void addDetectPupilAngleChangeListener(ChangeListener listener) {
         this.detectPupilAngleCheckBox.addChangeListener(listener);
     }
 
-    public void addCRIsCircleChangeListener(ChangeListener listener){
+    public void addCRIsCircleChangeListener(ChangeListener listener) {
         this.crIsCircleCheckBox.addChangeListener(listener);
     }
 
@@ -620,7 +628,7 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
     public boolean isCRColorHeighlighted() {
         return this.crColorHighlightedCheckBox.isSelected();
     }
-    
+
     public boolean isDetectingPupilAngle() {
         return this.detectPupilAngleCheckBox.isSelected();
     }
@@ -658,6 +666,11 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
         setSigmaSlider(sigma);
         if (sigma > 0) {
             this.unsharpCheckBox.setSelected(true);
+            setUnshrapenConfigEnable(true);
+        }else{
+            // Turn unsharpen off
+            this.unsharpCheckBox.setSelected(false);
+            setUnshrapenConfigEnable(false);
         }
         this.sigmaTextField.setText(String.valueOf(sigma));
     }
@@ -671,14 +684,14 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
 
     }
 
-    /** Setting value will enable unsharp config */
+    /** Setting value will not change enable/disable state of  unsharp config */
     public void setSharpeningFactor(double sharpeningFactor) {
         setSharpeningFactorSlider(sharpeningFactor);
         this.shaprningFactorTextField.setText(String.valueOf(this.sharpeningFactor));
-        this.unsharpCheckBox.setSelected(true);
-        setUnshrapenConfigEnable(true);
+        //this.unsharpCheckBox.setSelected(true);
+        //setUnshrapenConfigEnable(true);
     }
-
+    
     private void setSigmaSlider(int v) {
         v = Math.max(v, 0);
         v = Math.min(v, SIGMA_MAX);
