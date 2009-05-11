@@ -48,7 +48,8 @@ public class Parameters {
 
     public Parameters(int crThreshold, int pupilThreshold, int crGrayValue,
             int pupilGrayValue, int backgroundGrayValue, Rectangle searchArea,
-            int unsharpRadious, double unsharpFactor, boolean detectAngle) {
+            int unsharpRadious, double unsharpFactor, boolean detectAngle,
+            boolean isCRCircle) {
         this.crThreshold = crThreshold;
         this.pupilThreshold = pupilThreshold;
         this.crGrayValue = crGrayValue;
@@ -58,6 +59,7 @@ public class Parameters {
         this.unsharpRadious = unsharpRadious;
         this.unsharpFactor = unsharpFactor;
         this.detectPupilAngle = detectAngle;
+        this.isCRCircle = isCRCircle;
     }
 
     public Parameters() {
@@ -70,6 +72,7 @@ public class Parameters {
         this.unsharpFactor = 0d;
         this.unsharpRadious = 0;
         this.detectPupilAngle = false;
+        this.isCRCircle = false;
     }
 
     public Parameters(Element root) {
@@ -149,6 +152,15 @@ public class Parameters {
                 this.detectPupilAngle = Boolean.parseBoolean(value);
             }
         }
+
+        this.isCRCircle = false;
+        element = root.getChild(IS_CR_CIRCLE_ATTRIBUTE);
+        if(element != null){
+            value = element.getAttributeValue(VALUE_ATTRIBUTE);
+            if(value != null){
+                this.isCRCircle = Boolean.parseBoolean(value);
+            }
+        }
     }
 
     public int crThreshold;
@@ -160,6 +172,8 @@ public class Parameters {
     public int unsharpRadious;
     public double unsharpFactor;
     public boolean detectPupilAngle;
+    /** Flag for determining whether we consider CR as a circle and not an elisp*/
+    public boolean isCRCircle;
     /** Constants for parsing file */
     public static String CR_THRESHOLD_ELEMENT_NAME = "crthreshold";
     public static String PUPIL_THRESHOLD_ELEMENT_NAME = "pupilthreshold";
@@ -176,6 +190,7 @@ public class Parameters {
     public static String HEIGHT_ATTRIBUTE = "height";
     public static String UNSHARP_RADIOUS_ATTRIBUTE = "radious";
     public static String UNSHARP_FACTOR_ATTRIBUTE = "factor";
+    public static String IS_CR_CIRCLE_ATTRIBUTE = "criscircle";
     
 
     /**
@@ -257,7 +272,12 @@ public class Parameters {
         element.setAttribute(VALUE_ATTRIBUTE,
                 String.valueOf(detectPupilAngle));
         root.addContent(element);
-        
+
+        element = new Element(IS_CR_CIRCLE_ATTRIBUTE);
+        element.setAttribute(VALUE_ATTRIBUTE,
+                String.valueOf(isCRCircle));
+        root.addContent(element);
+
         return root;
     }
 }

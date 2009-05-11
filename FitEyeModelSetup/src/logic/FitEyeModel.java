@@ -239,8 +239,8 @@ public class FitEyeModel implements Runnable {
     final static String GAZE_ROOT = "Gaze";    // filenames
     File imageFile;
     File outputFile;
-    /** Flag for determining whether we consider CR as a circle and not an elisp*/
-    public boolean isCRCircle = true;
+//    /** Flag for determining whether we consider CR as a circle and not an elisp*/
+//    public boolean isCRCircle = true;
 
     public void setOutputFile(File outputFile) {
         this.outputFile = outputFile;
@@ -423,7 +423,7 @@ public class FitEyeModel implements Runnable {
 
             // set up starts and ends for each iteration
             double[] start;
-            if (isCRCircle) {
+            if (this.parameters.isCRCircle) {
                 start = new double[7];
             } else {
                 start = new double[8];
@@ -436,7 +436,7 @@ public class FitEyeModel implements Runnable {
             start[4] = cr.getX();
             start[5] = cr.getY();
             start[6] = cr.getMaxX();
-            if (!isCRCircle) {
+            if (!this.parameters.isCRCircle) {
                 start[7] = cr.getMaxY();
             }
 
@@ -447,7 +447,7 @@ public class FitEyeModel implements Runnable {
             }
 
             // Set if we are considering CR as circle
-            funct.isCRCircle = isCRCircle;
+            funct.isCRCircle = this.parameters.isCRCircle;
 
             // nelder-mead minimization
             nm.minimizes(funct, 1000, funct, start, end);
@@ -457,7 +457,7 @@ public class FitEyeModel implements Runnable {
             pupilCenterX = params[0] + ((params[2] - params[0]) / 2.0);
             pupilCenterY = params[1] + ((params[3] - params[1]) / 2.0);
             crCenterX = params[4] + ((params[6] - params[4]) / 2.0);
-            if (isCRCircle) {
+            if (this.parameters.isCRCircle) {
                 crCenterY = params[5] + ((params[6] - params[5]) / 2.0);
             } else {
                 crCenterY = params[5] + ((params[7] - params[5]) / 2.0);

@@ -73,6 +73,10 @@ public class ColorSelectionPanel extends javax.swing.JPanel
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
+        autoTestModelCheckBox = new javax.swing.JCheckBox();
+        detectPupilAngleCheckBox = new javax.swing.JCheckBox();
+        crIsCircleCheckBox = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -87,7 +91,6 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         backgroundDropperToggleButton = new javax.swing.JToggleButton();
         pupilColorHighlightedCheckBox = new javax.swing.JCheckBox();
         crColorHighlightedCheckBox = new javax.swing.JCheckBox();
-        autoTestModelCheckBox = new javax.swing.JCheckBox();
         unsharpCheckBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -96,7 +99,40 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         sigmaSlider = new javax.swing.JSlider();
         sigmaTextField = new javax.swing.JTextField();
         shaprningFactorTextField = new javax.swing.JTextField();
-        detectPupilAngleCheckBox = new javax.swing.JCheckBox();
+
+        autoTestModelCheckBox.setText("Automatically Test Model");
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/ColorSelectionPanel"); // NOI18N
+        detectPupilAngleCheckBox.setText(bundle.getString("Detect Pupil Angle")); // NOI18N
+
+        crIsCircleCheckBox.setText(bundle.getString("CR is circle")); // NOI18N
+
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(5, 5, 5)
+                .add(autoTestModelCheckBox)
+                .add(5, 5, 5)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(crIsCircleCheckBox)
+                    .add(detectPupilAngleCheckBox)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .add(5, 5, 5)
+                        .add(autoTestModelCheckBox))
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .add(5, 5, 5)
+                        .add(detectPupilAngleCheckBox)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(crIsCircleCheckBox)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         jLabel1.setText("Pupil Gray Level:"); // NOI18N
 
@@ -171,8 +207,6 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         crColorHighlightedCheckBox.setForeground(new java.awt.Color(255, 102, 0));
         crColorHighlightedCheckBox.setText("Highlight"); // NOI18N
 
-        autoTestModelCheckBox.setText("Automatically Test Model");
-
         unsharpCheckBox.setText("Unsharpen");
         unsharpCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -237,8 +271,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                     .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
+                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(sigmaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -260,37 +294,34 @@ public class ColorSelectionPanel extends javax.swing.JPanel
 
         sigmaSlider.getAccessibleContext().setAccessibleName("");
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/ColorSelectionPanel"); // NOI18N
-        detectPupilAngleCheckBox.setText(bundle.getString("Detect Pupil Angle Check Box Label")); // NOI18N
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pupilGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .add(crlGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .add(backgroundGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, pupilGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, crlGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, backgroundGrayLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 128, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 81, Short.MAX_VALUE)
                         .add(pupilColorHighlightedCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(pupilColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(pupilDropperToggleButton))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                    .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel3)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 183, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 136, Short.MAX_VALUE)
                                 .add(backgroundColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 51, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .add(crColorHighlightedCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(crColorTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -298,11 +329,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(backgroundDropperToggleButton)
                             .add(crDropperToggleButton)))
-                    .add(layout.createSequentialGroup()
-                        .add(autoTestModelCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(detectPupilAngleCheckBox))
-                    .add(unsharpCheckBox))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, unsharpCheckBox)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -336,11 +364,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                 .add(unsharpCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(7, 7, 7)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(autoTestModelCheckBox)
-                    .add(detectPupilAngleCheckBox))
-                .addContainerGap())
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
     private void pupilGrayLevelSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_pupilGrayLevelSliderStateChanged
@@ -487,6 +512,7 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JCheckBox crColorHighlightedCheckBox;
     private javax.swing.JTextField crColorTextField;
     private javax.swing.JToggleButton crDropperToggleButton;
+    private javax.swing.JCheckBox crIsCircleCheckBox;
     private javax.swing.JSlider crlGrayLevelSlider;
     private javax.swing.JCheckBox detectPupilAngleCheckBox;
     private javax.swing.JLabel jLabel1;
@@ -495,6 +521,7 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JCheckBox pupilColorHighlightedCheckBox;
     private javax.swing.JTextField pupilColorTextField;
     private javax.swing.JToggleButton pupilDropperToggleButton;
@@ -578,6 +605,10 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
         this.detectPupilAngleCheckBox.addChangeListener(listener);
     }
 
+    public void addCRIsCircleChangeListener(ChangeListener listener){
+        this.crIsCircleCheckBox.addChangeListener(listener);
+    }
+
     public boolean isAutoTestModelSelected() {
         return this.autoTestModelCheckBox.isSelected();
     }
@@ -596,6 +627,14 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
 
     public void setDetectPupilAngle(boolean b) {
         this.detectPupilAngleCheckBox.setSelected(b);
+    }
+
+    public boolean isCRIsCircle() {
+        return this.crIsCircleCheckBox.isSelected();
+    }
+
+    public void setCRIsCircle(boolean b) {
+        this.crIsCircleCheckBox.setSelected(b);
     }
 
     public void unselectAllDropperButtons() {
