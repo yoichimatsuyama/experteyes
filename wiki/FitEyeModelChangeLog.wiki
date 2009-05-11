@@ -1,3 +1,9 @@
+==1.10==
+   - Fix incorrect configuration is selected when clicking on the last config in the list
+   - Change a label text from "sigma" to "radius"
+   - Make Unsharpen configurations jump to default values when selected.
+   - Make Unsharpen configuration disable when the radius is set to 0.
+
 ==1.9==
    Add detecting a cornea reflection as a circle.
 
