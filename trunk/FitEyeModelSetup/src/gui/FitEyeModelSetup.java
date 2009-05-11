@@ -164,7 +164,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
 
-        this.colorSelectionPanel1.addDetectPupilAngleChangeListener(new ChangeListener() {
+        ChangeListener checkBoxChangeListener = new ChangeListener() {
 
             public void stateChanged(ChangeEvent e) {
                 setFrame(frameNum);
@@ -172,7 +172,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 setHighlight();
                 interactivePanel.repaint();
             }
-        });
+        };
+
+        this.colorSelectionPanel1.addDetectPupilAngleChangeListener(checkBoxChangeListener);
+
+        this.colorSelectionPanel1.addCRIsCircleChangeListener(checkBoxChangeListener);
 
         this.colorSelectionPanel1.addHighlightCheckBoxActionListener(new ActionListener() {
 
@@ -229,6 +233,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         grayLevelInfo.unsharpFactor = this.colorSelectionPanel1.getSharpeningFactor();
         grayLevelInfo.unsharpRadious = this.colorSelectionPanel1.getSigma();
         grayLevelInfo.isDetectingPupilAngle = this.colorSelectionPanel1.isDetectingPupilAngle();
+        grayLevelInfo.isCRCircle = this.colorSelectionPanel1.isCRIsCircle();
         grayLevelInfo.frameNum = currentFrame;
         grayLevelInfo.point = estimatePupilFromThreshold(currentFrame);
         // Need to use set method here to make sure that the value saved will not change
@@ -413,7 +418,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 searchRect,
                 this.colorSelectionPanel1.getSigma(),
                 this.colorSelectionPanel1.getSharpeningFactor(),
-                this.colorSelectionPanel1.isDetectingPupilAngle());
+                this.colorSelectionPanel1.isDetectingPupilAngle(),
+                this.colorSelectionPanel1.isCRIsCircle());
 
         return parameters;
     }
@@ -788,6 +794,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     parameters.unsharpFactor = info.unsharpFactor;
                     parameters.unsharpRadious = info.unsharpRadious;
                     parameters.detectPupilAngle = info.isDetectingPupilAngle;
+                    parameters.isCRCircle = info.isCRCircle;
 
                     parameterList.add(info.point, info.frameFileName, parameters);
                 }
@@ -879,6 +886,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 this.colorSelectionPanel1.setCRGrayValue(parameters.crGrayValue);
                 this.colorSelectionPanel1.setSharpeningFactor(parameters.unsharpFactor);
                 this.colorSelectionPanel1.setSigma(parameters.unsharpRadious);
+                this.colorSelectionPanel1.setCRIsCircle(parameters.isCRCircle);
                 this.colorSelectionPanel1.setDirty(false);
 
                 this.thresholdPanel1.setCrThresh(parameters.crThreshold);
@@ -899,6 +907,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 info.unsharpFactor = entry.parameters.unsharpFactor;
                 info.unsharpRadious = entry.parameters.unsharpRadious;
                 info.isDetectingPupilAngle = entry.parameters.detectPupilAngle;
+                info.isCRCircle = entry.parameters.isCRCircle;
 
                 info.setSearchArea(entry.parameters.searchArea);
 
@@ -1554,6 +1563,9 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 // Set whether we have to use angle detection
                 this.colorSelectionPanel1.setDetectPupilAngle(
                         currentConfig.isDetectingPupilAngle);
+
+                // Set whether CR is force to be circle
+                this.colorSelectionPanel1.setCRIsCircle(currentConfig.isCRCircle);
 
                 // Clear dirty bit
                 this.colorSelectionPanel1.setDirty(false);
