@@ -34,15 +34,15 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="eyeInfoDirectoryTextField" pref="827" max="32767" attributes="0"/>
+                              <Component id="eyeInfoDirectoryTextField" pref="835" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="browseEyeInfoButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="fullScreenDirectoryTextField" alignment="0" pref="827" max="32767" attributes="0"/>
-                                  <Component id="screenDirectoryTextField" alignment="0" pref="827" max="32767" attributes="0"/>
-                                  <Component id="eyeDirectoryTextField" alignment="0" pref="827" max="32767" attributes="0"/>
+                                  <Component id="fullScreenDirectoryTextField" alignment="0" pref="835" max="32767" attributes="0"/>
+                                  <Component id="screenDirectoryTextField" alignment="0" pref="835" max="32767" attributes="0"/>
+                                  <Component id="eyeDirectoryTextField" alignment="0" pref="835" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
@@ -54,7 +54,7 @@
                               </Group>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="screenInfoDirectoryTextField" pref="827" max="32767" attributes="0"/>
+                              <Component id="screenInfoDirectoryTextField" pref="835" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="browseScreenInfoButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -68,8 +68,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="screenFrameLoadedProgressBar" pref="641" max="32767" attributes="1"/>
-                          <Component id="eyeFrameLoadedProgressBar" alignment="1" pref="641" max="32767" attributes="1"/>
+                          <Component id="screenFrameLoadedProgressBar" pref="646" max="32767" attributes="1"/>
+                          <Component id="eyeFrameLoadedProgressBar" alignment="1" pref="646" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -210,7 +210,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Screen view location"/>
+        <Property name="text" type="java.lang.String" value="Scene view location"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="screenDirectoryTextField">
@@ -299,7 +299,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Screen Frame:"/>
+            <Property name="text" type="java.lang.String" value="Scene Frame:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="eyeFrameSynchPositionLabel">
@@ -333,7 +333,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Screen Frame Loaded:"/>
+        <Property name="text" type="java.lang.String" value="Scene Frame Loaded:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="browseScreenInfoButton">
@@ -348,7 +348,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Screen info location"/>
+        <Property name="text" type="java.lang.String" value="Scene info location"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel6">
@@ -378,7 +378,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel15">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Screen full view location"/>
+        <Property name="text" type="java.lang.String" value="Scene full size location"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="fullScreenDirectoryTextField">
@@ -475,7 +475,7 @@
         <Component class="javax.swing.JLabel" name="jLabel12">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="4"/>
-            <Property name="text" type="java.lang.String" value="Screen full size:"/>
+            <Property name="text" type="java.lang.String" value="Scene full size:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
