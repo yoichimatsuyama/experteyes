@@ -141,7 +141,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel3.setText("Screen view location");
+        jLabel3.setText("Scene view location");
 
         browseScreenViewButton.setText("Browse");
         browseScreenViewButton.addActionListener(new java.awt.event.ActionListener() {
@@ -164,7 +164,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Eye Frame:");
 
-        jLabel4.setText("Screen Frame:");
+        jLabel4.setText("Scene Frame:");
 
         eyeFrameSynchPositionLabel.setText("0");
 
@@ -205,7 +205,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
         jLabel7.setText("Eye Frame Loaded:");
 
-        jLabel8.setText("Screen Frame Loaded:");
+        jLabel8.setText("Scene Frame Loaded:");
 
         browseScreenInfoButton.setText("Browse");
         browseScreenInfoButton.addActionListener(new java.awt.event.ActionListener() {
@@ -214,7 +214,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel5.setText("Screen info location");
+        jLabel5.setText("Scene info location");
 
         jLabel6.setText("Eye info location");
 
@@ -229,7 +229,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
         markTrialButton.setText("Mark Trials");
 
-        jLabel15.setText("Screen full view location");
+        jLabel15.setText("Scene full size location");
 
         browseScreenFullViewButton.setText("Browse");
         browseScreenFullViewButton.addActionListener(new java.awt.event.ActionListener() {
@@ -239,7 +239,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         });
 
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel12.setText("Screen full size:");
+        jLabel12.setText("Scene full size:");
 
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel9.setText("Monitor size:");
@@ -370,14 +370,14 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(eyeInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
+                                .add(eyeInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseEyeInfoButton))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, fullScreenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, screenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, eyeDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE))
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, fullScreenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, screenDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, eyeDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -385,7 +385,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                                         .add(browseScreenViewButton))
                                     .add(browseScreenFullViewButton)))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(screenInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
+                                .add(screenInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(browseScreenInfoButton))))
                     .add(layout.createSequentialGroup()
@@ -395,8 +395,8 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                             .add(jLabel7))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(screenFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE)
-                            .add(eyeFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE))
+                            .add(screenFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
+                            .add(eyeFrameLoadedProgressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
