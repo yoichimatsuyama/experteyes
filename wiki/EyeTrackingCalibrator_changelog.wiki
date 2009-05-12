@@ -1,3 +1,7 @@
+==1.11==
+ * Change "Screen" labels to "Scene"
+ * Fix bug that corrupts export data when trial info is not entered in the correct order by the frame number
+ * Add capability to mark a trial as a bad trial then the export data will have -666 in fixations for the trial.
 ==1.10==
 - Fix display keeps enlarging
 ==1.9==
