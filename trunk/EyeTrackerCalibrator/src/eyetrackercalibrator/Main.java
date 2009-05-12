@@ -240,8 +240,8 @@ public class Main extends javax.swing.JFrame {
 
             // Prepare degree error computer
             DegreeErrorComputer dec = new DegreeErrorComputer(sceneDimension,
-                                    distanceFromMeasuredScene,
-                                    sceneWidth, sceneHeight);
+                    distanceFromMeasuredScene,
+                    sceneWidth, sceneHeight);
 
             // Scan through each frame
             for (int i = 1; i <= totalFrame; i++) {
@@ -1306,20 +1306,19 @@ public class Main extends javax.swing.JFrame {
 
                 for (int i = 1; i <= eyeFrameManager.getTotalFrames(); i++) {
                     // Get the current trial number
-                    if (trialNumber < trials.length) {
-                        if (i > trials[trialNumber].stopEyeFrame) {
-                            // Move to the next trial
-                            trialNumber++;
-                        }
-
-                        if (trialNumber < trials.length &&
-                                i >= trials[trialNumber].startEyeFrame) {
-                            // Set new trial name
-                            trialName = trials[trialNumber].label;
-                        } else {
-                            // Clear the name
-                            trialName = null;
-                        }
+                    while (trialNumber < trials.length &&
+                            i > trials[trialNumber].stopEyeFrame) {
+                        // Move to the next trial
+                        trialNumber++;
+                    }
+                    // Get the trial name when appropriate
+                    if (trialNumber < trials.length &&
+                            i >= trials[trialNumber].startEyeFrame) {
+                        // Set new trial name
+                        trialName = trials[trialNumber].label;
+                    } else {
+                        // Clear the name
+                        trialName = null;
                     }
 
                     /** If not a trial check if this is a calibration */
@@ -1362,25 +1361,37 @@ public class Main extends javax.swing.JFrame {
                         exportWriter.print(eyeInfo.getReflectX() + "\t" +
                                 eyeInfo.getReflectX() + "\t");
 
-                        // Compute eye vector
-                        Point2D.Double vector = Computation.computeEyeVector(
-                                eyeInfo.getPupilX(), eyeInfo.getPupilY(),
-                                eyeInfo.getReflectX(), eyeInfo.getReflectY());
 
-                        EyeGazeComputing.ComputingApproach approach =
-                                EyeGazeComputing.ComputingApproach.PRIMARY;
-
-                        // Compute eye gaze
+                        // For storing gaze point
                         Point2D.Double point[] = new Point2D.Double[3];
-                        point[0] = exportEyeGazes(exportWriter, i, vector,
-                                EyeGazeComputing.ComputingApproach.PRIMARY,
-                                screenViewFullSize);
-                        point[1] = exportEyeGazes(exportWriter, i, vector,
-                                EyeGazeComputing.ComputingApproach.SECONDARY,
-                                screenViewFullSize);
-                        point[2] = exportEyeGazes(exportWriter, i, vector,
-                                EyeGazeComputing.ComputingApproach.LINEAR,
-                                screenViewFullSize);
+
+                        // Don't compute eye gaze when the trial is marked bad
+                        if (trialName != null && trials[trialNumber].isBadTrial) {
+                            // Just put blank
+                            exportWriter.print(
+                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t" +
+                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t" +
+                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                        } else {
+                            // Compute eye vector
+                            Point2D.Double vector = Computation.computeEyeVector(
+                                    eyeInfo.getPupilX(), eyeInfo.getPupilY(),
+                                    eyeInfo.getReflectX(), eyeInfo.getReflectY());
+
+                            EyeGazeComputing.ComputingApproach approach =
+                                    EyeGazeComputing.ComputingApproach.PRIMARY;
+
+                            // Compute eye gaze
+                            point[0] = exportEyeGazes(exportWriter, i, vector,
+                                    EyeGazeComputing.ComputingApproach.PRIMARY,
+                                    screenViewFullSize);
+                            point[1] = exportEyeGazes(exportWriter, i, vector,
+                                    EyeGazeComputing.ComputingApproach.SECONDARY,
+                                    screenViewFullSize);
+                            point[2] = exportEyeGazes(exportWriter, i, vector,
+                                    EyeGazeComputing.ComputingApproach.LINEAR,
+                                    screenViewFullSize);
+                        }
 
                         // Get screen info
                         ScreenViewFrameInfo screenInfo =
@@ -1396,26 +1407,32 @@ public class Main extends javax.swing.JFrame {
                                     corners[1] != null && corners[2] != null &&
                                     corners[3] != null) {
                                 for (int j = 0; j < point.length; j++) {
-                                    // Compute fixation
-                                    fixation = Computation.ComputeScreenPositionProjective(
-                                            realMonitorDimension, point[j],
-                                            corners[ScreenViewFrameInfo.TOPLEFT],
-                                            corners[ScreenViewFrameInfo.TOPRIGHT],
-                                            corners[ScreenViewFrameInfo.BOTTOMLEFT],
-                                            corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
+                                    // Only estimate fixation when this is not a bad trial
+                                    if (trialName != null && trials[trialNumber].isBadTrial) {
+                                        // Compute fixation
+                                        fixation = Computation.ComputeScreenPositionProjective(
+                                                realMonitorDimension, point[j],
+                                                corners[ScreenViewFrameInfo.TOPLEFT],
+                                                corners[ScreenViewFrameInfo.TOPRIGHT],
+                                                corners[ScreenViewFrameInfo.BOTTOMLEFT],
+                                                corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
 
-                                    if (fixation == null) {
-                                        fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
-                                    }
-                                    if ((point[j].x < 0 && point[j].y < 0) ||
-                                            fixation.getX() < 0 || fixation.getY() < 0 ||
-                                            fixation.getX() > realMonitorDimension.width ||
-                                            fixation.getY() > realMonitorDimension.height) {
-                                        fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
-                                    }
+                                        if (fixation == null) {
+                                            fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
+                                        }
+                                        if ((point[j].x < 0 && point[j].y < 0) ||
+                                                fixation.getX() < 0 || fixation.getY() < 0 ||
+                                                fixation.getX() > realMonitorDimension.width ||
+                                                fixation.getY() > realMonitorDimension.height) {
+                                            fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
+                                        }
 
-                                    exportWriter.print(
-                                            fixation.getX() + "\t" + fixation.getY() + "\t");
+                                        exportWriter.print(
+                                                fixation.getX() + "\t" + fixation.getY() + "\t");
+                                    } else {
+                                        exportWriter.print(
+                                                ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                    }
                                 }
 
                                 double[] similarities = screenInfo.similarities;
