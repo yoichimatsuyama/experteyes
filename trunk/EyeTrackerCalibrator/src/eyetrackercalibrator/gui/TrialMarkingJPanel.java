@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * TrialMarkingJPanel.java
  *
@@ -105,7 +105,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         graphTabPanel = new IlluminationGraphTabPanel();
         graphTabPanel.setFixVerticalSize(247);
         layout.replace(graphHolder, graphTabPanel);
-        
+
         // Add listener to mouse click on graph
         graphTabPanel.addChartProgressListener(new ChartProgressListener() {
 
@@ -280,7 +280,6 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         markTrialPanel = new javax.swing.JPanel();
         trialMarkCancelButton = new javax.swing.JButton();
@@ -297,6 +296,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         removeButton = new javax.swing.JButton();
         fixEndFrameButton = new javax.swing.JButton();
         fixStartFrameButton = new javax.swing.JButton();
+        badTrialCheckBox = new javax.swing.JCheckBox();
         backButton = new javax.swing.JButton();
         operationPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -415,27 +415,38 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             }
         });
 
+        badTrialCheckBox.setText("Bad trial");
+        badTrialCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                badTrialCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout trialInfoPanelLayout = new org.jdesktop.layout.GroupLayout(trialInfoPanel);
         trialInfoPanel.setLayout(trialInfoPanelLayout);
         trialInfoPanelLayout.setHorizontalGroup(
             trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(trialInfoPanelLayout.createSequentialGroup()
-                .add(fixStartFrameButton)
+                .add(trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(fixEndFrameButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(fixStartFrameButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(fixEndFrameButton)
+                .add(badTrialCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(removeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 58, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
         trialInfoPanelLayout.setVerticalGroup(
             trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, trialInfoPanelLayout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(trialInfoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(fixStartFrameButton)
                     .add(removeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(fixEndFrameButton)))
+                    .add(badTrialCheckBox))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(fixEndFrameButton))
         );
 
         backButton.setText("Back");
@@ -481,10 +492,10 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(trialLabelTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
+                .add(trialLabelTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(markToggleButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
-            .add(loadTrialPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+            .add(markToggleButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+            .add(loadTrialPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
         );
         operationPanelLayout.setVerticalGroup(
             operationPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -506,8 +517,8 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                 .add(backButton)
                 .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, trialInfoPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, operationPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, operationPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, trialInfoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         bottomPanelLayout.setVerticalGroup(
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -515,7 +526,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 .add(trialInfoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(operationPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(9, 9, 9)
                 .add(backButton))
         );
 
@@ -528,7 +539,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                     .add(graphHolder, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
                     .add(topPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(bottomPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 340, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(bottomPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 292, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -581,9 +592,13 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_markToggleButtonActionPerformed
 
     private void startRecording() {
+
+        // Unselect trial list
+        this.trialList.clearSelection();
+
         // Create trial marking
         TrialMarker mark = new TrialMarker();
-        
+
         // Set interval marker
         mark.setIntervalMarker(intervalMarkerManager.getNewIntervalMarker());
 
@@ -620,12 +635,16 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeButtonActionPerformed
 
     private void trialListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_trialListMouseClicked
+
+        // Get selected info
+        TrialMarker mark = (TrialMarker) trialList.getSelectedValue();
+
         // More than one click move to marked frame
         // Check if it is double click or not
-        if (evt.getClickCount() >= 2) {
+        if (evt.getClickCount() >= 2 && mark != null) {
             // Get info and move to the frame
-            int singleSelect = trialList.getSelectedIndex();
-            TrialMarker mark = (TrialMarker) trialSet.get(singleSelect);
+            //int singleSelect = trialList.getSelectedIndex();
+            //TrialMarker mark = (TrialMarker) trialSet.get(singleSelect);
             int frame = 0;
             if (evt.getClickCount() == 2) {
                 // Two click to move to the starting frame
@@ -635,6 +654,10 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 frame = mark.stopEyeFrame;
             }
             frameScrollingJPanel.setCurrentFrame(frame - eyeViewOffset);
+        }
+        // Anyway change the bad trial mark accordingly
+        if(mark != null){
+            this.badTrialCheckBox.setSelected(mark.isBadTrial);
         }
     }//GEN-LAST:event_trialListMouseClicked
 
@@ -696,7 +719,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             this.isGettingEndOfFullTrial = false;
 
             loadTrialInfo();
-        } 
+        }
 }//GEN-LAST:event_markButtonActionPerformed
 
     private void estimateTrialButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_estimateTrialButtonActionPerformed
@@ -763,6 +786,16 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void badTrialCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_badTrialCheckBoxActionPerformed
+        // Mark all selected trial accordingly
+        Object[] selected = trialList.getSelectedValues();
+        TrialMarker mark = null;
+        for (int i = 0; i < selected.length; i++) {
+            mark = (TrialMarker) selected[i];
+            mark.isBadTrial = this.badTrialCheckBox.isSelected();
+        }
+    }//GEN-LAST:event_badTrialCheckBoxActionPerformed
 
     /** 
      * Load trial info making sure that only one of 
@@ -839,6 +872,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
+    private javax.swing.JCheckBox badTrialCheckBox;
     private javax.swing.JPanel bottomPanel;
     private eyetrackercalibrator.gui.DisplayJPanel displayJPanel;
     private javax.swing.JButton estimateTrialButton;
@@ -862,6 +896,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     private javax.swing.JButton trialMarkCancelButton;
     private javax.swing.JLabel trialRangeMarkLabel;
     // End of variables declaration//GEN-END:variables
+
     public void loadTrialMarks(File trialMarkFile) {
         // Clear old marking
         clear();
@@ -903,12 +938,12 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 intervalMarker = intervalMarkerManager.getNewIntervalMarker();
                 intervalMarker.setStartValue(trial.startScreenFrame - screenViewOffset);
                 intervalMarker.setEndValue(trial.stopScreenFrame - screenViewOffset);
-                if(changeColor){// Change color for even trial
+                if (changeColor) {// Change color for even trial
                     intervalMarker.setPaint(Color.YELLOW);
                 }
-                
+
                 changeColor = !changeColor;
-                
+
                 trial.setIntervalMarker(intervalMarker);
             }
 
