@@ -212,7 +212,7 @@ public class DisplayJPanel extends javax.swing.JPanel {
 
         add(eyeViewPanelPanel);
 
-        screenViewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Screen View", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        screenViewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Scene View", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
         screenViewPanel.setPreferredSize(new java.awt.Dimension(100, 100));
 
         screenViewLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -235,6 +235,7 @@ public class DisplayJPanel extends javax.swing.JPanel {
         );
 
         add(screenViewPanel);
+        screenViewPanel.getAccessibleContext().setAccessibleName("Scene View");
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -169,14 +169,14 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         eyeOnlyCheckBox.setText("Eye only");
 
-        screenOnlyCheckBox.setText("Screen only");
+        screenOnlyCheckBox.setText("Scene only");
 
         sideBySideCheckBox.setSelected(true);
-        sideBySideCheckBox.setText("Eye and screen side by side");
+        sideBySideCheckBox.setText("Eye and scene side by side");
 
-        screenInCornerCheckBox.setText("Screen in the corner of eye");
+        screenInCornerCheckBox.setText("Scene in the corner of eye");
 
-        eyeInCornerCheckBox.setText("Eye in the corner of screen");
+        eyeInCornerCheckBox.setText("Eye in the corner of scene");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -231,7 +231,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         toTextField.setText("1");
         toTextField.setInputVerifier(textFieldPosIntInputVerifier);
 
-        drawCornerCheckBox.setText("Draw corners in screen frames");
+        drawCornerCheckBox.setText("Draw screen corners in scenes");
 
         jLabel4.setText("Moving median gaze point across");
 
@@ -313,8 +313,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                                 .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel5))
-                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
+                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)

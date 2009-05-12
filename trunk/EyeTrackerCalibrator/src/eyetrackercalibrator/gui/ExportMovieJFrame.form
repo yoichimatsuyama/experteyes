@@ -83,8 +83,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="toTextField" alignment="0" pref="125" max="32767" attributes="1"/>
-                          <Component id="fromTextField" alignment="0" pref="125" max="32767" attributes="1"/>
+                          <Component id="toTextField" alignment="0" pref="135" max="32767" attributes="1"/>
+                          <Component id="fromTextField" alignment="0" pref="135" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -216,23 +216,23 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="screenOnlyCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Screen only"/>
+            <Property name="text" type="java.lang.String" value="Scene only"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="sideBySideCheckBox">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="Eye and screen side by side"/>
+            <Property name="text" type="java.lang.String" value="Eye and scene side by side"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="screenInCornerCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Screen in the corner of eye"/>
+            <Property name="text" type="java.lang.String" value="Scene in the corner of eye"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="eyeInCornerCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Eye in the corner of screen"/>
+            <Property name="text" type="java.lang.String" value="Eye in the corner of scene"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -283,7 +283,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="drawCornerCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Draw corners in screen frames"/>
+        <Property name="text" type="java.lang.String" value="Draw screen corners in scenes"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
