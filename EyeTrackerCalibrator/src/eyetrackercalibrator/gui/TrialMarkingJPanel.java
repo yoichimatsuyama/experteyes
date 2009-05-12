@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -656,7 +657,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             frameScrollingJPanel.setCurrentFrame(frame - eyeViewOffset);
         }
         // Anyway change the bad trial mark accordingly
-        if(mark != null){
+        if (mark != null) {
             this.badTrialCheckBox.setSelected(mark.isBadTrial);
         }
     }//GEN-LAST:event_trialListMouseClicked
@@ -961,11 +962,9 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             root.addContent(className);
         }
 
-        Enumeration enumeration = trialSet.elements();
-        while (enumeration.hasMoreElements()) {
-            TrialMarker trial = (TrialMarker) enumeration.nextElement();
-
-            root.addContent(trial.toElement());
+        TrialMarker[] trial = getTrials();
+        for (int i = 0; i < trial.length; i++) {
+            root.addContent(trial[i].toElement());
         }
 
         // Write out to file as xml
@@ -992,6 +991,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         intervalMarkerManager.clearIntervalMarker();
     }
 
+    /** Get trials sorted by the frame */
     public TrialMarker[] getTrials() {
         Object[] objs = trialSet.toArray();
 
@@ -1000,6 +1000,20 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         for (int i = 0; i < trials.length; i++) {
             trials[i] = (TrialMarker) objs[i];
         }
+
+        Arrays.sort(trials, new Comparator<TrialMarker>() {
+
+            public int compare(TrialMarker o1, TrialMarker o2) {
+                int i = o1.startEyeFrame - o2.startEyeFrame;
+                if(i == 0){
+                    i = o1.stopEyeFrame - o2.stopEyeFrame;
+                }
+                if(i == 0 && o1.label != null && o2.label != null){
+                    i = o1.label.compareTo(o2.label);
+                }
+                return i;
+            }
+        });
 
         return trials;
     }
