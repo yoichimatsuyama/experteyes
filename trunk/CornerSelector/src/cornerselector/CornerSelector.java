@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * CornerSelector.java
  *
@@ -103,6 +103,7 @@ public class CornerSelector extends javax.swing.JFrame {
      * @param frameRate Frame rate e.g. 10 means shows every 10th frames
      */
     public CornerSelector(File[] fileList, File cornerHintsDirectory, int frameRate) {
+        setLocationByPlatform(true);
         initComponents();
 
         this.cornerHintsDirectory = cornerHintsDirectory;
@@ -247,31 +248,33 @@ public class CornerSelector extends javax.swing.JFrame {
                 lastGoodCorners[BL] = corners[BL][i];
             }
 
-            String filename = toHintFileName(this.files[i].getName());
-            File outFile = new File(this.cornerHintsDirectory, filename);
-            BufferedWriter bw;
+            if (this.files[i] != null) {
+                String filename = toHintFileName(this.files[i].getName());
+                File outFile = new File(this.cornerHintsDirectory, filename);
+                BufferedWriter bw;
 
-            // Write out last good corners
-            String TLString = lastGoodCorners[TL].x + "\t" + lastGoodCorners[TL].y;
-            String TRString = lastGoodCorners[TR].x + "\t" + lastGoodCorners[TR].y;
-            String BRString = lastGoodCorners[BR].x + "\t" + lastGoodCorners[BR].y;
-            String BLString = lastGoodCorners[BL].x + "\t" + lastGoodCorners[BL].y;
-            try {
-                bw = new BufferedWriter(new FileWriter(outFile));
-                bw.write(TLString);
-                bw.newLine();
-                bw.write(TRString);
-                bw.newLine();
-                bw.write(BRString);
-                bw.newLine();
-                bw.write(BLString);
-                bw.close();
-            } catch (IOException ex) {
-                Logger.getLogger(CornerSelector.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(this,
-                        ex.getMessage(), "Error Saving Corner Hints",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
+                // Write out last good corners
+                String TLString = lastGoodCorners[TL].x + "\t" + lastGoodCorners[TL].y;
+                String TRString = lastGoodCorners[TR].x + "\t" + lastGoodCorners[TR].y;
+                String BRString = lastGoodCorners[BR].x + "\t" + lastGoodCorners[BR].y;
+                String BLString = lastGoodCorners[BL].x + "\t" + lastGoodCorners[BL].y;
+                try {
+                    bw = new BufferedWriter(new FileWriter(outFile));
+                    bw.write(TLString);
+                    bw.newLine();
+                    bw.write(TRString);
+                    bw.newLine();
+                    bw.write(BRString);
+                    bw.newLine();
+                    bw.write(BLString);
+                    bw.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(CornerSelector.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(this,
+                            ex.getMessage(), "Error Saving Corner Hints",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
         }
         progressJDialog.dispose();
@@ -300,51 +303,53 @@ public class CornerSelector extends javax.swing.JFrame {
                 progressJDialog.setProgrss(i);
                 progressJDialog.repaint();
                 // Check the hint file
-                hintFile = new File(this.cornerHintsDirectory,
-                        toHintFileName(files[i].getName()));
-                if (hintFile.exists()) {
-                    try {
-                        // Get the file content
-                        RandomAccessFile in = new RandomAccessFile(hintFile, "r");
-                        // Read contents
-                        int j = 0;
-                        String line = in.readLine();
-                        while (line != null && j < 4) {
-                            String[] token = line.split("\t");
-                            if (token.length > 1) { // Sanity check
-                                Point p = null;
-                                switch (j) {
-                                    case 0:
-                                        p = this.corners[TL][i];
-                                        break;
-                                    case 1:
-                                        p = this.corners[TR][i];
-                                        break;
-                                    case 2:
-                                        p = this.corners[BR][i];
-                                        break;
-                                    case 3:
-                                        p = this.corners[BL][i];
-                                        break;
+                if (files[i] != null) {
+                    hintFile = new File(this.cornerHintsDirectory,
+                            toHintFileName(files[i].getName()));
+                    if (hintFile.exists()) {
+                        try {
+                            // Get the file content
+                            RandomAccessFile in = new RandomAccessFile(hintFile, "r");
+                            // Read contents
+                            int j = 0;
+                            String line = in.readLine();
+                            while (line != null && j < 4) {
+                                String[] token = line.split("\t");
+                                if (token.length > 1) { // Sanity check
+                                    Point p = null;
+                                    switch (j) {
+                                        case 0:
+                                            p = this.corners[TL][i];
+                                            break;
+                                        case 1:
+                                            p = this.corners[TR][i];
+                                            break;
+                                        case 2:
+                                            p = this.corners[BR][i];
+                                            break;
+                                        case 3:
+                                            p = this.corners[BL][i];
+                                            break;
+                                    }
+                                    try {
+                                        p.x = Integer.parseInt(token[0]);
+                                        p.y = Integer.parseInt(token[1]);
+                                    } catch (NumberFormatException numberFormatException) {
+                                        p.x = NOT_CODED;
+                                        p.y = NOT_CODED;
+                                    }
                                 }
-                                try {
-                                    p.x = Integer.parseInt(token[0]);
-                                    p.y = Integer.parseInt(token[1]);
-                                } catch (NumberFormatException numberFormatException) {
-                                    p.x = NOT_CODED;
-                                    p.y = NOT_CODED;
-                                }
-                            }
 
-                            // Next line
-                            line = in.readLine();
-                            j++;
+                                // Next line
+                                line = in.readLine();
+                                j++;
+                            }
+                            in.close();
+                        } catch (IOException ex) {
+                            // We should not get this
+                            Logger.getLogger(CornerSelector.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        in.close();
-                    } catch (IOException ex) {
-                        // We should not get this
-                        Logger.getLogger(CornerSelector.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    }// Do not load anything id the files doesnot exists
                 }// Do not load anything id the files doesnot exists
             }
             progressJDialog.dispose();
