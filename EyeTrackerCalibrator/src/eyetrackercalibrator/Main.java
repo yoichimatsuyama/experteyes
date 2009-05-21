@@ -359,6 +359,7 @@ public class Main extends javax.swing.JFrame {
 
     private void initComponents() {
         /** SEt windows behavior */
+        setLocationByPlatform(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
 
