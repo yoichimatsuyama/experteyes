@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -94,14 +94,14 @@ public class DetectCornerRunner extends Thread {
     @Override
     public void run() {
         // Check output dir existance
-        if(!this.cornerOutputDir.exists()){
+        if (!this.cornerOutputDir.exists()) {
             // Try making it
-            if(!this.cornerOutputDir.mkdirs()){
+            if (!this.cornerOutputDir.mkdirs()) {
                 // Fail to create, inform user and quit
-                JOptionPane.showMessageDialog(null, "Cannot create directory : " + 
-                        this.cornerOutputDir.getAbsolutePath(), 
+                JOptionPane.showMessageDialog(null, "Cannot create directory : " +
+                        this.cornerOutputDir.getAbsolutePath(),
                         "Error Creating Output Dir", JOptionPane.ERROR_MESSAGE);
-                if(this.listener != null){
+                if (this.listener != null) {
                     this.listener.fullCompletion();
                 }
                 return;
@@ -124,15 +124,20 @@ public class DetectCornerRunner extends Thread {
                     j <= this.ranges[i].stopScreenFrame; j++) {
                 String fileName = this.screenFrameManager.getFrameFileName(j);
 
-                largeSceneFiles[k] = new File(this.largeSceneDir, fileName);
-                smallSceneFiles[k] =
-                        new File(this.screenFrameManager.getFrameDirectory(),
-                        fileName);
+                if (fileName != null) {
+                    largeSceneFiles[k] = new File(this.largeSceneDir, fileName);
+                    smallSceneFiles[k] =
+                            new File(this.screenFrameManager.getFrameDirectory(),
+                            fileName);
+                }else{
+                    largeSceneFiles[k] = null;
+                    smallSceneFiles[k] = null;
+                }
 
                 k++;
             }
         }
-        
+
         // Get the scale to compute how big the box should be
         double scale = this.screenFrameManager.getScreenInfoScalefactor();
 
@@ -192,7 +197,6 @@ public class DetectCornerRunner extends Thread {
 
         FindCornerTrainingSetup cornerTrainingSetup = new FindCornerTrainingSetup(
                 smallSceneFiles, largeSceneFiles, gwtGridFile);
-
 
         /** Set up training parameters */
         cornerTrainingSetup.setGWTNumOrientations(numOrientations);
@@ -272,6 +276,7 @@ public class DetectCornerRunner extends Thread {
 
             final FindCornerProgressJDialog progressJDialog =
                     new FindCornerProgressJDialog(null, false);
+            
             progressJDialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                 @Override
@@ -289,7 +294,7 @@ public class DetectCornerRunner extends Thread {
                     Point[] points = fc.getCorners();
                     progressJDialog.setCorners(
                             points[CornerSelector.TL], points[CornerSelector.TR],
-                            points[CornerSelector.BL], points[CornerSelector.BR]);                    
+                            points[CornerSelector.BL], points[CornerSelector.BR]);
                     progressJDialog.setProgress(totalCompleted);
                 }
 
@@ -301,7 +306,7 @@ public class DetectCornerRunner extends Thread {
 
             findCornersMainThreadedAsync.setNumThreads(availableProcessor);
             // Run corner detection here
-            Thread t = new Thread(findCornersMainThreadedAsync,"Find Corner Main Thread");
+            Thread t = new Thread(findCornersMainThreadedAsync, "Find Corner Main Thread");
             t.start();
             progressJDialog.setVisible(true);
             progressJDialog.requestFocusInWindow();
