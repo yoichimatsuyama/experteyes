@@ -1,3 +1,6 @@
+==1.13==
+ * Fix unexpected crashes when scene file names are skipped or not available during corner detection
+ * Corner can be marked as bad during detection by moving a hint box totally outside the scene image.
 ==1.11==
  * Change "Screen" labels to "Scene"
  * Fix bug that corrupts export data when trial info is not entered in the correct order by the frame number
