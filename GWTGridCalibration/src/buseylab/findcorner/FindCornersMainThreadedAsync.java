@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package buseylab.findcorner;
 
 import buseylab.gwtgrid.GWTGrid;
@@ -153,8 +153,12 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
              * threads and the completed thread
              */
             this.threadLock.lock();
-            for (int i = 0; alive && i < totalThread; i++) {
-                assignSceneProcessing(this.currentScene);
+            for (int i = 0; alive &&
+                    i < totalThread && this.currentScene < this.sceneFiles.length;
+                    i++) {
+                if (!assignSceneProcessing(this.currentScene)) {
+                    i--;
+                }
                 this.currentScene++;
             }
             this.threadLock.unlock();
@@ -173,13 +177,21 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
 
     /**
      * This method assigning the scene to the FinCorner thread
+     * @return false if assignment fails or true otherwise.
      */
-    private void assignSceneProcessing(int sceneNumber) {
+    private boolean assignSceneProcessing(int sceneNumber) {
         // Sanity check
         if (sceneNumber >= this.sceneFiles.length) {
-            return;
+            return false;
         }
         File curSceneFile = this.sceneFiles[sceneNumber];
+
+        if (curSceneFile == null) {
+            Logger.getLogger(FindCornersMainThreadedAsync.class.getName()).log(
+                    Level.SEVERE, "Skip because of missing file name number " + sceneNumber + 1);
+
+            return false;
+        }
 
         String curSceneFilename = curSceneFile.getName();
         String curSceneFilenameWithoutExt = curSceneFilename.substring(
@@ -199,6 +211,7 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             // Start running
             Thread t = new Thread(fc, "Find Corner Thread " + sceneNumber);
             t.start();
+            return true;
         } else {
             String error = "Skip " + curCornerFilename + "because of missing ";
             if (!curHintFile.exists()) {
@@ -213,35 +226,39 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             Logger.getLogger(FindCornersMainThreadedAsync.class.getName()).log(
                     Level.SEVERE, error);
 
-            this.completed(null);
+            return false;
         }
     }
+
 
     /*
      * returns the first index of a dead thread or -1 if all are alive
      */
     public static int firstDeadIndex(Thread[] threads) {
-        for (int i = 0; i < threads.length; i++) {
+        for (int i = 0; i <
+                threads.length; i++) {
             if (!threads[i].isAlive()) {
                 return i;
             }
+
         }
         return -1;
     }
 
-    // return the frame number for a filename
+// return the frame number for a filename
     public static long parseFrameno(File f) {
         String filename = f.getName();
         String framenoStr = filename.substring(filename.indexOf('_') + 1, filename.indexOf('.'));
         return Long.parseLong(framenoStr);
     }
-    //CAUTION- THIS ASSUMES THAT THE FILES ARE IN ALPHABETICAL ORDER- SHOULD SORT FIRST.
+//CAUTION- THIS ASSUMES THAT THE FILES ARE IN ALPHABETICAL ORDER- SHOULD SORT FIRST.
 
     public int getIndexOfFirstFrame(File[] files) throws Exception {
         FileInputStream fis = new FileInputStream(this.gwtGridFile);
         ObjectInputStream ois = new ObjectInputStream(fis);
 
-        for (int corner = 0; corner < 4; corner++) {
+        for (int corner = 0; corner <
+                4; corner++) {
             // don't care about these. get them off the file stack
             ois.readObject();
             ois.readObject();
@@ -251,10 +268,12 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
         ois.close();
         fis.close();
         // search for this filename in the files array
-        for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i <
+                files.length; i++) {
             if (files[i].getName().equals(firstFilename)) {
                 return i;
             }
+
         }
 
         // not found
@@ -301,6 +320,7 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
                                 cd.setCorners(fc.getCorners());
                                 cd.setHints(fc.getHints());
                             }
+
                         }
                         numberDone++;
 
@@ -384,7 +404,7 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
         this.isPrintingOut = isPrintingOut;
     }
 
-    /** 
+    /**
      * This method is called when a FindCorners thread finished
      * execution
      */
@@ -395,15 +415,22 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             // Remove ourself
             this.findCornersesList.remove(whoIsComplete);
         }
-        if (alive && this.currentScene < this.sceneFiles.length) {
-            // Schedule a find corner this must be in lock since it adds
-            // a FindCorner to the queue
-            assignSceneProcessing(this.currentScene);
+
+        // Schedule a find corner this must be in lock since it adds
+        // a FindCorner to the queue
+        // While asignment turn sour keep moving on
+        while (alive && this.currentScene < this.sceneFiles.length &&
+                !assignSceneProcessing(this.currentScene)) {
             this.currentScene++;
-        } else {
+            this.totalCompleted++;
+        }
+        this.currentScene++;
+
+        if (!alive || this.currentScene >= this.sceneFiles.length) {
             // Signal completion when there is nothing more
             this.completionSemaphore.release();
         }
+
         this.threadLock.unlock();
         if (whoIsComplete != null && this.isPrintingOut) {
             System.out.println("Time for one scene = " +
@@ -417,9 +444,11 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
                     (this.sceneFiles.length - this.totalCompleted) /
                     60.0 / 60.0 / (double) this.numThreads);
         }
+
         if (this.listener != null) {
             this.listener.progress(totalCompleted, whoIsComplete);
         }
+
     }
 
     /**
@@ -433,6 +462,7 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             FindCorners fc = findCornersesList.removeFirst();
             fc.kill();
         }
+
         this.threadLock.unlock();
     }
 }
