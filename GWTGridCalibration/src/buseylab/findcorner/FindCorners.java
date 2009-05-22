@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package buseylab.findcorner;
 
 import buseylab.gwtgrid.GWTGrid;
@@ -101,7 +101,7 @@ public class FindCorners implements Runnable {
             // Create buffered space
             double[][][][] magnitudeRespsBuffer = GWTGrid.createRespsSpace(
                     freqKernels.length, freqKernels[0].length, size);
-            double[][][][] phaseRespsBuffer  = GWTGrid.createRespsSpace(
+            double[][][][] phaseRespsBuffer = GWTGrid.createRespsSpace(
                     freqKernels.length, freqKernels[0].length, size);
 
             for (int corner = 0; corner < 4 && alive; corner++) {
@@ -110,14 +110,23 @@ public class FindCorners implements Runnable {
                 yHint = Integer.parseInt(hints[1]);
                 // store the hint
                 cornerHints[corner] = new Point(xHint, yHint);
+
+                int xHintTranslated = (int) (xHint * scale);
+                int yHintTranslated = (int) (yHint * scale);
+
+                // Check if the hint box is out side of the image (In that case we will treat it as missing corner
+                int UpperLeftX = xHintTranslated - (int) (size / 2.0);
+                int UpperLeftY = yHintTranslated - (int) (size / 2.0);
+
                 // make sure screen is not off frame
-                if (xHint > -1 && yHint > -1) {
-                    int xHintTranslated = (int) (xHint * scale);
-                    int yHintTranslated = (int) (yHint * scale);
+                if (xHint > -1 && yHint > -1 &&
+                        // Make sure that the hint box is on the scene
+                        !(UpperLeftX > img.getWidth() || UpperLeftX + size < 0 ||
+                        UpperLeftY > img.getHeight() || UpperLeftY + size < 0)) {
 
                     // make sure we don't move off the screen at top left
-                    int UpperLeftX = Math.max(xHintTranslated - (int) (size / 2.0), 0);
-                    int UpperLeftY = Math.max(yHintTranslated - (int) (size / 2.0), 0);
+                    UpperLeftX = Math.max(UpperLeftX, 0);
+                    UpperLeftY = Math.max(UpperLeftY, 0);
 
                     // make sure we don't move off the screen at bottom right
                     if (UpperLeftX + size >= img.getWidth()) {
@@ -127,13 +136,8 @@ public class FindCorners implements Runnable {
                         UpperLeftY = img.getHeight() - size - 1;
                     }
 
-                    double[] pixels = ImageUtils.RGBtoGrayDouble(img.getRGB(UpperLeftX, UpperLeftY, size, size, buffer, 0, size));//ImageUtils.getPixels(img, UpperLeftX, UpperLeftY, size, size));
-                    GWTGrid gwt = new GWTGrid(pixels, size, freqKernels,magnitudeRespsBuffer, phaseRespsBuffer);
-
-                    // write out image for debugging
-//					BufferedImage tmp = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-//					tmp.setRGB(0, 0, size, size, ImageUtils.grayDoubleToRGB(pixels), 0, size);
-//					ImageIO.write(tmp, "jpg", new File("test" + corner + ".jpg"));
+                    double[] pixels = ImageUtils.RGBtoGrayDouble(img.getRGB(UpperLeftX, UpperLeftY, size, size, buffer, 0, size));
+                    GWTGrid gwt = new GWTGrid(pixels, size, freqKernels, magnitudeRespsBuffer, phaseRespsBuffer);
 
                     double maxSim = 0;
                     Point maxSimIdx = null;
@@ -168,7 +172,8 @@ public class FindCorners implements Runnable {
                             System.out.println("Couldn't compute similarities. Assuming -1,-1");
                         }
                     }
-                } // corner hints had -1's
+
+                } // corner hints had -1's or hint box is out of the image all together
                 else {
                     corners[corner] = new Point(-1, -1);
                     similarities[corner] = .5;
