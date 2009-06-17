@@ -1,0 +1,3 @@
+<filename> <pupil X position> <pupil Y position> <reflect X position> <reflect Y position>
+<pupil fit top left x> <pupil fit top left y> <pupil fit bottom right x> <pupil fit bottom right y> [optional: <cornia reflect fit top left x> <cornia reflect fit top left y> <cornia reflect fit bottom right x> <cornia reflect fit bottom right y>
+<fit error> <pupil fit angle> <cornia reflect fit angle>
