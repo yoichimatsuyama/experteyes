@@ -2,7 +2,7 @@ The data file composes of 3 lines.  Data in each line is separated by white spac
 
 Line 1:
 
-<filename> <pupil X position> <pupil Y position> <cornea reflection X position> <cornea reflection Y position>
+<file name> <pupil X position> <pupil Y position> <cornea reflection X position> <cornea reflection Y position>
 
 Note: File name MUST not contains any space and must includes extension.  Information here must be correct as they are used for calibration and further output.
 
