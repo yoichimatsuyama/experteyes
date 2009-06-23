@@ -1,6 +1,6 @@
 Here is the explanation of each column in the output file.  All numbers are 0 or positive real number (except for trial number)  -666 represents an error or unavailable information.
 
-|| Column name || Description ||
+|| *Column name* || *Description* ||
 || Screen Frame || This is the screen frame number.||
 || Pupil x || This is the x coordinate of the pupil in eye scene picture. ||
 || Pupil y || This is the y coordinate of the pupil in eye scene picture. ||
@@ -29,4 +29,3 @@ Here is the explanation of each column in the output file.  All numbers are 0 or
 || Error|| Error code from what are marked in "clean data" panel. The code is an integer whose bit represents the following error types `[bottomright corner detection, bottomleft corner detection, topright corner detection, topleft corner detection, unrecoverable, eye]`||
 || Trial file name|| Name of the trial as marked in the "Mark Trials" panel.  If the name is C_x_y, it means this is a part of calibration sequence stored in (x,y) slot in the calibration panel.||
 || Trial number|| Trial number as marked in the "Mark Trials" panel. 0 means it's not a trial nor calibration.  negative number means it's part of a calibration sequence.||
-
