@@ -35,8 +35,6 @@
 
 package eyetrackercalibrator.framemanaging;
 
-import org.jfree.data.DomainOrder;
-import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
 
 /**
