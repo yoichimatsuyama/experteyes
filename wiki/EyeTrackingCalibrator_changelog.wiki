@@ -1,3 +1,6 @@
+==1.14==
+ * Fix a bug that mark good trial output as having error and show bad trial as normal 
+
 ==1.13==
  * Fix unexpected crashes when scene file names are skipped or not available during corner detection
  * Corner can be marked as bad during detection by moving a hint box totally outside the scene image.
