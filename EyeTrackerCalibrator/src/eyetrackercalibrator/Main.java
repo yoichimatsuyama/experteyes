@@ -1409,7 +1409,7 @@ public class Main extends javax.swing.JFrame {
                                     corners[3] != null) {
                                 for (int j = 0; j < point.length; j++) {
                                     // Only estimate fixation when this is not a bad trial
-                                    if (trialName != null && trials[trialNumber].isBadTrial) {
+                                    if (trialName != null && !trials[trialNumber].isBadTrial) {
                                         // Compute fixation
                                         fixation = Computation.ComputeScreenPositionProjective(
                                                 realMonitorDimension, point[j],
