@@ -1240,7 +1240,7 @@ public class Main extends javax.swing.JFrame {
                     "<html>Eye gaze has not been calibrated</html>",
                     "Error getting eye gaze coefficients",
                     JOptionPane.ERROR_MESSAGE);
-        // Does nothing more and waiting to return
+            // Does nothing more and waiting to return
         } else {
             PrintWriter exportWriter = null;
 
@@ -1409,7 +1409,10 @@ public class Main extends javax.swing.JFrame {
                                     corners[3] != null) {
                                 for (int j = 0; j < point.length; j++) {
                                     // Only estimate fixation when this is not a bad trial
-                                    if (trialName != null && !trials[trialNumber].isBadTrial) {
+                                    if (trialName != null && trials[trialNumber].isBadTrial) {
+                                        exportWriter.print(
+                                                ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                    } else {
                                         // Compute fixation
                                         fixation = Computation.ComputeScreenPositionProjective(
                                                 realMonitorDimension, point[j],
@@ -1430,9 +1433,6 @@ public class Main extends javax.swing.JFrame {
 
                                         exportWriter.print(
                                                 fixation.getX() + "\t" + fixation.getY() + "\t");
-                                    } else {
-                                        exportWriter.print(
-                                                ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
                                     }
                                 }
 
@@ -1456,11 +1456,11 @@ public class Main extends javax.swing.JFrame {
 
 
                         // Processing error code
+                        long errorValue = 0;
                         if (error != null && error.startEyeFrame <= i) {
                             // Check if it's in range
                             if (i <= error.stopEyeFrame) {
-                                // Print error code
-                                exportWriter.print(error.getErrorCode() + "\t");
+                                errorValue = error.getErrorCode();
                             } else {
                                 // Mismatch. Try finding the next one
                                 while (errorIter.hasNext() &&
@@ -1470,20 +1470,22 @@ public class Main extends javax.swing.JFrame {
                                 // Check if we found one
                                 if (error.startEyeFrame <= i) {
                                     if (i <= error.stopEyeFrame) {
-                                        // Found it so print
-                                        exportWriter.print(error.getErrorCode() + "\t");
+                                        // Found it so store
+                                        errorValue = error.getErrorCode();
                                     } else {
                                         // Nothing is found and we are out of error so stop searching
                                         error = null;
-                                        exportWriter.print("0\t");
                                     }
-                                } else {
-                                    exportWriter.print("0\t");
                                 }
                             }
-                        } else {
-                            exportWriter.print("0\t");
                         }
+                        // Shift one bit to the most significant bit and store bad trial bit
+                        errorValue *=2;
+                        if (trialName != null && trials[trialNumber].isBadTrial) {
+                            errorValue += 1;
+                        }
+
+                        exportWriter.print(errorValue + "\t");
 
                         if (trialName != null) {
                             exportWriter.println(trials[trialNumber].label + "\t" + trialNumber);
