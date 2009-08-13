@@ -1,3 +1,7 @@
+==1.15==
+ * Make change so that only bad trial data will skip computation and output -666 for screen coordinate.
+ * Add bad trial to error type.  See [error_code] for information.
+
 ==1.14==
  * Fix a bug that mark good trial output as having error and show bad trial as normal 
 
