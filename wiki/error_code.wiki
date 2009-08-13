@@ -1,0 +1,9 @@
+Error code is a bit coded integer.  The meaning of each bit starting from the least significant bit is as follows
+
+# Bad Trial
+# Eye Detection Error
+# Unrecoverable Error
+# Top Left Corner Error
+# Top Right Corner Error
+# Bottom Left Corner Error
+# Bottom Right Corner Error
