@@ -133,12 +133,16 @@ public class EyeViewFrameInfo implements FrameInfo {
                     info.corniaFit[3] = Double.parseDouble(coorString[3]) - info.corniaFit[1];
                 }
                 // check for reflect set
-                if (coorString.length >= 8) {
+                if (coorString.length >= 7) {
                     info.setReflectFit(new double[4]);
                     info.reflectFit[0] = Double.parseDouble(coorString[4]);
                     info.reflectFit[1] = Double.parseDouble(coorString[5]);
                     info.reflectFit[2] = Double.parseDouble(coorString[6]) - info.reflectFit[0];
-                    info.reflectFit[3] = Double.parseDouble(coorString[7]) - info.reflectFit[1];
+                    if (coorString.length >= 8) {
+                        info.reflectFit[3] = Double.parseDouble(coorString[7]) - info.reflectFit[1];
+                    } else {
+                        info.reflectFit[3] = info.reflectFit[2];
+                    }
                 }
             }
 
