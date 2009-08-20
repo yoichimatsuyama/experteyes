@@ -152,7 +152,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
         eyeModelGraphics2D.setColor(new Color(crGray, crGray, crGray));
 
         if (this.isCRCircle) {
-            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5]+params[4]-params[6]);
+            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5] + params[4] - params[6]);
         } else {
             cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
         }
@@ -233,7 +233,6 @@ public class FitEyeModel implements Runnable {
     // gradient descent step size
 
     final static int STEP_SIZE = 10;
-
     // Create instace of class holding function to be minimized
     ImgDiffErr funct = new ImgDiffErr();    // where to save gaze data
     final static String GAZE_ROOT = "Gaze";    // filenames
@@ -470,9 +469,14 @@ public class FitEyeModel implements Runnable {
                         crCenterX + "\t" + crCenterY + "\t" + "\n");
                 // also write out our final parameters
                 // TL = top left, BR = bottom right
-                // pupilTLX, pupilTLY, pupilBRX, pupilBRY, crTLX, crTLY, crBRX, crBRY, pupil angle, cr angle
+                // pupilTLX, pupilTLY, pupilBRX, pupilBRY, crTLX, crTLY, crBRX, crBRY
                 for (int i = 0; i < params.length; i++) {
                     output.write(params[i] + "\t");
+                    // Special case for circle
+                }
+                if (this.parameters.isCRCircle) {
+                    // Write height equal to width in case of the circle
+                    output.write(params[params.length - 1] + "\t");
                 }
                 // also write out our goodness of fit, pupil angle and cr angle
                 output.write("\n" + funct.getSSE() + "\t" +
