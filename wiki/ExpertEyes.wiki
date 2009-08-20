@@ -11,5 +11,3 @@ Babcock, J.S., and Pelz, J. (2004). Building a lightweight eyetracking headgear,
 http://www.jasonbabcock.com/research/ETRA04_babcock_pelz_color_small.pdf
 
 and the video files are split into image sequences for temporal alignment and calibration.
-
-We anticipate the code becoming available in January 2008.
