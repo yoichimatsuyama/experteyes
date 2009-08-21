@@ -18,7 +18,7 @@ For videos recorded using a new HDV camera. ( .MOV encoded with H.264 format )
 
 {{{ffmpeg -i FILE0001.MOV  -pix_fmt h264 eye/eye_%5d.tiff}}}`
 
-(you may need to add the -deinterlace flag to the command above)
+(you may need to add the -deinterlace flag to the command above depending on your camera to avoid horizontal lines in your images.)
 
 If you want to save as .jpg instead of .tiff (and the 2nd f is very important in tiff) also add the -sameq flag to ffmpeg
 
