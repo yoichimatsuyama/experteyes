@@ -9,10 +9,13 @@ From the terminal, run ffmpeg:
 Note different video recording devices need different ffmpeg parameters. 
 For videos recorded using a java program ( .AVI ) or from a DV cam (.dv)
 {{{ffmpeg -i stream2001.avi -deinterlace eye/eye_%5d.tiff}}}
+
 or
+
 {{{ffmpeg -i stream2001.dv -deinterlace eye/eye_%5d.tiff}}}
 
 For videos recorded using a new HDV camera. ( .MOV encoded with H.264 format )
+
 {{{ffmpeg -i FILE0001.MOV  -pix_fmt h264 eye/eye_%5d.tiff}}}`
 
 (you may need to add the -deinterlace flag to the command above)
