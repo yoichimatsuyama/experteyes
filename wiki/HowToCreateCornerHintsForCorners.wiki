@@ -6,7 +6,7 @@ The ExpertEyes eye tracker calibrator will use Gabor jets to find the corners on
 
 To run this program, download the Corner_Selector.jar file. Run it by double-clicking the .jar file.
 
-Once it runs, browse to your calibration folder for your subject (not the project folder, despite the name).
+Once it runs, browse to your calibration folder for your subject (not the project folder, despite the name). This will place a folder called CornerHints in the calibration folder, which the EyeTrackerCalibrator creates. If you don't have this yet, you can just select the project folder and then drag the cornerhints folder into the calibration folder later on when you want to find the corners.
 
 Also choose the small cleaned scene folder. The ratio of the small and large cleaned scene files should be approximately 2.81. The small versions are used for speed, and the large are used for accuracy. You can also correct for barrel distortion when you create these from your raw video footage if you like.
 
