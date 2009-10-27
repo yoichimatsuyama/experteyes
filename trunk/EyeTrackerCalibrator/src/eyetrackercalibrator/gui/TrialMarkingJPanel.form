@@ -97,7 +97,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="graphHolder" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="bottomPanel" pref="673" max="32767" attributes="0"/>
+          <Component id="bottomPanel" pref="680" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -213,13 +213,13 @@
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="removeButton" min="-2" pref="58" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" alignment="1" pref="288" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="1" pref="289" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="jScrollPane1" pref="439" max="32767" attributes="1"/>
+                      <Component id="jScrollPane1" pref="430" max="32767" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="fixStartFrameButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -306,11 +306,11 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="trialLabelTextField" pref="205" max="32767" attributes="0"/>
+                      <Component id="trialLabelTextField" pref="238" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
-                  <Component id="markToggleButton" alignment="0" pref="292" max="32767" attributes="0"/>
-                  <Component id="loadTrialPanel" alignment="0" pref="292" max="32767" attributes="1"/>
+                  <Component id="markToggleButton" alignment="0" pref="293" max="32767" attributes="0"/>
+                  <Component id="loadTrialPanel" alignment="0" pref="293" max="32767" attributes="1"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
