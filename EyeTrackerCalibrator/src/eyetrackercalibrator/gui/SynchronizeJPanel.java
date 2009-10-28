@@ -213,14 +213,33 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
     public void addSyncPoint(SynchronizationPoint sp) {
         // Find a place to add according to the eye frame
         int index = 0;
+
+        // Protect from overlapping
         for (Enumeration<SynchronizationPoint> e =
                 (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
                 e.hasMoreElements();) {
             SynchronizationPoint p = e.nextElement();
+
             if (p.equals(sp)) {
-                // Do not add
+                // Do not add duplicate
                 return;
             }
+
+            if ((p.eyeFrame > sp.eyeFrame && p.sceneFrame < sp.sceneFrame) ||
+                    (p.eyeFrame < sp.eyeFrame && p.sceneFrame > sp.sceneFrame)) {
+                // Show message saying that there sync point cannot over lapped
+                JOptionPane.showMessageDialog(this, "The synchronization point overlaps with "+p,
+                        "Invalid Synchronization Point", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        for (Enumeration<SynchronizationPoint> e =
+                (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
+                e.hasMoreElements();) {
+            SynchronizationPoint p = e.nextElement();
+
+
             if (p.eyeFrame > sp.eyeFrame || (p.eyeFrame <= sp.eyeFrame && p.sceneFrame > sp.sceneFrame)) {
                 // We found the spot just add
                 this.synchPointSet.add(index, sp);
