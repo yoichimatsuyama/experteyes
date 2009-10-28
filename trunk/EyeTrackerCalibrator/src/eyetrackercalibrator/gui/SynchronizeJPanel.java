@@ -36,9 +36,18 @@ import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.framemanaging.SynchronizationPoint;
 import eyetrackercalibrator.gui.util.AnimationTimer;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * To use this Panel.  The "start" method must be explicitly called after 
@@ -52,6 +61,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
     private FrameManager eyeFrameManager = null;
     private FrameManager screenFrameManager = null;
     DefaultListModel synchPointSet = new DefaultListModel();
+    public static final String SYNC_LIST_ELEMENT = "synchronization";
 
     /** Creates new form SynchronizeJPanel */
     public SynchronizeJPanel() {
@@ -118,6 +128,111 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
     public void addActionListener(ActionListener listener) {
         synchronizeButton.addActionListener(listener);
         cancelButton.addActionListener(listener);
+    }
+
+    /** 
+     * This method populates the synchronization panel with points expressed in
+     * XML element structure
+     * The root element name does not matter but the contained elements must follows
+     * format described by SynchronizationPoint class.
+     * <root>
+     *    <synchpoint1.../>
+     *    <synchpoint2.../>
+     *    ...
+     * </root>
+     */
+    public void loadSynchronizationPoints(File synchronizationFile) {
+        // Clear current sync points
+        this.synchPointSet.clear();
+
+        // Load from file
+        SAXBuilder builder = new SAXBuilder();
+        Element root = null;
+        try {
+            Document doc = builder.build(synchronizationFile);
+            root = doc.getRootElement();
+        } catch (Exception ex) {
+            // Show message saying that there is an error
+            JOptionPane.showMessageDialog(this, ex,
+                    "Error Loading Synchronization Points", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (root != null) {
+            List list = root.getChildren(SynchronizationPoint.XMLELEMENT);
+            for (Object object : list) {
+                try {
+                    addSyncPoint(SynchronizationPoint.fromElement((Element) object));
+                } catch (InstantiationException ex) {
+                    // Show message saying that there is an error
+                    JOptionPane.showMessageDialog(this, ex,
+                            "Error Loading Synchronization Points", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Synchronization file " +
+                    synchronizationFile.getAbsolutePath() + " is empty.",
+                    "Error Loading Synchronization Points", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+
+    /**
+     * This method populates the synchronization panel with points expressed in
+     * XML element structure the contained elements follow
+     * format described by SynchronizationPoint class.
+     * <synchronization>
+     *    <synchpoint1.../>
+     *    <synchpoint2.../>
+     *    ...
+     * </synchronization>
+     */
+    public void saveSynchronizationPoints(File synchronizationFile) {
+        Element root = new Element(SYNC_LIST_ELEMENT);
+
+        for (Enumeration<SynchronizationPoint> e =
+                (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
+                e.hasMoreElements();) {
+            SynchronizationPoint p = e.nextElement();
+            root.addContent(p.toXMLElement());
+        }
+
+        // Write out to file as xml
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        try {
+            outputter.output(new Document(root), new FileWriter(synchronizationFile));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * This method add a sync point to the system
+     */
+    public void addSyncPoint(SynchronizationPoint sp) {
+        // Find a place to add according to the eye frame
+        int index = 0;
+        for (Enumeration<SynchronizationPoint> e =
+                (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
+                e.hasMoreElements();) {
+            SynchronizationPoint p = e.nextElement();
+            if (p.equals(sp)) {
+                // Do not add
+                return;
+            }
+            if (p.eyeFrame > sp.eyeFrame || (p.eyeFrame <= sp.eyeFrame && p.sceneFrame > sp.sceneFrame)) {
+                // We found the spot just add
+                this.synchPointSet.add(index, sp);
+                // We are done
+                return;
+            } else {
+                // Keep searching when eyeframe and sceneframe is still smaller
+                index++;
+            }
+        }
+        this.synchPointSet.add(index, sp);
+        return;
     }
 
     /** This method is called from within the constructor to
@@ -236,31 +351,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         SynchronizationPoint sp = new SynchronizationPoint(
                 this.eyeFrameScrollingJPanel.getCurrentFrame(),
                 this.screenFrameScrollingJPanel.getCurrentFrame());
-
-        // Find a place to add according to the eye frame
-        int index = 0;
-        for (Enumeration<SynchronizationPoint> e = (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
-                e.hasMoreElements();) {
-            SynchronizationPoint p = e.nextElement();
-            if(p.equals(sp)){
-                // Do not add
-                return;
-            }
-            if(p.eyeFrame > sp.eyeFrame || 
-                    (p.eyeFrame <= sp.eyeFrame && p.sceneFrame > sp.sceneFrame)){
-                // We found the spot just add
-                this.synchPointSet.add(index, sp);
-                // We are done
-                return;
-            }else{
-                // Keep searching when eyeframe and sceneframe is still smaller
-                index++;
-            }
-        }
-
-        this.synchPointSet.add(index, sp);
-        return;
-
+        addSyncPoint(sp);
     }//GEN-LAST:event_addSynchPointButtonActionPerformed
 
     private void removeSynchPointButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeSynchPointButtonActionPerformed
@@ -270,7 +361,6 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
             this.synchPointSet.removeElement(objs[i]);
         }
     }//GEN-LAST:event_removeSynchPointButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel SynchPointList;
     private javax.swing.JButton addSynchPointButton;
@@ -285,4 +375,8 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
     private javax.swing.JButton synchronizeButton;
     private javax.swing.JList synchronizePointList;
     // End of variables declaration//GEN-END:variables
+
+    public void clear() {
+        this.synchPointSet.clear();
+    }
 }

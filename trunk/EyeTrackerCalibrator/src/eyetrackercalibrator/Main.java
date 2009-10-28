@@ -121,6 +121,7 @@ public class Main extends javax.swing.JFrame {
     static final public String SCREEN_LOAD_PROGRESS = "screenloadprogress";
     static final public String PROJECT_PROPERTY_FILE_NAME = "project.ini";
     static final public String CALIBRATION_FILE_NAME = "calibration.xml";
+    static final public String SYNC_FILE_NAME = "synchronization.xml";
     static final public String ERROR_FILE_NAME = "errors.xml";
     static final public String TRIAL_FILE_NAME = "trial.xml";
     static final public String MONITOR_TRUE_WIDTH_PX = "monitortruewidth";
@@ -1106,6 +1107,14 @@ public class Main extends javax.swing.JFrame {
             markTrialJPanel.clear();
         }
 
+        // Load synch file if exists
+        File syncFile = new File(projectLocation, SYNC_FILE_NAME);
+        if (syncFile.exists()) {
+            synchronizeJPanel.loadSynchronizationPoints(syncFile);
+        } else {
+            synchronizeJPanel.clear();
+        }
+
         // Link frame manager to update progress to project panel
         eyeFrameManager.setLoadingListener(projectSelectPanel.getEyeFrameLoadingListener());
         screenFrameManager.setLoadingListener(projectSelectPanel.getScreenFrameLoadingListener());
@@ -1171,6 +1180,9 @@ public class Main extends javax.swing.JFrame {
 
         // Save trial mark information
         markTrialJPanel.saveTrialMarks(new File(projectLocation, TRIAL_FILE_NAME));
+
+        // Save sync points information
+        synchronizeJPanel.saveSynchronizationPoints(new File(projectLocation, SYNC_FILE_NAME));
 
         // Save project property
         Properties p = new Properties();
