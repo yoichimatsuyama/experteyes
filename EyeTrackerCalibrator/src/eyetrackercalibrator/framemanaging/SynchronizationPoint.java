@@ -40,6 +40,7 @@ public class SynchronizationPoint{
     }
 
     @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object obj) {
         if(SynchronizationPoint.class.isInstance(obj)){
             SynchronizationPoint o = (SynchronizationPoint) obj;
@@ -64,7 +65,7 @@ public class SynchronizationPoint{
     public int eyeFrame;
     public int sceneFrame;
     /** Name of XML exported element */
-    final public static String XMLELEMENT = "synchpoint";
+    final public static String XMLELEMENT = "syncpoint";
     final public static String ATTRIBUTE_EYE_FRAME = "eyeframe";
     final public static String ATTRIBUTE_SCENE_FRAME = "sceneframe";
 
