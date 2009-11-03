@@ -39,15 +39,13 @@ import java.util.Arrays;
 import org.jfree.data.DomainOrder;
 import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
-import org.jfree.data.xy.XYDataset;
 
 /**
  *
  * @author ruj
  */
-public class CornerSimilarityXYDataSet implements XYDataset{
+public class CornerSimilarityXYDataSet extends SyncXYDataSet{
     FrameManager frameInfoManager = null;
-    private int offset = 0;
     private double[][] buffer;
     private int firstItem = 0;
     private int bufferSize = 0;
@@ -127,7 +125,7 @@ public class CornerSimilarityXYDataSet implements XYDataset{
             
             // Move buffer position
             firstItem = firstItem + changes;
-        }else if(pos + offset <= frameInfoManager.getTotalFrames()){
+        }else if(pos <= this.frameSynchronizor.getTotalFrame()){
             // Just reload the information at the position if we have it
             changes = 1;
             arrayPos = pos % bufferSize;
@@ -138,7 +136,8 @@ public class CornerSimilarityXYDataSet implements XYDataset{
         for (int i = 0; i < changes; i++) {
             // Get info
             ScreenViewFrameInfo info =
-                    (ScreenViewFrameInfo) frameInfoManager.getFrameInfo(startPos+offset+i);
+                    (ScreenViewFrameInfo) frameInfoManager.getFrameInfo(
+                    this.frameSynchronizor.getSceneFrame(startPos+i));
             if(info == null || info.similarities == null){
                 // Set information to unavailable
                 for (int j = 0; j < buffer.length; j++) {
@@ -228,7 +227,4 @@ public class CornerSimilarityXYDataSet implements XYDataset{
     public void setGroup(DatasetGroup datasetGroup) {
     }
     
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
 }

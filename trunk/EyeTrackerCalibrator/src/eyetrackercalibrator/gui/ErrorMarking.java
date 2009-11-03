@@ -101,7 +101,7 @@ public class ErrorMarking {
      * than the end frame.  The method only works if you use it after
      * calling setStartFrame.
      */
-    public void setEndFrame(int currentFrame, int eyeOffset, int screenOffset) {
+    public void setEndFrame(int currentFrame, int eyeFrame, int sceneFrame) {
         int endRef = 0;
         int startRef = 0;
 
@@ -113,19 +113,17 @@ public class ErrorMarking {
             endRef = referenceFrame;
         }
 
-        stopEyeFrame = endRef + eyeOffset;
-        stopScreenFrame = endRef + screenOffset;
-        startEyeFrame = startRef + eyeOffset;
-        startScreenFrame = startRef + screenOffset;
+        stopEyeFrame = eyeFrame;
+        stopScreenFrame = sceneFrame;
         if (intervalMarker != null) {
             intervalMarker.setEndValue(endRef);
             intervalMarker.setStartValue(startRef);
         }
     }
 
-    public void setStartFrame(int currentFrame, int eyeOffset, int screenOffset) {
-        startEyeFrame = currentFrame + eyeOffset;
-        startScreenFrame = currentFrame + screenOffset;
+    public void setStartFrame(int currentFrame, int eyeFrame, int sceneFrame) {
+        startEyeFrame = eyeFrame;
+        startScreenFrame = sceneFrame;
         if (intervalMarker != null) {
             intervalMarker.setStartValue(currentFrame);
         }

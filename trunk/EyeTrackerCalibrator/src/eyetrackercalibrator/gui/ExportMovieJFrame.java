@@ -26,13 +26,14 @@
  */
 /*
  * ExportMovieJFrame.java
- *
+ * @todo add a check box to eliminate frames that are not in pair
  * Created on March 18, 2008, 11:10 AM
  */
 package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.Main;
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.math.EyeGazeComputing;
@@ -62,7 +63,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
     /** Creates new form ExportMovieJFrame */
     public ExportMovieJFrame(File currentDir, int exportWidth, int exportHeight,
-            EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
+            EyeGazeComputing eyeGazeComputing, FrameSynchronizor frameSynchronizor,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager) {
 
         // Load ffmpeg location
@@ -86,15 +87,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         initComponents();
 
         // Set up initial range t export
-        int totalEyeFrame = eyeFrameManager.getTotalFrames();
-        int totalScreenFrame = screenFrameManager.getTotalFrames();
-        int diff = eyeOffset - screenOffset;
-        int totalExport = 0;
-        if (diff > 0) {
-            totalExport = Math.max(totalEyeFrame - diff, totalScreenFrame);
-        } else {
-            totalExport = Math.max(totalEyeFrame, totalScreenFrame + diff);
-        }
+        int totalExport = frameSynchronizor.getTotalFrame();
         this.toTextField.setText(String.valueOf(totalExport));
         this.start = 1;
         this.totalProcess = totalExport + 1;
@@ -106,7 +99,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         // Set up exporter
         this.movieFrameExporter = new MovieFrameExporter(exportWidth, exportHeight,
-                CORNER_FRAME_SCALE, eyeGazeComputing, eyeOffset, screenOffset,
+                CORNER_FRAME_SCALE, eyeGazeComputing, frameSynchronizor,
                 eyeFrameManager, screenFrameManager, ffmpegFile,
                 Integer.parseInt(this.frameRateTextField.getText()), this);
 

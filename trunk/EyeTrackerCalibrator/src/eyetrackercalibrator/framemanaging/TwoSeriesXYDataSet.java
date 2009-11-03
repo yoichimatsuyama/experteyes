@@ -38,16 +38,14 @@ package eyetrackercalibrator.framemanaging;
 import org.jfree.data.DomainOrder;
 import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
-import org.jfree.data.xy.XYDataset;
 
 /**
  *
  * @author ruj
  */
-public abstract class TwoSeriesXYDataSet implements XYDataset{
+public abstract class TwoSeriesXYDataSet extends SyncXYDataSet{
     
     protected FrameManager frameInfoManager = null;
-    protected int offset = 0;
     
     /** Creates a new instance of TwoSeriesXYDataSet */
     public TwoSeriesXYDataSet(FrameManager frameInfoManager) {
@@ -134,8 +132,4 @@ public abstract class TwoSeriesXYDataSet implements XYDataset{
     protected abstract String getFirst_series_key();
 
     protected abstract String getSecond_series_key();       
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
 }

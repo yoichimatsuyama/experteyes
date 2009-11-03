@@ -63,7 +63,8 @@ public class PupilXYDataset extends TwoSeriesXYDataSet{
         
         // Get info
         EyeViewFrameInfo info =
-                (EyeViewFrameInfo) frameInfoManager.getFrameInfo(item+offset);
+                (EyeViewFrameInfo) frameInfoManager.getFrameInfo(
+                this.frameSynchronizor.getEyeFrame(item));
         if(info != null){
             switch(series){
                 case 0: // This is X value of pupil

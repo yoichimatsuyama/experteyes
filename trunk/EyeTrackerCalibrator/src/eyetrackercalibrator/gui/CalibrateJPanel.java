@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * NewJPanel.java
  *
@@ -34,6 +34,7 @@ package eyetrackercalibrator.gui;
 import eyetrackercalibrator.ImageTools;
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.framemanaging.ScreenViewFrameInfo;
 import eyetrackercalibrator.gui.CalibrationInfo.CalibrationType;
@@ -90,8 +91,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     double[][][] eyeGazeCoefficient = null;
     Point[] screenViewMark = null;
     Point2D.Double selectedPoint = null;
-    int eyeViewOffset = 0;
-    int screenViewOffset = 0;
     // Set of calibration list set for each calibration point
     DefaultListModel[] calibrationSet = new DefaultListModel[TOTAL_CALIBRATION_X * TOTAL_CALIBRATION_Y];
     // Current calibration point
@@ -152,7 +151,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         graphTabPanel = new FrameInfoGraphTabPanel();
         graphTabPanel.setFixVerticalSize(247);
         layout.replace(graphHolder, graphTabPanel);
- 
+
 
         // Add listener to mouse click event on display
         displayJPanel.addEyeViewMouseListener(new MouseAdapter() {
@@ -307,7 +306,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         // Move marker if there is one
         if (this.currentCalibrationInfo != null) {
             this.currentCalibrationInfo.setEndFrame(
-                    frame, eyeViewOffset, screenViewOffset);
+                    frame, timer.getFrameSynchronizor().getEyeFrame(frame),
+                    timer.getFrameSynchronizor().getSceneFrame(frame));
         }
     }
 
@@ -445,10 +445,12 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Setting frame
         calibrationInfo.setStartFrame(currentFrame,
-                eyeViewOffset, screenViewOffset);
+                this.timer.getFrameSynchronizor().getEyeFrame(currentFrame),
+                this.timer.getFrameSynchronizor().getSceneFrame(currentFrame));
 
         calibrationInfo.setEndFrame(currentFrame,
-                eyeViewOffset, screenViewOffset);
+                this.timer.getFrameSynchronizor().getEyeFrame(currentFrame),
+                this.timer.getFrameSynchronizor().getSceneFrame(currentFrame));
 
         // Setting that this is new
         calibrationInfo.isCalibrationPointPositionLocated = false;
@@ -510,9 +512,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         // Register framemanager to animation timer
         timer.setEyeFrameManager(eyeFrameManager);
 
-        // Set total frame for frame scrolling
-        setTotalFrame(timer.getScreenFrameManager(), eyeFrameManager);
-
         // Register framemanager to graph display
         graphTabPanel.setEyeFrameManager(eyeFrameManager);
 
@@ -527,9 +526,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     public void setScreenFrameManager(ScreenFrameManager screenFrameManager) {
         timer.setScreenFrameManager(screenFrameManager);
 
-        // Set total frame for frame scrolling
-        setTotalFrame(timer.getEyeFrameManager(), screenFrameManager);
-
         // Register framemanager to graph display
         graphTabPanel.setScreenFrameManager(screenFrameManager);
 
@@ -537,37 +533,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         frameScrollingJPanel.setCurrentFrame(1);
     }
 
-    /** 
-     * Helper for setting total frame for frame scrolling panel.  The method set
-     * the total frame to be the maximum between total eye and total screen frames
-     */
-    private void setTotalFrame(
-            FrameManager eyeFrameManager,
-            FrameManager screenFrameManager) {
-        if (eyeFrameManager != null) {
-            if (screenFrameManager != null) {
-                this.frameScrollingJPanel.setTotalFrame(Math.max(
-                        eyeFrameManager.getTotalFrames(),
-                        screenFrameManager.getTotalFrames()));
-            } else {
-                this.frameScrollingJPanel.setTotalFrame(
-                        eyeFrameManager.getTotalFrames());
-            }
-
-        } else if (screenFrameManager != null) {
-            this.frameScrollingJPanel.setTotalFrame(
-                    screenFrameManager.getTotalFrames());
-        } else {
-            this.frameScrollingJPanel.setTotalFrame(1);
-        }
-
-    }
-
-    public void setOffSet(int eyeViewOffset, int screenViewOffset) {
-        this.eyeViewOffset = eyeViewOffset;
-        this.screenViewOffset = screenViewOffset;
-        timer.setOffset(eyeViewOffset, screenViewOffset);
-        graphTabPanel.setOffset(eyeViewOffset, screenViewOffset);
+    /**  Set frame sync and total frames*/
+    public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
+        this.timer.setFrameSynchronizor(frameSynchronizor);
+        this.graphTabPanel.setFrameSynchronizor(frameSynchronizor);
+        this.frameScrollingJPanel.setTotalFrame(frameSynchronizor.getTotalFrame());
     }
 
     /**
@@ -755,9 +725,9 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         en.hasMoreElements();) {
                     // Create element
                     CalibrationInfo info = (CalibrationInfo) en.nextElement();
-                    if(screenFrameNumber >= info.startScreenFrame &&
-                            screenFrameNumber <= info.stopScreenFrame){
-                        point = new Point(x,y);
+                    if (screenFrameNumber >= info.startScreenFrame &&
+                            screenFrameNumber <= info.stopScreenFrame) {
+                        point = new Point(x, y);
                     }
                 }
             }
@@ -1023,7 +993,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Set panel size
         //int size = (int) (512 / displayJPanel.getGazeScaleFactor());
-        panel.setDisplayArea((int)this.fullScreenDim.getWidth(), (int)this.fullScreenDim.getWidth());
+        panel.setDisplayArea((int) this.fullScreenDim.getWidth(), (int) this.fullScreenDim.getWidth());
 
         t.start();
 
@@ -1046,7 +1016,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             public void run() {
                 // Start computation
-               try {
+                try {
                     eyeGazeCoefficient[1] =
                             secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
                 } catch (Exception e) {
@@ -1121,7 +1091,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         this.timer.setEyeGazeComputing(eyeGazeComputing);
     }
 
-    public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer){
+    public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer) {
         this.degreeErrorComputer = degreeErrorComputer;
     }
 
@@ -1365,7 +1335,8 @@ private void calibrateListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIR
     // Check if it is double click or not
     if (evt.getClickCount() >= 2) {
         //Move to the frame
-        frameScrollingJPanel.setCurrentFrame(info.startEyeFrame - eyeViewOffset);
+        frameScrollingJPanel.setCurrentFrame(
+                timer.getFrameSynchronizor().eyeFrameToSyncFrame(info.startEyeFrame));
     }
     // Change the check mark to reflect the value
     switch (info.calibrationType) {

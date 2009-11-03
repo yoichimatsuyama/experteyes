@@ -37,6 +37,7 @@ package eyetrackercalibrator;
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
 import eyetrackercalibrator.framemanaging.FrameLoadingListener;
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.framemanaging.ScreenViewFrameInfo;
@@ -48,7 +49,6 @@ import eyetrackercalibrator.gui.NewProjectJDialog;
 import eyetrackercalibrator.gui.ProjectSelectPanel;
 import eyetrackercalibrator.gui.SynchronizeJPanel;
 import eyetrackercalibrator.gui.TrialMarkingJPanel;
-import eyetrackercalibrator.gui.util.FrameTranslator;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.ComputeIlluminationRangeThread;
 import eyetrackercalibrator.math.DegreeErrorComputer;
@@ -96,6 +96,7 @@ public class Main extends javax.swing.JFrame {
     private TrialMarkingJPanel markTrialJPanel;
     private FrameManager eyeFrameManager = null;
     private ScreenFrameManager screenFrameManager = null;
+    private FrameSynchronizor frameSynchronizor = new FrameSynchronizor();
     private EyeGazeComputing eyeGazeComputing = new EyeGazeComputing();
     private JMenuBar menuBar;
     private JMenu projectMenu;
@@ -209,15 +210,9 @@ public class Main extends javax.swing.JFrame {
             double sceneHeight = projectSelectPanel.getSceneHeightCM();
             double sceneWidth = projectSelectPanel.getSceneWidthCM();
 
-            // Get offset
-            FrameTranslator frameTranslator = new FrameTranslator();
-            frameTranslator.setSynchronizePoint(
-                    Integer.parseInt(this.projectSelectPanel.getSynchronizedEyeFrame()),
-                    Integer.parseInt(this.projectSelectPanel.getSynchronizedScreenFrame()));
-
             // Print header
             out.println(
-                    "Scene Frame\t" +
+                    "Frame\t" +
                     "Scene X\t" +
                     "Scene Y\t" +
                     "Top Left X\t" +
@@ -230,14 +225,11 @@ public class Main extends javax.swing.JFrame {
                     "Bottom Right Y\t" +
                     "Eye Gaze X\t" +
                     "Eye Gaze Y\t" +
-                    "Error Angle");
+                    "Error Angle\t" +
+                    "Eye Frame File\t" +
+                    "Scene Frame File");
 
-            int totalFrame = 0;
-            if (screenFrameManager != null) {
-                totalFrame = screenFrameManager.getTotalFrames();
-            } else {
-                return;
-            }
+            int totalFrame = this.frameSynchronizor.getTotalFrame();
 
             // Prepare degree error computer
             DegreeErrorComputer dec = new DegreeErrorComputer(sceneDimension,
@@ -246,12 +238,14 @@ public class Main extends javax.swing.JFrame {
 
             // Scan through each frame
             for (int i = 1; i <= totalFrame; i++) {
+
                 Point calibrationPoint =
                         calibrateJPanel.frameToCalibrationPoint(i);
                 if (calibrationPoint != null) {
                     // Found calibration points so output info
                     ScreenViewFrameInfo info =
-                            (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
+                            (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(
+                            this.frameSynchronizor.getSceneFrame(i));
 
                     out.print(i);
 
@@ -284,9 +278,10 @@ public class Main extends javax.swing.JFrame {
                     }
 
                     // Get eyeGaze
+                    EyeViewFrameInfo eyeInfo = null;
                     if (this.eyeFrameManager != null) {
-                        EyeViewFrameInfo eyeInfo = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
-                                frameTranslator.getEyeFrameFromSceneFrame(i));
+                        eyeInfo = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
+                                frameSynchronizor.getEyeFrame(i));
 
                         if (eyeInfo != null) {
                             Point2D.Double gazeVec = Computation.computeEyeVector(
@@ -294,8 +289,7 @@ public class Main extends javax.swing.JFrame {
                                     eyeInfo.getReflectX(), eyeInfo.getReflectY());
                             // Computer eye gaze point
                             Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
-                                    frameTranslator.getUniversalFrameFromSceneFrame(i),
-                                    gazeVec.x, gazeVec.y);
+                                    i, gazeVec.x, gazeVec.y);
 
                             // Compute error angel
                             double errorAngle = dec.degreeError(
@@ -307,6 +301,17 @@ public class Main extends javax.swing.JFrame {
                                 out.print("\t" + ERROR_VALUE);
                             }
                         }
+                    }
+                    // Print files involved
+                    if (eyeInfo != null) {
+                        out.print("\t" + eyeInfo.getSourceFileName());
+                    } else {
+                        out.print("\t-");
+                    }
+                    if (info != null) {
+                        out.print("\t" + info.getSourceFileName());
+                    } else {
+                        out.print("\t-");
                     }
                     out.println();
                 }
@@ -335,25 +340,10 @@ public class Main extends javax.swing.JFrame {
     private void exportMovies() {
         int eyeFrame, screenFrame;
 
-        String num = this.projectSelectPanel.getSynchronizedEyeFrame();
-        if (num != null) {
-            eyeFrame = Integer.parseInt(num);
-        } else {
-            eyeFrame = 0;
-        }
-
-        num = this.projectSelectPanel.getSynchronizedScreenFrame();
-        if (num != null) {
-            screenFrame = Integer.parseInt(num);
-        } else {
-            screenFrame = 0;
-        }
-
         ExportMovieJFrame exportMovieJFrame = new ExportMovieJFrame(
                 projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
-                this.eyeGazeComputing,
-                eyeFrame, screenFrame,
-                eyeFrameManager, screenFrameManager);
+                this.eyeGazeComputing, this.frameSynchronizor,
+                this.eyeFrameManager, this.screenFrameManager);
         exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
     }
@@ -525,9 +515,10 @@ public class Main extends javax.swing.JFrame {
         boolean switchBack = false;
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Read in synchronize data and set all offset in all panel
-            setOffset(
-                    synchronizeJPanel.getEyeViewCurrentFrame(),
-                    synchronizeJPanel.getScreenViewCurrentFrame());
+            this.frameSynchronizor.setSynchronizationPoints(
+                    this.synchronizeJPanel.getSynchronizationPoints(),
+                    this.eyeFrameManager.getTotalFrames(),
+                    this.screenFrameManager.getTotalFrames());
 
             switchBack = true;
         } else if ("Cancel".equals(evt.getActionCommand())) {
@@ -590,32 +581,16 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    private void setOffset(
-            int synchronizedEyeFrame,
-            int synChronizedScreenFrame) {
-        /** Information to keep */
-        int eyeViewOffSet = 0;
-        int screenViewOffSet = 0;
-
-        // St offset value in relative fasion.
-        if (synChronizedScreenFrame > synchronizedEyeFrame) {
-            eyeViewOffSet = 0;
-            screenViewOffSet = synChronizedScreenFrame - synchronizedEyeFrame;
-        } else {
-            screenViewOffSet = 0;
-            eyeViewOffSet = synchronizedEyeFrame - synChronizedScreenFrame;
-        }
-        // Set display in project select what we chose
-        projectSelectPanel.setSynchronizeFrames(synchronizedEyeFrame, synChronizedScreenFrame);
+    private void setOffset() {
 
         // Set calibration offset
-        calibrateJPanel.setOffSet(eyeViewOffSet, screenViewOffSet);
+        calibrateJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
         // Set clean data offset
-        cleanDataJPanel.setOffSet(eyeViewOffSet, screenViewOffSet);
+        cleanDataJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
         // Set mark trial offset
-        markTrialJPanel.setOffSet(eyeViewOffSet, screenViewOffSet);
+        markTrialJPanel.setFrameSynchronizor(this.frameSynchronizor);
     }
 
     /**
@@ -630,18 +605,6 @@ public class Main extends javax.swing.JFrame {
 
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Set up synchronized panel
-            int frame = 1;
-            try {
-                frame = Integer.parseInt(projectSelectPanel.getSynchronizedEyeFrame());
-            } catch (NumberFormatException numberFormatException) {
-            }
-            synchronizeJPanel.setEyeViewCurrentFrame(frame);
-            frame = 1;
-            try {
-                frame = Integer.parseInt(projectSelectPanel.getSynchronizedScreenFrame());
-            } catch (NumberFormatException numberFormatException) {
-            }
-            synchronizeJPanel.setScreenViewCurrentFrame(frame);
 
             // need this to set the stat for frame playing (total frame and what not)
             synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1240,7 +1203,7 @@ public class Main extends javax.swing.JFrame {
         }
         int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
 
-        // Get screen dimansion
+        // Get screen dimension
         Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
         Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
 
@@ -1297,7 +1260,9 @@ public class Main extends javax.swing.JFrame {
                         "Similarity of bottomright\t" +
                         "Error\t" +
                         "Trial file name\t" +
-                        "Trial number");
+                        "Trial number\t" +
+                        "Eye Frame File\t" +
+                        "Scene Frame File");
 
                 // Variables
                 Point2D fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
@@ -1492,7 +1457,7 @@ public class Main extends javax.swing.JFrame {
                             }
                         }
                         // Shift one bit to the most significant bit and store bad trial bit
-                        errorValue *=2;
+                        errorValue *= 2;
                         if (trialName != null && trials[trialNumber].isBadTrial) {
                             errorValue += 1;
                         }

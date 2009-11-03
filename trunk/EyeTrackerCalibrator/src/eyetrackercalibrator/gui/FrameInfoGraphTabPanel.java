@@ -37,6 +37,7 @@ package eyetrackercalibrator.gui;
 import eyetrackercalibrator.framemanaging.CornerSimilarityXYDataSet;
 import eyetrackercalibrator.framemanaging.CorniaReflectXYDataSet;
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.PupilXYDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 
@@ -61,6 +62,7 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
     };
     private int eyeOffset = 0;
     private int screenOffset = 0;
+    private FrameSynchronizor frameSynchronizor = null;
 
     /**
      * Creates a new instance of GraphTabPanel
@@ -84,11 +86,11 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         if (eyeFrameManager != null) {
             // Populate pupil graph
             this.pupilXYDataset = new PupilXYDataset(eyeFrameManager);
-            this.pupilXYDataset.setOffset(eyeOffset);
+            this.pupilXYDataset.setFrameSynchronizor(this.frameSynchronizor);
             setDataSet(pupilXYDataset, graphPanel[INDEX_PUPIL_GRAPH_PANEL]);
             // Populate cornia reflection graph
             this.corniaXYDataset = new CorniaReflectXYDataSet(eyeFrameManager);
-            this.corniaXYDataset.setOffset(eyeOffset);
+            this.corniaXYDataset.setFrameSynchronizor(this.frameSynchronizor);
             setDataSet(corniaXYDataset, graphPanel[INDEX_REFLECTION_GRAPH_PANEL]);
         } else {
             // Otherwise clear out all data
@@ -103,7 +105,7 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
             // Populate corner similarity graph
             this.cornerSimilarityXYDataSet =
                     new CornerSimilarityXYDataSet(screenFrameManager, 510);
-            this.cornerSimilarityXYDataSet.setOffset(screenOffset);
+            this.cornerSimilarityXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
             setDataSet(
                     cornerSimilarityXYDataSet,
                     graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL]);
@@ -115,20 +117,18 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         }
     }
 
-    public void setOffset(int eyeOffset, int screenOffset) {
-        this.eyeOffset = eyeOffset;
-        this.screenOffset = screenOffset;
-
+    public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
+        this.frameSynchronizor = frameSynchronizor;
         if (this.cornerSimilarityXYDataSet != null) {
-            this.cornerSimilarityXYDataSet.setOffset(screenOffset);
+            this.cornerSimilarityXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
         }
 
         if (this.corniaXYDataset != null) {
-            this.corniaXYDataset.setOffset(eyeOffset);
+            this.corniaXYDataset.setFrameSynchronizor(this.frameSynchronizor);
         }
 
         if (this.pupilXYDataset != null) {
-            this.pupilXYDataset.setOffset(eyeOffset);
+            this.pupilXYDataset.setFrameSynchronizor(this.frameSynchronizor);
         }
     }
 }

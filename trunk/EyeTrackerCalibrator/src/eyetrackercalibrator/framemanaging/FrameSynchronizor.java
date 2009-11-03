@@ -27,13 +27,16 @@
 package eyetrackercalibrator.framemanaging;
 
 /**
- * This class helps synchronize eye frames and scene frames.
+ * This class helps synchronize eye frames and scene frames.  Once synch, the
+ * total number of frames usually increases.  Therefore it is recommended that
+ * getTotalFrame is used to get the new total frames.
  * @author ruj
  */
 public class FrameSynchronizor {
 
     int currentBlock = 0;
     int currentFrame = 0;
+    private int totalFrame;
 
     class SyncBlock {
 
@@ -50,13 +53,21 @@ public class FrameSynchronizor {
     SyncBlock[] syncBlocks;
 
     public FrameSynchronizor() {
-        clearSyncPoints();
+        clearSyncPoints(1, 1);
     }
 
-    private void clearSyncPoints() {
+    private void clearSyncPoints(int totalEyeFrame, int totalSceneFrame) {
         this.syncBlocks = new SyncBlock[1];
         this.syncBlocks[0] = new SyncBlock();
+        this.syncBlocks[0].endEyeFrame = totalEyeFrame;
+        this.syncBlocks[0].endSceneFrame = totalSceneFrame;
+        this.totalFrame = Math.max(totalEyeFrame, totalSceneFrame);
         this.currentBlock = 0;
+    }
+
+    /** Return total number of frames */
+    public int getTotalFrame() {
+        return this.totalFrame;
     }
 
     /**
@@ -66,10 +77,11 @@ public class FrameSynchronizor {
      * The points must not overlap.  If they do, the the output behavior is
      * unknown.
      */
-    public void setSynchronizationPoints(SynchronizationPoint[] points) {
+    public void setSynchronizationPoints(SynchronizationPoint[] points,
+            int totalEyeFrame, int totalSceneFrame) {
         if (points == null || points.length == 0) {
             // Just clear the sync point
-            clearSyncPoints();
+            clearSyncPoints(totalEyeFrame, totalSceneFrame);
         } else {
             int total = points.length;
             // Populate accordingly
@@ -85,13 +97,15 @@ public class FrameSynchronizor {
                 this.syncBlocks[0].startSceneFrame = points[0].sceneFrame - points[0].eyeFrame + 1;
             }
 
+            int length = 0;
+
             // Compute offset for all following blocks
             for (int i = 1; i < points.length; i++) {
                 // Compute the end points for the previous block
                 this.syncBlocks[i - 1].endEyeFrame = points[i].eyeFrame - 1;
                 this.syncBlocks[i - 1].endSceneFrame = points[i].sceneFrame - 1;
 
-                int length = this.syncBlocks[i - 1].endEyeFrame - this.syncBlocks[i - 1].startEyeFrame;
+                length = this.syncBlocks[i - 1].endEyeFrame - this.syncBlocks[i - 1].startEyeFrame;
                 length = Math.max(length,
                         this.syncBlocks[i - 1].endSceneFrame - this.syncBlocks[i - 1].startSceneFrame);
                 this.syncBlocks[i - 1].end = this.syncBlocks[i - 1].start + length;
@@ -101,11 +115,23 @@ public class FrameSynchronizor {
                 this.syncBlocks[i].startSceneFrame = points[i].sceneFrame;
                 this.syncBlocks[i].start = this.syncBlocks[i - 1].end + 1;
             }
+
+            // Compute the total frames from last block
+            SyncBlock s = this.syncBlocks[this.syncBlocks.length - 1];
+            length = s.endEyeFrame - s.startEyeFrame;
+            length = Math.max(length, s.endSceneFrame - s.startSceneFrame);
+            s.end = s.start + length;
+            this.totalFrame = s.end;
         }
     }
 
-    public void setCurrentFrame(int currentFrame) {
-        this.currentFrame = currentFrame;
+    private void setCurrentFrame(int currentFrame) {
+        if (this.currentFrame == currentFrame) {
+            // Does nothing
+            return;
+        } else {
+            this.currentFrame = currentFrame;
+        }
 
         SyncBlock block = this.syncBlocks[this.currentBlock];
         /* Check if the current frame is in the current block */
@@ -140,7 +166,7 @@ public class FrameSynchronizor {
     }
 
     /** Get eye frame number according to previously set current frame */
-    public int getEyeFrame() {
+    private int getEyeFrame() {
         SyncBlock block = this.syncBlocks[this.currentBlock];
 
         // Look up from the current block
@@ -163,7 +189,7 @@ public class FrameSynchronizor {
     }
 
     /** Get scene frame number according to previously set current frame */
-    public int getSceneFrame() {
+    private int getSceneFrame() {
         SyncBlock block = this.syncBlocks[this.currentBlock];
 
         // Look up from the current block
@@ -183,5 +209,35 @@ public class FrameSynchronizor {
     public int getSceneFrame(int currentFrame) {
         setCurrentFrame(currentFrame);
         return getSceneFrame();
+    }
+
+    /**
+     * Finding a sync frame number given an eye frame number.  The function is
+     * not optimized so it will go through sync points linearly.
+     */
+    public int eyeFrameToSyncFrame(int eyeFrame) {
+        for (int i = 0; i < syncBlocks.length; i++) {
+            SyncBlock syncBlock = syncBlocks[i];
+            if (syncBlock.startEyeFrame <= eyeFrame && syncBlock.endEyeFrame >= eyeFrame) {
+                return eyeFrame - syncBlock.startEyeFrame + syncBlock.start;
+            }
+        }
+        // This should not be reached
+        return -1;
+    }
+
+    /**
+     * Finding a sync frame number given an scene frame number.  The function is
+     * not optimized so it will go through sync points linearly.
+     */
+    public int sceneFrameToSyncFrame(int sceneFrame) {
+        for (int i = 0; i < syncBlocks.length; i++) {
+            SyncBlock syncBlock = syncBlocks[i];
+            if (syncBlock.startSceneFrame <= sceneFrame && syncBlock.endSceneFrame >= sceneFrame) {
+                return sceneFrame - syncBlock.startSceneFrame + syncBlock.start;
+            }
+        }
+        // This should not be reached
+        return -1;
     }
 }

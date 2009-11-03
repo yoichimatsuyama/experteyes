@@ -130,6 +130,19 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         cancelButton.addActionListener(listener);
     }
 
+    public SynchronizationPoint[] getSynchronizationPoints(){
+        SynchronizationPoint[] sps = new SynchronizationPoint[this.synchPointSet.size()];
+        int i = 0;
+        for (Enumeration<SynchronizationPoint> e =
+                (Enumeration<SynchronizationPoint>) this.synchPointSet.elements();
+                e.hasMoreElements();) {
+            sps[i] = e.nextElement();
+            i++;
+        }
+        
+        return sps;
+    }
+
     /** 
      * This method populates the synchronization panel with points expressed in
      * XML element structure
