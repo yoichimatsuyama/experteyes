@@ -58,12 +58,14 @@ public class CorniaReflectXYDataSet extends PupilXYDataset{
      * @param series 0 for X value of pupil 1 for Y value of pupil
      * @return -1 When information is not avilable
      */
+    @Override
     public double getYValue(int series, int item) {
         double result = -1d;
         
         // Get info
         EyeViewFrameInfo info =
-                (EyeViewFrameInfo) frameInfoManager.getFrameInfo(item+offset);
+                (EyeViewFrameInfo) frameInfoManager.getFrameInfo(
+                this.frameSynchronizor.getEyeFrame(item));
         if(info != null){
             switch(series){
                 case 0: // This is X value of pupil

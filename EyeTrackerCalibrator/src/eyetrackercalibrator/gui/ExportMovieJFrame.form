@@ -42,7 +42,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="exportLocationTextField" pref="407" max="32767" attributes="0"/>
+                      <Component id="exportLocationTextField" pref="425" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="browseButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -83,8 +83,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="toTextField" alignment="0" pref="135" max="32767" attributes="1"/>
-                          <Component id="fromTextField" alignment="0" pref="135" max="32767" attributes="1"/>
+                          <Component id="toTextField" alignment="0" pref="150" max="32767" attributes="1"/>
+                          <Component id="fromTextField" alignment="0" pref="150" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>

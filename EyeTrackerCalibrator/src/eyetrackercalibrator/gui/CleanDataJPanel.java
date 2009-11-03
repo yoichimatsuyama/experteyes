@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * ScreenEstimationJPanel.java
  *
@@ -32,6 +32,7 @@
 package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.gui.util.AnimationTimer;
 import eyetrackercalibrator.gui.util.CompletionListener;
@@ -77,8 +78,6 @@ import org.jfree.chart.plot.XYPlot;
  */
 public class CleanDataJPanel extends javax.swing.JPanel {
 
-    int eyeViewOffset = 0;
-    int screenViewOffset = 0;
     private AnimationTimer timer;
     FrameInfoGraphTabPanel graphTabPanel = null;
     ErrorMarking errorMarking = null;
@@ -162,7 +161,7 @@ public class CleanDataJPanel extends javax.swing.JPanel {
 
         // Sanity check the output dir
         if (this.screenInfoDir == null || this.screenInfoDir.length() < 1) {
-            JOptionPane.showMessageDialog(this, 
+            JOptionPane.showMessageDialog(this,
                     "Please specify screen info directory in project set up.",
                     "No Screen Info Directory", JOptionPane.ERROR_MESSAGE);
             return;
@@ -172,14 +171,14 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         // Sanity check the large scene dir
         if (this.fullScreenFrameDirectory == null ||
                 this.fullScreenFrameDirectory.length() < 1) {
-            JOptionPane.showMessageDialog(this, 
+            JOptionPane.showMessageDialog(this,
                     "Please specify screen full view directory in project set up.",
                     "No Screen Full View Directory", JOptionPane.ERROR_MESSAGE);
             return;
         }
         File fullViewFile = new File(this.fullScreenFrameDirectory);
-        if(!fullViewFile.exists()){
-            JOptionPane.showMessageDialog(this, 
+        if (!fullViewFile.exists()) {
+            JOptionPane.showMessageDialog(this,
                     "Please specify correct screen full view directory in project set up.",
                     "Screen Full View Directory Does Not Exists", JOptionPane.ERROR_MESSAGE);
             return;
@@ -213,7 +212,9 @@ public class CleanDataJPanel extends javax.swing.JPanel {
 
         // Move marker if there is one
         if (this.errorMarking != null) {
-            this.errorMarking.setEndFrame(frame, eyeViewOffset, screenViewOffset);
+            this.errorMarking.setEndFrame(frame,
+                    this.timer.getFrameSynchronizor().getEyeFrame(frame),
+                    this.timer.getFrameSynchronizor().getSceneFrame(frame));
         }
     }
 
@@ -309,11 +310,11 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         }
     }
 
-    public void setOffSet(int eyeViewOffset, int screenViewOffset) {
-        this.eyeViewOffset = eyeViewOffset;
-        this.screenViewOffset = screenViewOffset;
-        timer.setOffset(eyeViewOffset, screenViewOffset);
-        graphTabPanel.setOffset(eyeViewOffset, screenViewOffset);
+    /**  Set frame sync and total frames*/
+    public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
+        this.timer.setFrameSynchronizor(frameSynchronizor);
+        this.graphTabPanel.setFrameSynchronizor(frameSynchronizor);
+        this.frameScrollingJPanel.setTotalFrame(frameSynchronizor.getTotalFrame());
     }
 
     public void setEyeGazeScaleFactor(double scaleFactor) {
@@ -521,7 +522,8 @@ public class CleanDataJPanel extends javax.swing.JPanel {
             // Get info and move to the frame
             int singleSelect = errorList.getSelectedIndex();
             ErrorMarking mark = (ErrorMarking) errorSet.get(singleSelect);
-            frameScrollingJPanel.setCurrentFrame(mark.startEyeFrame - eyeViewOffset);
+            frameScrollingJPanel.setCurrentFrame(
+                    this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(mark.startEyeFrame));
         }
     }//GEN-LAST:event_errorListMouseClicked
 
@@ -667,11 +669,14 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
         mark.setIntervalMarker(intervalMarker);
 
         // Setting frame
-        mark.setStartFrame(frameScrollingJPanel.getCurrentFrame(),
-                eyeViewOffset, screenViewOffset);
+        int currentFrame = frameScrollingJPanel.getCurrentFrame();
+        mark.setStartFrame(currentFrame,
+                this.timer.getFrameSynchronizor().getEyeFrame(currentFrame),
+                this.timer.getFrameSynchronizor().getSceneFrame(currentFrame));
 
-        mark.setEndFrame(frameScrollingJPanel.getCurrentFrame(),
-                eyeViewOffset, screenViewOffset);
+        mark.setEndFrame(currentFrame,
+                this.timer.getFrameSynchronizor().getEyeFrame(currentFrame),
+                this.timer.getFrameSynchronizor().getSceneFrame(currentFrame));
 
         this.errorMarking = mark;
     }
@@ -731,8 +736,17 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
 
                 // Add marker to the graph
                 IntervalMarker intervalMarker = intervalMarkerManager.getNewIntervalMarker();
-                intervalMarker.setStartValue(error.startEyeFrame - eyeViewOffset);
-                intervalMarker.setEndValue(error.stopEyeFrame - eyeViewOffset);
+                int frame = error.startEyeFrame;
+                if (frame < 1) {
+                    frame = error.startScreenFrame;
+                }
+                frame = error.stopEyeFrame;
+                if (frame < 1) {
+                    frame = error.stopScreenFrame;
+                }
+                intervalMarker.setEndValue(
+                        this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(frame));
+
                 error.setIntervalMarker(intervalMarker);
 
                 // Add marker to the list

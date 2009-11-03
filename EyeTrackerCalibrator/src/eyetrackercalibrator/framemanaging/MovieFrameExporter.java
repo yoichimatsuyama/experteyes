@@ -82,8 +82,7 @@ public class MovieFrameExporter {
     EyeGazeComputing eyeGazeComputing;
     FrameManager eyeFrameManager;
     ScreenFrameManager screenFrameManager;
-    int eyeOffset;
-    int screenOffset;
+    FrameSynchronizor frameSynchronizor;
     private File ffmpegExecutable;
     private ReentrantLock processLock = new ReentrantLock();
     Process process = null;
@@ -103,7 +102,7 @@ public class MovieFrameExporter {
      * @param listener
      */
     public MovieFrameExporter(int width, int height, double smallImageScale,
-            EyeGazeComputing eyeGazeComputing, int eyeOffset, int screenOffset,
+            EyeGazeComputing eyeGazeComputing, FrameSynchronizor frameSynchronizor,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
             File ffmpegExecutable, float frameRate, PropertyChangeListener listener) {
         this.width = width;
@@ -114,15 +113,7 @@ public class MovieFrameExporter {
         this.screenFrameManager = screenFrameManager;
         this.ffmpegExecutable = ffmpegExecutable;
         this.frameRate = frameRate;
-
-        // Compute the real offset
-        if (eyeOffset > screenOffset) {
-            this.eyeOffset = eyeOffset - screenOffset;
-            this.screenOffset = 0;
-        } else {
-            this.eyeOffset = 0;
-            this.screenOffset = screenOffset - eyeOffset;
-        }
+        this.frameSynchronizor = frameSynchronizor;
 
         this.listener = listener;
     }
@@ -202,17 +193,18 @@ public class MovieFrameExporter {
         }
 
         // loop for all frames
+        int eyeStartFrame = this.frameSynchronizor.getEyeFrame(start);
         for (int i = start; i <= end && alive; i++) {
             // Create file name
             String fileName = numberFormat.format(i - start + 1) + ".tiff";
 
             // Get eye frame
             BufferedImage eyeImage = renderEyeImage(
-                    i + eyeOffset, eyeFrameManager);
+                    this.frameSynchronizor.getEyeFrame(i), eyeFrameManager);
 
             // Get average eye gaze
-            Point2D.Double point = getNextAverageEyeGaze(start + eyeOffset,
-                    averageFrames, scaleFactor);
+            Point2D.Double point = getNextAverageEyeGaze(
+                    start, averageFrames, scaleFactor);
             if (point != null) {
                 gazePoint.setLocation(point);
             } else {
@@ -220,7 +212,8 @@ public class MovieFrameExporter {
             }
 
             // Get screen frame
-            BufferedImage screenImage = renderScreenImage(i + screenOffset,
+            BufferedImage screenImage = renderScreenImage(
+                    this.frameSynchronizor.getSceneFrame(i),
                     screenFrameManager, withCorners, gazePoint);
 
             // Writing out information
@@ -485,12 +478,13 @@ public class MovieFrameExporter {
             int firstFrame = start - range / 2;
             // Populate the list from start to completion of range
             for (int i = 0; i < range; i++) {
+                int eyeFrameNum = this.frameSynchronizor.getEyeFrame(i + firstFrame);
                 info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
-                        i + firstFrame);
+                        eyeFrameNum);
 
                 if (info != null) {
                     // Compute scaled eye gaze
-                    eyeGaze = computeEyeGaze(scaleFactor, i + firstFrame, info);
+                    eyeGaze = computeEyeGaze(scaleFactor, eyeFrameNum, info);
                     this.gazeList.add(eyeGaze);
                 }
             }
