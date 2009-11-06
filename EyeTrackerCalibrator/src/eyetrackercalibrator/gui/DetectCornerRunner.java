@@ -111,8 +111,8 @@ public class DetectCornerRunner extends Thread {
         // Compute all files in range
         int totalFrame = 0;
         for (int i = 0; i < this.ranges.length; i++) {
-            totalFrame = totalFrame + this.ranges[i].stopScreenFrame -
-                    this.ranges[i].startScreenFrame + 1;
+            totalFrame = totalFrame + this.ranges[i].stopSceneFrame -
+                    this.ranges[i].startSceneFrame + 1;
         }
 
         // Create array of files
@@ -120,8 +120,8 @@ public class DetectCornerRunner extends Thread {
         File[] smallSceneFiles = new File[totalFrame];
         int k = 0;
         for (int i = 0; i < this.ranges.length; i++) {
-            for (int j = this.ranges[i].startScreenFrame;
-                    j <= this.ranges[i].stopScreenFrame; j++) {
+            for (int j = this.ranges[i].startSceneFrame;
+                    j <= this.ranges[i].stopSceneFrame; j++) {
                 String fileName = this.screenFrameManager.getFrameFileName(j);
 
                 if (fileName != null) {
@@ -330,8 +330,8 @@ public class DetectCornerRunner extends Thread {
             this.screenFrameManager.loadFrames(
                     this.screenFrameManager.getFrameDirectory(),
                     this.cornerOutputDir.getAbsolutePath(),
-                    this.ranges[i].startScreenFrame - 1,
-                    this.ranges[i].stopScreenFrame - this.ranges[i].startScreenFrame + 1,
+                    this.ranges[i].startSceneFrame - 1,
+                    this.ranges[i].stopSceneFrame - this.ranges[i].startSceneFrame + 1,
                     true);
         }
 

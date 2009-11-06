@@ -32,6 +32,7 @@
 package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.framemanaging.FrameManager;
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.gui.util.AnimationTimer;
@@ -79,8 +80,6 @@ import org.jfree.chart.plot.XYPlot;
  */
 public class TrialMarkingJPanel extends javax.swing.JPanel {
 
-    int eyeViewOffset = 0;
-    int screenViewOffset = 0;
     private AnimationTimer timer;
     TrialMarker trialMarking = null;
     DefaultListModel trialSet = new DefaultListModel();
@@ -163,7 +162,9 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
 
         // Move marker if there is one
         if (this.trialMarking != null) {
-            this.trialMarking.setEndFrame(frame, eyeViewOffset, screenViewOffset);
+            this.trialMarking.setEndFrame(frame,
+                    timer.getFrameSynchronizor().getEyeFrame(frame),
+                    timer.getFrameSynchronizor().getSceneFrame(frame));
         }
 
         if (this.fullTrialMarker != null && isGettingEndOfFullTrial) {
@@ -252,11 +253,11 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         }
     }
 
-    public void setOffSet(int eyeViewOffset, int screenViewOffset) {
-        this.eyeViewOffset = eyeViewOffset;
-        this.screenViewOffset = screenViewOffset;
-        timer.setOffset(eyeViewOffset, screenViewOffset);
-        this.graphTabPanel.setOffset(screenViewOffset);
+    /**  Set frame sync and total frames*/
+    public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
+        this.timer.setFrameSynchronizor(frameSynchronizor);
+        this.graphTabPanel.setFrameSynchronizor(frameSynchronizor);
+        this.frameScrollingJPanel.setTotalFrame(frameSynchronizor.getTotalFrame());
     }
 
     public void setEyeGazeScaleFactor(double scaleFactor) {
@@ -606,11 +607,14 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         mark.label = trialLabelTextField.getText();
 
         // Setting frame
-        mark.setStartFrame(frameScrollingJPanel.getCurrentFrame(),
-                eyeViewOffset, screenViewOffset);
+        int frame = frameScrollingJPanel.getCurrentFrame();
+        mark.setStartFrame(frame,
+                timer.getFrameSynchronizor().getEyeFrame(frame),
+                timer.getFrameSynchronizor().getSceneFrame(frame));
 
-        mark.setEndFrame(frameScrollingJPanel.getCurrentFrame(),
-                eyeViewOffset, screenViewOffset);
+        mark.setEndFrame(frame,
+                timer.getFrameSynchronizor().getEyeFrame(frame),
+                timer.getFrameSynchronizor().getSceneFrame(frame));
 
         this.trialMarking = mark;
     }
@@ -648,12 +652,19 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
             int frame = 0;
             if (evt.getClickCount() == 2) {
                 // Two click to move to the starting frame
-                frame = mark.startEyeFrame;
+                frame = timer.getFrameSynchronizor().eyeFrameToSyncFrame(mark.startEyeFrame);
+                /** Use scene frame when eye is not available*/
+                if (frame < 1) {
+                    frame = timer.getFrameSynchronizor().sceneFrameToSyncFrame(mark.startSceneFrame);
+                }
             } else {
                 // Three click to move to the end frame
-                frame = mark.stopEyeFrame;
+                frame = timer.getFrameSynchronizor().eyeFrameToSyncFrame(mark.stopEyeFrame);
+                if (frame < 1) {
+                    frame = timer.getFrameSynchronizor().sceneFrameToSyncFrame(mark.stopSceneFrame);
+                }
             }
-            frameScrollingJPanel.setCurrentFrame(frame - eyeViewOffset);
+            frameScrollingJPanel.setCurrentFrame(frame);
         }
         // Anyway change the bad trial mark accordingly
         if (mark != null) {
@@ -757,7 +768,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 }
 
                 trialFileHandler.estimateTrialMarking(informationDatabase,
-                        trials, screenViewOffset, eyeViewOffset);
+                        trials, timer.getFrameSynchronizor());
             }
         }
 }//GEN-LAST:event_estimateTrialButtonActionPerformed
@@ -766,8 +777,10 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         // Remove entry from list
         TrialMarker mark = (TrialMarker) trialList.getSelectedValue();
         if (mark != null) {
-            mark.setStartFrame(frameScrollingJPanel.getCurrentFrame(),
-                    eyeViewOffset, screenViewOffset);
+            int frame = frameScrollingJPanel.getCurrentFrame();
+            mark.setStartFrame(frame,
+                    timer.getFrameSynchronizor().getEyeFrame(frame),
+                    timer.getFrameSynchronizor().getSceneFrame(frame));
         }
 }//GEN-LAST:event_fixStartFrameButtonActionPerformed
 
@@ -775,11 +788,11 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         // Remove entry from list
         TrialMarker mark = (TrialMarker) trialList.getSelectedValue();
         if (mark != null) {
-            mark.setStartFrame(
-                    mark.startScreenFrame - screenViewOffset,
-                    eyeViewOffset, screenViewOffset);
-            mark.setEndFrame(frameScrollingJPanel.getCurrentFrame(),
-                    eyeViewOffset, screenViewOffset);
+            /** Compute frame from eye if not available then scene */
+            int frame = frameScrollingJPanel.getCurrentFrame();
+            mark.setEndFrame(frame,
+                    timer.getFrameSynchronizor().getEyeFrame(frame),
+                    timer.getFrameSynchronizor().getSceneFrame(frame));
         }
     }//GEN-LAST:event_fixEndFrameButtonActionPerformed
 
@@ -840,7 +853,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                         informationDatabase, t,
                         (int) fullTrialMarker.getStartValue(),
                         (int) fullTrialMarker.getEndValue(),
-                        eyeViewOffset, screenViewOffset,
+                        this.timer.getFrameSynchronizor(),
                         intervalMarkerManager);
 
 
@@ -936,8 +949,20 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
 
                 // Set up interval marker
                 intervalMarker = intervalMarkerManager.getNewIntervalMarker();
-                intervalMarker.setStartValue(trial.startScreenFrame - screenViewOffset);
-                intervalMarker.setEndValue(trial.stopScreenFrame - screenViewOffset);
+
+                int frame = this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(trial.startSceneFrame);
+                if (frame < 1) {
+                    /* Use eye frame when scene frame is no good */
+                    frame = this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(trial.startEyeFrame);
+                }
+                intervalMarker.setStartValue(frame);
+
+                frame = this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(trial.stopSceneFrame);
+                if (frame < 1) {
+                    /* Use eye frame when scene frame is no good */
+                    frame = this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(trial.stopEyeFrame);
+                }
+                intervalMarker.setEndValue(frame);
                 if (changeColor) {// Change color for even trial
                     intervalMarker.setPaint(Color.YELLOW);
                 }
@@ -1004,10 +1029,10 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
 
             public int compare(TrialMarker o1, TrialMarker o2) {
                 int i = o1.startEyeFrame - o2.startEyeFrame;
-                if(i == 0){
+                if (i == 0) {
                     i = o1.stopEyeFrame - o2.stopEyeFrame;
                 }
-                if(i == 0 && o1.label != null && o2.label != null){
+                if (i == 0 && o1.label != null && o2.label != null) {
                     i = o1.label.compareTo(o2.label);
                 }
                 return i;

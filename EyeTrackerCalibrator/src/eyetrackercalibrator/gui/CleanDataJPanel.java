@@ -621,17 +621,17 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                 if (count > 1) {
                     JOptionPane.showMessageDialog(this,
                             "There are more than one incorrect corner in frame " +
-                            +error.startScreenFrame + " to " + error.stopScreenFrame +
+                            +error.startSceneFrame + " to " + error.stopSceneFrame +
                             ". They cannot be corrected",
                             "Unable to correct corners",
                             JOptionPane.ERROR_MESSAGE);
                 }
 
-                completed += error.stopScreenFrame = error.startScreenFrame + 1;
+                completed += error.stopSceneFrame = error.startSceneFrame + 1;
                 progressDialog.setProgrss(completed);
             } else {
                 // Iterate correction through frame range
-                for (int j = error.startScreenFrame; j <= error.stopScreenFrame; j++) {
+                for (int j = error.startSceneFrame; j <= error.stopSceneFrame; j++) {
 
                     cornerCorrection.correctCorner(j, timer.getScreenFrameManager(), corner);
 
@@ -738,11 +738,11 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                 IntervalMarker intervalMarker = intervalMarkerManager.getNewIntervalMarker();
                 int frame = error.startEyeFrame;
                 if (frame < 1) {
-                    frame = error.startScreenFrame;
+                    frame = error.startSceneFrame;
                 }
                 frame = error.stopEyeFrame;
                 if (frame < 1) {
-                    frame = error.stopScreenFrame;
+                    frame = error.stopSceneFrame;
                 }
                 intervalMarker.setEndValue(
                         this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(frame));
@@ -819,18 +819,18 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                         // Simply merge them
                         error.startEyeFrame = Math.min(
                                 error.startEyeFrame, compressdMark.startEyeFrame);
-                        error.startScreenFrame = Math.min(
-                                error.startScreenFrame, compressdMark.startScreenFrame);
+                        error.startSceneFrame = Math.min(
+                                error.startSceneFrame, compressdMark.startSceneFrame);
                         error.stopEyeFrame = Math.max(
                                 error.stopEyeFrame, compressdMark.stopEyeFrame);
-                        error.stopScreenFrame = Math.max(
-                                error.stopScreenFrame, compressdMark.stopScreenFrame);
+                        error.stopSceneFrame = Math.max(
+                                error.stopSceneFrame, compressdMark.stopSceneFrame);
                     } else {
                         // Split the tail of uncompressed part if any
                         if (error.stopEyeFrame > compressdMark.stopEyeFrame) {
                             ErrorMarking tail = (ErrorMarking) error.clone();
                             tail.startEyeFrame = compressdMark.stopEyeFrame + 1;
-                            tail.startScreenFrame = compressdMark.stopScreenFrame + 1;
+                            tail.startSceneFrame = compressdMark.stopSceneFrame + 1;
                             // Add tail part to temp list
                             tempList.addFirst(tail);
                         }
@@ -838,7 +838,7 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                         if (error.stopEyeFrame < compressdMark.stopEyeFrame) {
                             ErrorMarking tail = (ErrorMarking) compressdMark.clone();
                             tail.startEyeFrame = error.stopEyeFrame + 1;
-                            tail.startScreenFrame = error.stopScreenFrame + 1;
+                            tail.startSceneFrame = error.stopSceneFrame + 1;
                             // Add tail part to temp list
                             tempList.addFirst(tail);
                         }
@@ -850,24 +850,24 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                                 compressdMark.getErrorCode());
                         overlap.startEyeFrame = Math.max(
                                 error.startEyeFrame, compressdMark.startEyeFrame);
-                        overlap.startScreenFrame = Math.max(
-                                error.startScreenFrame, compressdMark.startScreenFrame);
+                        overlap.startSceneFrame = Math.max(
+                                error.startSceneFrame, compressdMark.startSceneFrame);
                         overlap.stopEyeFrame = Math.min(
                                 error.stopEyeFrame, compressdMark.stopEyeFrame);
-                        overlap.stopScreenFrame = Math.min(
-                                error.stopScreenFrame, compressdMark.stopScreenFrame);
+                        overlap.stopSceneFrame = Math.min(
+                                error.stopSceneFrame, compressdMark.stopSceneFrame);
                         tempList.addFirst(overlap);
 
                         // Split the head part if any
                         if (error.startEyeFrame < compressdMark.startEyeFrame) {
                             // If the head part if of the error
                             error.stopEyeFrame = compressdMark.startEyeFrame - 1;
-                            error.stopScreenFrame = compressdMark.startScreenFrame - 1;
+                            error.stopSceneFrame = compressdMark.startSceneFrame - 1;
                         } else {
                             if (error.startEyeFrame > compressdMark.startEyeFrame) {
                                 // if the head part is of the compressed error
                                 compressdMark.stopEyeFrame = error.startEyeFrame - 1;
-                                compressdMark.stopScreenFrame = error.startScreenFrame - 1;
+                                compressdMark.stopSceneFrame = error.startSceneFrame - 1;
                                 tempList.addFirst(compressdMark);
                             }
                             // Done

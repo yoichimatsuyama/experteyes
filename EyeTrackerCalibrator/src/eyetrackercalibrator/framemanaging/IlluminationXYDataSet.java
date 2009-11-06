@@ -38,13 +38,12 @@ package eyetrackercalibrator.framemanaging;
 import org.jfree.data.DomainOrder;
 import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
-import org.jfree.data.xy.XYDataset;
 
 /**
  *
  * @author ruj
  */
-public class IlluminationXYDataSet implements XYDataset{
+public class IlluminationXYDataSet extends SyncXYDataSet{
     InformationDatabase informationDatabase = null;
     protected int offset = 0;
     private int lastItem = 0;
@@ -134,10 +133,6 @@ public class IlluminationXYDataSet implements XYDataset{
     public void setGroup(DatasetGroup datasetGroup) {
     }
     
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
     public int getLastItem() {
         return lastItem;
     }

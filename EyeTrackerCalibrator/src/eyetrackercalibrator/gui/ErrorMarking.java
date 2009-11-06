@@ -50,8 +50,8 @@ public class ErrorMarking {
         e.bottomright = bottomright;
         e.startEyeFrame = startEyeFrame;
         e.stopEyeFrame = stopEyeFrame;
-        e.startScreenFrame = startScreenFrame;
-        e.stopScreenFrame = stopScreenFrame;
+        e.startSceneFrame = startSceneFrame;
+        e.stopSceneFrame = stopSceneFrame;
         e.referenceFrame = referenceFrame;
         return e;
     }
@@ -64,8 +64,8 @@ public class ErrorMarking {
     public boolean bottomright = false;
     public int startEyeFrame = 0;
     public int stopEyeFrame = 0;
-    public int startScreenFrame = 0;
-    public int stopScreenFrame = 0;
+    public int startSceneFrame = 0;
+    public int stopSceneFrame = 0;
     private IntervalMarker intervalMarker = null;
     private int referenceFrame = 0;
 
@@ -83,8 +83,8 @@ public class ErrorMarking {
 
         // Set screen frame
         element = e.getChild("ScreenFrames");
-        startScreenFrame = Integer.parseInt(element.getAttributeValue("from"));
-        stopScreenFrame = Integer.parseInt(element.getAttributeValue("to"));
+        startSceneFrame = Integer.parseInt(element.getAttributeValue("from"));
+        stopSceneFrame = Integer.parseInt(element.getAttributeValue("to"));
 
         // Set up flags
         unrecoverable = Boolean.parseBoolean(e.getAttributeValue("unrecoverable"));
@@ -114,7 +114,7 @@ public class ErrorMarking {
         }
 
         stopEyeFrame = eyeFrame;
-        stopScreenFrame = sceneFrame;
+        stopSceneFrame = sceneFrame;
         if (intervalMarker != null) {
             intervalMarker.setEndValue(endRef);
             intervalMarker.setStartValue(startRef);
@@ -123,7 +123,7 @@ public class ErrorMarking {
 
     public void setStartFrame(int currentFrame, int eyeFrame, int sceneFrame) {
         startEyeFrame = eyeFrame;
-        startScreenFrame = sceneFrame;
+        startSceneFrame = sceneFrame;
         if (intervalMarker != null) {
             intervalMarker.setStartValue(currentFrame);
         }
@@ -136,9 +136,9 @@ public class ErrorMarking {
         String retValue = "<html>";
 
         retValue = retValue.concat(
-                "From:" + startEyeFrame + ":" + startScreenFrame + "(eye:screen)<br>");
+                "From:" + startEyeFrame + ":" + startSceneFrame + "(eye:screen)<br>");
         retValue = retValue.concat(
-                "To:" + stopEyeFrame + ":" + stopScreenFrame + "(eye:screen)<br>");
+                "To:" + stopEyeFrame + ":" + stopSceneFrame + "(eye:screen)<br>");
         retValue = retValue.concat("Errors:");
 
         if (unrecoverable) {
@@ -180,8 +180,8 @@ public class ErrorMarking {
 
         // Add screen frame range
         elm = new Element("ScreenFrames");
-        elm.setAttribute("from", String.valueOf(startScreenFrame));
-        elm.setAttribute("to", String.valueOf(stopScreenFrame));
+        elm.setAttribute("from", String.valueOf(startSceneFrame));
+        elm.setAttribute("to", String.valueOf(stopSceneFrame));
         root.addContent(elm);
 
         root.setAttribute("unrecoverable", String.valueOf(unrecoverable));

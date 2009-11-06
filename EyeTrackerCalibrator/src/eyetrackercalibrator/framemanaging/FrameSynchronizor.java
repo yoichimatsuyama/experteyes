@@ -216,6 +216,11 @@ public class FrameSynchronizor {
      * not optimized so it will go through sync points linearly.
      */
     public int eyeFrameToSyncFrame(int eyeFrame) {
+        /** Sanity check */
+        if(eyeFrame < 1){
+            return -1;
+        }
+
         for (int i = 0; i < syncBlocks.length; i++) {
             SyncBlock syncBlock = syncBlocks[i];
             if (syncBlock.startEyeFrame <= eyeFrame && syncBlock.endEyeFrame >= eyeFrame) {
@@ -231,6 +236,11 @@ public class FrameSynchronizor {
      * not optimized so it will go through sync points linearly.
      */
     public int sceneFrameToSyncFrame(int sceneFrame) {
+        /** Sanity check */
+        if(sceneFrame < 1){
+            return -1;
+        }
+        
         for (int i = 0; i < syncBlocks.length; i++) {
             SyncBlock syncBlock = syncBlocks[i];
             if (syncBlock.startSceneFrame <= sceneFrame && syncBlock.endSceneFrame >= sceneFrame) {
