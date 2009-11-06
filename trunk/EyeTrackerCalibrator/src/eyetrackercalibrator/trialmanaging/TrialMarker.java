@@ -30,7 +30,6 @@
  */
 package eyetrackercalibrator.trialmanaging;
 
-import java.awt.Color;
 import org.jdom.Element;
 import org.jfree.chart.plot.IntervalMarker;
 
@@ -43,8 +42,8 @@ public class TrialMarker implements Comparable{
     /** Trial information */
     public int startEyeFrame = 0;
     public int stopEyeFrame = 0;
-    public int startScreenFrame = 0;
-    public int stopScreenFrame = 0;
+    public int startSceneFrame = 0;
+    public int stopSceneFrame = 0;
     public String label;
     public boolean isBadTrial = false;
 
@@ -89,11 +88,11 @@ public class TrialMarker implements Comparable{
         if(element != null){
             string = element.getAttributeValue(FROM_ATTRIBUTE);
             if(string != null){
-                startScreenFrame = Integer.parseInt(string);
+                startSceneFrame = Integer.parseInt(string);
             }
             string = element.getAttributeValue(TO_ATTRIBUTE);
             if(string != null){
-                stopScreenFrame = Integer.parseInt(string);
+                stopSceneFrame = Integer.parseInt(string);
             }
         }
        
@@ -105,7 +104,7 @@ public class TrialMarker implements Comparable{
         }
     }
 
-    public void setEndFrame(int currentFrame, int eyeOffset, int screenOffset) {
+    public void setEndFrame(int currentFrame, int eyeFrame, int screenFrame) {
         int endRef = 0;
         int startRef = 0;
 
@@ -117,19 +116,16 @@ public class TrialMarker implements Comparable{
             endRef = referenceFrame;
         }
 
-        stopEyeFrame = endRef + eyeOffset;
-        stopScreenFrame = endRef + screenOffset;
-        startEyeFrame = startRef + eyeOffset;
-        startScreenFrame = startRef + screenOffset;
+        stopEyeFrame = eyeFrame;
+        stopSceneFrame = screenFrame;
         if (intervalMarker != null) {
             intervalMarker.setEndValue(endRef);
-            intervalMarker.setStartValue(startRef);
         }
     }
 
-    public void setStartFrame(int currentFrame, int eyeOffset, int screenOffset) {
-        startEyeFrame = currentFrame + eyeOffset;
-        startScreenFrame = currentFrame + screenOffset;
+    public void setStartFrame(int currentFrame, int eyeFrame, int screenFrame) {
+        startEyeFrame = eyeFrame;
+        startSceneFrame = screenFrame;
         if (intervalMarker != null) {
             intervalMarker.setStartValue(currentFrame);
         }
@@ -145,9 +141,9 @@ public class TrialMarker implements Comparable{
         }
 
         retValue = retValue.concat(
-                "From:" + startEyeFrame + ":" + startScreenFrame + "(eye:scene)<br>");
+                "From:" + startEyeFrame + ":" + startSceneFrame + "(eye:scene)<br>");
         retValue = retValue.concat(
-                "To:" + stopEyeFrame + ":" + stopScreenFrame + "(eye:scene)<br>");
+                "To:" + stopEyeFrame + ":" + stopSceneFrame + "(eye:scene)<br>");
         retValue = retValue.concat("</html>");
 
         return retValue;
@@ -163,8 +159,8 @@ public class TrialMarker implements Comparable{
 
         // Add screen frame range
         elm = new Element(SCENE_FRAME_ELEMENT_NAME);
-        elm.setAttribute(FROM_ATTRIBUTE, String.valueOf(startScreenFrame));
-        elm.setAttribute(TO_ATTRIBUTE, String.valueOf(stopScreenFrame));
+        elm.setAttribute(FROM_ATTRIBUTE, String.valueOf(startSceneFrame));
+        elm.setAttribute(TO_ATTRIBUTE, String.valueOf(stopSceneFrame));
         root.addContent(elm);
 
         root.setAttribute(NAME_ATTRIBUTE, label);
@@ -190,7 +186,7 @@ public class TrialMarker implements Comparable{
         if(this.startEyeFrame == m.startEyeFrame){
             return this.label.compareTo(m.label);
         }else{
-            return this.startScreenFrame - m.startScreenFrame;
+            return this.startSceneFrame - m.startSceneFrame;
         }
     }
 }

@@ -41,6 +41,7 @@ import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.framemanaging.ScreenViewFrameInfo;
+import eyetrackercalibrator.framemanaging.SynchronizationPoint;
 import eyetrackercalibrator.gui.CalibrateJPanel;
 import eyetrackercalibrator.gui.CleanDataJPanel;
 import eyetrackercalibrator.gui.ErrorMarking;
@@ -320,11 +321,11 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    private Point2D.Double exportEyeGazes(PrintWriter exportWriter, int i,
+    private Point2D.Double exportEyeGazes(PrintWriter exportWriter, int currentFrame,
             Double vector, ComputingApproach approach, Dimension screenViewFullSize) {
         Double point = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
 
-        Point2D p = this.eyeGazeComputing.computeEyeGaze(i, vector.x, vector.y, approach);
+        Point2D p = this.eyeGazeComputing.computeEyeGaze(currentFrame, vector.x, vector.y, approach);
         if (p != null) {
             point.setLocation(p);
             // Check the range and mark is with ERROR_VALUE,ERROR_VALUE if out of screen
@@ -887,8 +888,7 @@ public class Main extends javax.swing.JFrame {
                 if (!location.exists()) {
                     location.mkdirs();
                 }
-                // Reset offset
-                setOffset(0, 0);
+                frameSynchronizor.setSynchronizationPoints(null, 1, 1);
                 createProject(location);
             } else {
                 // Does nothing
@@ -999,8 +999,6 @@ public class Main extends javax.swing.JFrame {
 
         this.isProjectOpen = true;
 
-        setOffset(Integer.parseInt(p.getProperty(EYE_OFFSET, "0")), Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
-
         projectSelectPanel.setEyeFrameDirectory(p.getProperty(EYE_VIEW_DIRECTORY));
         projectSelectPanel.setEyeInfoDirectory(p.getProperty(EYE_INFO_DIRECTORY));
         projectSelectPanel.setScreenFrameDirectory(p.getProperty(SCREEN_VIEW_DIRECTORY));
@@ -1022,6 +1020,15 @@ public class Main extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error open project", JOptionPane.ERROR_MESSAGE);
             return OpenProjectError.ERROR_OPENING_DATABASE;
         }
+
+        /* Set offset.  This exists to provide backward compatibility */
+        SynchronizationPoint[] sps = new SynchronizationPoint[1];
+        sps[0] = new SynchronizationPoint(
+                Integer.parseInt(p.getProperty(EYE_OFFSET, "0")),
+                Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
+        this.frameSynchronizor.setSynchronizationPoints(sps,
+                eyeFrameManager.getTotalFrames(),
+                screenFrameManager.getTotalFrames());
 
         // Set up scaling factor of the screen info
         updateFullScreenDimansion();
@@ -1149,10 +1156,6 @@ public class Main extends javax.swing.JFrame {
 
         // Save project property
         Properties p = new Properties();
-        p.setProperty(EYE_OFFSET,
-                projectSelectPanel.getSynchronizedEyeFrame());
-        p.setProperty(SCREEN_OFFSET,
-                projectSelectPanel.getSynchronizedScreenFrame());
         p.setProperty(EYE_VIEW_DIRECTORY, projectSelectPanel.getEyeFrameDirectory());
         p.setProperty(EYE_INFO_DIRECTORY, projectSelectPanel.getEyeInfoDirectory());
         p.setProperty(SCREEN_VIEW_DIRECTORY, projectSelectPanel.getScreenFrameDirectory());
@@ -1191,17 +1194,17 @@ public class Main extends javax.swing.JFrame {
         // Gather information 
 
         // Get offset
-        int eyeSynchFrame = 0;
-        String s = projectSelectPanel.getSynchronizedEyeFrame();
-        if (s != null) {
-            eyeSynchFrame = Integer.parseInt(s);
-        }
-        int screenSynchFrame = 0;
-        s = projectSelectPanel.getSynchronizedScreenFrame();
-        if (s != null) {
-            screenSynchFrame = Integer.parseInt(s);
-        }
-        int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
+//        int eyeSynchFrame = 0;
+//        String s = projectSelectPanel.getSynchronizedEyeFrame();
+//        if (s != null) {
+//            eyeSynchFrame = Integer.parseInt(s);
+//        }
+//        int screenSynchFrame = 0;
+//        s = projectSelectPanel.getSynchronizedScreenFrame();
+//        if (s != null) {
+//            screenSynchFrame = Integer.parseInt(s);
+//        }
+//        int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
 
         // Get screen dimension
         Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
@@ -1248,12 +1251,12 @@ public class Main extends javax.swing.JFrame {
                         "Raw secondary y\t" +
                         "Raw linear interpolated x\t" + // This is a gaze coor on the screen view
                         "Raw linear interpolated y\t" +
-                        "Screen primary x\t" +
-                        "Screen primary y\t" +
-                        "Screen secondary x\t" +
-                        "Screen secondary y\t" +
-                        "Screen linear interpolated x\t" +
-                        "Screen linear interpolated y\t" +
+                        "Scene primary x\t" +
+                        "Scene primary y\t" +
+                        "Scene secondary x\t" +
+                        "Scene secondary y\t" +
+                        "Scene linear interpolated x\t" +
+                        "Scene linear interpolated y\t" +
                         "Similarity of topleft\t" +
                         "Similarity of topright\t" +
                         "Similarity of bottomleft\t" +
@@ -1282,16 +1285,16 @@ public class Main extends javax.swing.JFrame {
                     error = errorIter.next();
                 }
 
-                for (int i = 1; i <= eyeFrameManager.getTotalFrames(); i++) {
+                for (int i = 1; i <= this.frameSynchronizor.getTotalFrame(); i++) {
                     // Get the current trial number
                     while (trialNumber < trials.length &&
-                            i > trials[trialNumber].stopEyeFrame) {
+                            (this.frameSynchronizor.getSceneFrame(i) > trials[trialNumber].stopSceneFrame)) {
                         // Move to the next trial
                         trialNumber++;
                     }
                     // Get the trial name when appropriate
                     if (trialNumber < trials.length &&
-                            i >= trials[trialNumber].startEyeFrame) {
+                            this.frameSynchronizor.getSceneFrame(i) >= trials[trialNumber].startSceneFrame) {
                         // Set new trial name
                         trialName = trials[trialNumber].label;
                     } else {
@@ -1301,8 +1304,8 @@ public class Main extends javax.swing.JFrame {
 
                     /** If not a trial check if this is a calibration */
                     if (trialName == null) {
-                        Point calibrationPoint =
-                                calibrateJPanel.frameToCalibrationPoint(i + eyeToScreen);
+                        Point calibrationPoint = calibrateJPanel.frameToCalibrationPoint(
+                                this.frameSynchronizor.getSceneFrame(i));
                         if (calibrationPoint != null) {
                             calibrationName = "C_" + calibrationPoint.x + "_" +
                                     calibrationPoint.y;
@@ -1316,7 +1319,8 @@ public class Main extends javax.swing.JFrame {
 
                     // Get eyeInfo
                     EyeViewFrameInfo eyeInfo =
-                            (EyeViewFrameInfo) eyeFrameManager.getFrameInfo(i);
+                            (EyeViewFrameInfo) eyeFrameManager.getFrameInfo(
+                            this.frameSynchronizor.getEyeFrame(i));
 
                     // Skip a frame when there is no eye information
                     if (eyeInfo != null) {
@@ -1325,8 +1329,8 @@ public class Main extends javax.swing.JFrame {
                             pupilFit = eyeInfo.getCorniaFit();
                         }
 
-                        // Write Screen Frame, Pupil(x,y)
-                        exportWriter.print((i + eyeToScreen) + "\t" +
+                        // Write current Frame, Pupil(x,y)
+                        exportWriter.print(i + "\t" +
                                 eyeInfo.getPupilX() + "\t" +
                                 eyeInfo.getPupilY() + "\t");
 
@@ -1372,14 +1376,15 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         // Get screen info
-                        ScreenViewFrameInfo screenInfo =
-                                (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i + eyeToScreen);
+                        ScreenViewFrameInfo sceneInfo =
+                                (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(
+                                this.frameSynchronizor.getSceneFrame(i));
 
                         // Set default value for not available
                         fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
 
-                        if (screenInfo != null) {
-                            Point2D[] corners = screenInfo.getCorners();
+                        if (sceneInfo != null) {
+                            Point2D[] corners = sceneInfo.getCorners();
 
                             if (corners != null && corners[0] != null &&
                                     corners[1] != null && corners[2] != null &&
@@ -1413,7 +1418,7 @@ public class Main extends javax.swing.JFrame {
                                     }
                                 }
 
-                                double[] similarities = screenInfo.similarities;
+                                double[] similarities = sceneInfo.similarities;
                                 // Write Gaze on monitor (x,y), Similarity (topleft, topright, bottomleft, bottomright)
                                 exportWriter.print(
                                         similarities[ScreenViewFrameInfo.TOPLEFT] + "\t" +
@@ -1434,14 +1439,26 @@ public class Main extends javax.swing.JFrame {
 
                         // Processing error code
                         long errorValue = 0;
-                        if (error != null && error.startEyeFrame <= i) {
+                        int eyeFrame = this.frameSynchronizor.getEyeFrame(i);
+                        int sceneFrame = this.frameSynchronizor.getSceneFrame(i);
+                        if (error != null &&
+                                ((error.startEyeFrame > 0 &&
+                                error.startEyeFrame <= eyeFrame) ||
+                                (error.startSceneFrame > 0 &&
+                                error.startSceneFrame <= sceneFrame))) {
                             // Check if it's in range
-                            if (i <= error.stopEyeFrame) {
+                            if ((error.stopEyeFrame > 0 &&
+                                    eyeFrame <= error.stopEyeFrame) ||
+                                    (error.stopSceneFrame > 0 &&
+                                    sceneFrame <= error.stopSceneFrame)) {
                                 errorValue = error.getErrorCode();
                             } else {
                                 // Mismatch. Try finding the next one
                                 while (errorIter.hasNext() &&
-                                        error.stopEyeFrame < i) {
+                                        ((error.stopEyeFrame > 0 &&
+                                        error.stopEyeFrame < eyeFrame) ||
+                                        (error.stopSceneFrame > 0 &&
+                                        error.stopSceneFrame < sceneFrame))) {
                                     error = errorIter.next();
                                 }
                                 // Check if we found one
@@ -1465,13 +1482,25 @@ public class Main extends javax.swing.JFrame {
                         exportWriter.print(errorValue + "\t");
 
                         if (trialName != null) {
-                            exportWriter.println(trials[trialNumber].label + "\t" + trialNumber);
+                            exportWriter.print(trials[trialNumber].label + "\t" + trialNumber);
                         } else {
                             if (calibrationName != null) {
-                                exportWriter.println(calibrationName + "\t" + calibrationNumber);
+                                exportWriter.print(calibrationName + "\t" + calibrationNumber);
                             } else {
-                                exportWriter.println("-\t" + ERROR_VALUE);
+                                exportWriter.print("-\t" + ERROR_VALUE);
                             }
+                        }
+
+                        /** Print eye frame name */
+                        if(eyeInfo != null){
+                            exportWriter.print(eyeInfo.getSourceFileName()+"\t");
+                        }else{
+                            exportWriter.print("-\t");
+                        }
+                        if(sceneInfo != null){
+                            exportWriter.println(sceneInfo.getSourceFileName()+"\t");
+                        }else{
+                            exportWriter.println("-");
                         }
                     }
                 }

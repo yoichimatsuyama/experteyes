@@ -30,6 +30,7 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.IlluminationXYDataSet;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
 
@@ -40,7 +41,14 @@ import eyetrackercalibrator.framemanaging.InformationDatabase;
 public class IlluminationGraphTabPanel extends GraphTabPanel {
     
     IlluminationXYDataSet dataSet = null;
-    private int offset;
+    FrameSynchronizor frameSynchronizor = null;
+
+    public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
+        this.frameSynchronizor = frameSynchronizor;
+        if(this.dataSet != null){
+            this.dataSet.setFrameSynchronizor(frameSynchronizor);
+        }
+    }
     
     private final static String[] graphName = {
         "Illumination"
@@ -55,15 +63,8 @@ public class IlluminationGraphTabPanel extends GraphTabPanel {
      */
     public void setDataSet(InformationDatabase infoDatabase, int lastFrame){
         this.dataSet = new IlluminationXYDataSet(infoDatabase);
-        this.dataSet.setOffset(offset);
+        this.dataSet.setFrameSynchronizor(this.frameSynchronizor);
         this.dataSet.setLastItem(lastFrame);
         setDataSet(dataSet, this.graphPanel[0]);
-    }
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-        if(this.dataSet != null){
-            this.dataSet.setOffset(offset);
-        }
     }
 }

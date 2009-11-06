@@ -144,8 +144,8 @@ public class BothMatchingTrialFileHandler extends TrialFileHandler {
     @Override
     public void estimateTrialMarking(InformationDatabase informationDatabase,
             TrialMarker[] trials, int screenViewOffset, int eyeViewOffset) {
-        int firstFrame = trials[0].startScreenFrame;
-        int lastFrame = trials[trials.length - 1].startScreenFrame;
+        int firstFrame = trials[0].startSceneFrame;
+        int lastFrame = trials[trials.length - 1].startSceneFrame;
 
         // Compute kernal
         EstimateTrialMarking est =
@@ -154,13 +154,13 @@ public class BothMatchingTrialFileHandler extends TrialFileHandler {
         // Reestimate the trial
         for (int i = 0; i < trials.length - 1; i++) {
             // Set bounddary to middle of current trial to middle of next trial
-            int leftBound = (trials[i].stopScreenFrame + trials[i].startScreenFrame) / 2;
-            int rightBound = (trials[i + 1].stopScreenFrame + trials[i + 1].startScreenFrame) / 2;
+            int leftBound = (trials[i].stopSceneFrame + trials[i].startSceneFrame) / 2;
+            int rightBound = (trials[i + 1].stopSceneFrame + trials[i + 1].startSceneFrame) / 2;
 
             double[] k = est.estimateGroup(leftBound, rightBound);
 
             // Set start frame to to prevent bug
-            trials[i].setStartFrame(trials[i].startScreenFrame - screenViewOffset,
+            trials[i].setStartFrame(trials[i].startSceneFrame - screenViewOffset,
                     eyeViewOffset, screenViewOffset);
 
             // Search from left bound to right bound
