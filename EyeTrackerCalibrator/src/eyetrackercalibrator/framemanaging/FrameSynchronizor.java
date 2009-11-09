@@ -76,6 +76,11 @@ public class FrameSynchronizor {
      *
      * The points must not overlap.  If they do, the the output behavior is
      * unknown.
+     *
+     * @param points if null or of zero size.  All synchronizations are clear by
+     * having only one sync point.
+     * @param totalEyeFrame if less than 1 then the value will be set to 1.
+     * @param totalSceneFrame if less than 1 then the value will be set to 1.
      */
     public void setSynchronizationPoints(SynchronizationPoint[] points,
             int totalEyeFrame, int totalSceneFrame) {
@@ -101,6 +106,8 @@ public class FrameSynchronizor {
 
             // Compute offset for all following blocks
             for (int i = 1; i < points.length; i++) {
+                this.syncBlocks[i] = new SyncBlock();
+
                 // Compute the end points for the previous block
                 this.syncBlocks[i - 1].endEyeFrame = points[i].eyeFrame - 1;
                 this.syncBlocks[i - 1].endSceneFrame = points[i].sceneFrame - 1;
@@ -118,6 +125,8 @@ public class FrameSynchronizor {
 
             // Compute the total frames from last block
             SyncBlock s = this.syncBlocks[this.syncBlocks.length - 1];
+            s.endEyeFrame = totalEyeFrame;
+            s.endSceneFrame = totalSceneFrame;
             length = s.endEyeFrame - s.startEyeFrame;
             length = Math.max(length, s.endSceneFrame - s.startSceneFrame);
             s.end = s.start + length;
@@ -217,7 +226,7 @@ public class FrameSynchronizor {
      */
     public int eyeFrameToSyncFrame(int eyeFrame) {
         /** Sanity check */
-        if(eyeFrame < 1){
+        if (eyeFrame < 1) {
             return -1;
         }
 
@@ -237,10 +246,10 @@ public class FrameSynchronizor {
      */
     public int sceneFrameToSyncFrame(int sceneFrame) {
         /** Sanity check */
-        if(sceneFrame < 1){
+        if (sceneFrame < 1) {
             return -1;
         }
-        
+
         for (int i = 0; i < syncBlocks.length; i++) {
             SyncBlock syncBlock = syncBlocks[i];
             if (syncBlock.startSceneFrame <= sceneFrame && syncBlock.endSceneFrame >= sceneFrame) {
