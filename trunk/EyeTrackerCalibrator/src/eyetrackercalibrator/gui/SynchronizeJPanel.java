@@ -59,7 +59,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
 
     private AnimationTimer timer;
     private FrameManager eyeFrameManager = null;
-    private FrameManager screenFrameManager = null;
+    private FrameManager sceneFrameManager = null;
     DefaultListModel synchPointSet = new DefaultListModel();
     public static final String SYNC_LIST_ELEMENT = "synchronization";
 
@@ -109,17 +109,21 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         // Set total frame for control
         eyeFrameScrollingJPanel.setTotalFrame(eyeFrameManager.getTotalFrames());
         timer.setEyeFrameManager(eyeFrameManager);
+
+        setSynchSystem();
     }
 
     public FrameManager getScreenFrameManager() {
-        return screenFrameManager;
+        return sceneFrameManager;
     }
 
-    public void setScreenFrameManager(ScreenFrameManager screenFrameManager) {
-        this.screenFrameManager = screenFrameManager;
+    public void setSceneFrameManager(ScreenFrameManager screenFrameManager) {
+        this.sceneFrameManager = screenFrameManager;
         // Set total frame for control
         screenFrameScrollingJPanel.setTotalFrame(screenFrameManager.getTotalFrames());
         timer.setScreenFrameManager(screenFrameManager);
+        
+        setSynchSystem();
     }
 
     /**
@@ -130,7 +134,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         cancelButton.addActionListener(listener);
     }
 
-    public SynchronizationPoint[] getSynchronizationPoints(){
+    public SynchronizationPoint[] getSynchronizationPoints() {
         SynchronizationPoint[] sps = new SynchronizationPoint[this.synchPointSet.size()];
         int i = 0;
         for (Enumeration<SynchronizationPoint> e =
@@ -139,7 +143,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
             sps[i] = e.nextElement();
             i++;
         }
-        
+
         return sps;
     }
 
@@ -241,7 +245,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
             if ((p.eyeFrame > sp.eyeFrame && p.sceneFrame < sp.sceneFrame) ||
                     (p.eyeFrame < sp.eyeFrame && p.sceneFrame > sp.sceneFrame)) {
                 // Show message saying that there sync point cannot over lapped
-                JOptionPane.showMessageDialog(this, "The synchronization point overlaps with "+p,
+                JOptionPane.showMessageDialog(this, "The synchronization point overlaps with " + p,
                         "Invalid Synchronization Point", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -410,5 +414,18 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
 
     public void clear() {
         this.synchPointSet.clear();
+    }
+
+    private void setSynchSystem() {
+        /* Set sync point properly */
+        int totalEyeFrame = 1;
+        if (this.eyeFrameManager != null) {
+            totalEyeFrame = this.eyeFrameManager.getTotalFrames();
+        }
+        int totalSceneFrame = 1;
+        if (this.sceneFrameManager != null) {
+            totalSceneFrame = this.sceneFrameManager.getTotalFrames();
+        }
+        timer.getFrameSynchronizor().setSynchronizationPoints(null, totalEyeFrame, totalSceneFrame);
     }
 }

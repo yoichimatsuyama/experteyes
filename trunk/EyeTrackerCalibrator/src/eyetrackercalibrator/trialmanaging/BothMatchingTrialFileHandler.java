@@ -30,6 +30,7 @@
  */
 package eyetrackercalibrator.trialmanaging;
 
+import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.InformationDatabase;
 import eyetrackercalibrator.gui.util.IntervalMarkerManager;
 import eyetrackercalibrator.math.EstimateTrialMarking;
@@ -106,8 +107,7 @@ public class BothMatchingTrialFileHandler extends TrialFileHandler {
 
     public Vector<TrialMarker> estimateTrials(InformationDatabase infoDatabase,
             Trial trial, int firstTrialStartFrame, int lastTrialStartFrame,
-            int eyeOffset, int screenOffset,
-            IntervalMarkerManager intervalMarkerManager) {
+            FrameSynchronizor frameSynchronizor, IntervalMarkerManager intervalMarkerManager) {
 
         Vector<TrialMarker> trialMarkers = new Vector<TrialMarker>();
 
@@ -131,8 +131,10 @@ public class BothMatchingTrialFileHandler extends TrialFileHandler {
             int startFrame = (int) ((info.startTime - startTime) * frameRate) + firstTrialStartFrame;
             int endFrame = (int) ((info.startTime - startTime + trialLength) * frameRate) + firstTrialStartFrame;
 
-            marker.setStartFrame(startFrame, eyeOffset, screenOffset);
-            marker.setEndFrame(endFrame, eyeOffset, screenOffset);
+            marker.setStartFrame(startFrame, frameSynchronizor.getEyeFrame(startFrame),
+                    frameSynchronizor.getSceneFrame(startFrame));
+            marker.setEndFrame(endFrame, frameSynchronizor.getEyeFrame(endFrame),
+                    frameSynchronizor.getSceneFrame(endFrame));
 
             trialMarkers.add(marker);
         }
@@ -143,55 +145,61 @@ public class BothMatchingTrialFileHandler extends TrialFileHandler {
 
     @Override
     public void estimateTrialMarking(InformationDatabase informationDatabase,
-            TrialMarker[] trials, int screenViewOffset, int eyeViewOffset) {
-        int firstFrame = trials[0].startSceneFrame;
-        int lastFrame = trials[trials.length - 1].startSceneFrame;
-
-        // Compute kernal
-        EstimateTrialMarking est =
-                new EstimateTrialMarking(informationDatabase);
-
-        // Reestimate the trial
-        for (int i = 0; i < trials.length - 1; i++) {
-            // Set bounddary to middle of current trial to middle of next trial
-            int leftBound = (trials[i].stopSceneFrame + trials[i].startSceneFrame) / 2;
-            int rightBound = (trials[i + 1].stopSceneFrame + trials[i + 1].startSceneFrame) / 2;
-
-            double[] k = est.estimateGroup(leftBound, rightBound);
-
-            // Set start frame to to prevent bug
-            trials[i].setStartFrame(trials[i].startSceneFrame - screenViewOffset,
-                    eyeViewOffset, screenViewOffset);
-
-            // Search from left bound to right bound
-            int pos = leftBound;
-
-            while (pos <= rightBound && !(est.isHighGroup(pos) && est.getDiff(pos) > 0)) {
-                pos++;
-            }
-
-            // Set new trial end if the bound is not reached otherwise no setting
-            if (pos < rightBound) {
-                trials[i].setEndFrame(pos - screenViewOffset, eyeViewOffset, screenViewOffset);
-            // Change the color to mark the change
-            } else {
-                trials[i].getIntervalMarker().setPaint(Color.BLUE);
-            }
-
-            // Search from right bound to left bound
-            pos = rightBound;
-
-            // Search further for beginning of another trial
-            while (pos >= leftBound && !(est.isHighGroup(pos) && est.getDiff(pos) < 0)) {
-                pos--;
-            }
-
-            // Set new trial start if the bound is not reached
-            if (pos > leftBound) {
-                trials[i + 1].setStartFrame(pos - screenViewOffset, eyeViewOffset, screenViewOffset);
-            } else {
-                trials[i + 1].getIntervalMarker().setPaint(Color.BLUE);
-            }
-        }
+            TrialMarker[] trials, FrameSynchronizor frameSynchronizor) {
+//        int firstFrame = trials[0].startSceneFrame;
+//        int lastFrame = trials[trials.length - 1].startSceneFrame;
+//
+//        // Compute kernal
+//        EstimateTrialMarking est =
+//                new EstimateTrialMarking(informationDatabase);
+//
+//        // Reestimate the trial
+//        for (int i = 0; i < trials.length - 1; i++) {
+//            // Set bounddary to middle of current trial to middle of next trial
+//            int leftBound = (trials[i].stopSceneFrame + trials[i].startSceneFrame) / 2;
+//            int rightBound = (trials[i + 1].stopSceneFrame + trials[i + 1].startSceneFrame) / 2;
+//
+//            double[] k = est.estimateGroup(leftBound, rightBound);
+//
+//            // Set start frame to to prevent bug
+//            int frame = frameSynchronizor.sceneFrameToSyncFrame(trials[i].startSceneFrame);
+//            if(frame < 1){
+//                frame = frameSynchronizor.sceneFrameToSyncFrame(trials[i].startEyeFrame);
+//            }
+//            trials[i].setStartFrame(frame,frameSynchronizor.getEyeFrame(frame),
+//                    frameSynchronizor.getSceneFrame(frame));
+//
+//            // Search from left bound to right bound
+//            int pos = leftBound;
+//
+//            while (pos <= rightBound && !(est.isHighGroup(pos) && est.getDiff(pos) > 0)) {
+//                pos++;
+//            }
+//
+//            // Set new trial end if the bound is not reached otherwise no setting
+//            if (pos < rightBound) {
+//                trials[i].setEndFrame(pos - screenViewOffset, eyeViewOffset, screenViewOffset);
+//            // Change the color to mark the change
+//            } else {
+//                trials[i].getIntervalMarker().setPaint(Color.BLUE);
+//            }
+//
+//            // Search from right bound to left bound
+//            pos = rightBound;
+//
+//            // Search further for beginning of another trial
+//            while (pos >= leftBound && !(est.isHighGroup(pos) && est.getDiff(pos) < 0)) {
+//                pos--;
+//            }
+//
+//            // Set new trial start if the bound is not reached
+//            if (pos > leftBound) {
+//                trials[i + 1].setStartFrame(pos - screenViewOffset, eyeViewOffset, screenViewOffset);
+//            } else {
+//                trials[i + 1].getIntervalMarker().setPaint(Color.BLUE);
+//            }
+//        }
     }
+
+
 }

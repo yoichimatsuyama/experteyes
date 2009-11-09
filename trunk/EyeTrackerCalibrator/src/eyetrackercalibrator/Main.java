@@ -609,7 +609,7 @@ public class Main extends javax.swing.JFrame {
 
             // need this to set the stat for frame playing (total frame and what not)
             synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
-            synchronizeJPanel.setScreenFrameManager(screenFrameManager);
+            synchronizeJPanel.setSceneFrameManager(screenFrameManager);
 
             // Go to synchronized panel
             remove(projectSelectPanel);
@@ -778,6 +778,7 @@ public class Main extends javax.swing.JFrame {
                         projectSelectPanel.getDistanceFromMeasuredScene(),
                         projectSelectPanel.getSceneWidthCM(),
                         projectSelectPanel.getSceneHeightCM()));
+                calibrateJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
                 add(calibrateJPanel);
@@ -798,6 +799,7 @@ public class Main extends javax.swing.JFrame {
                         projectSelectPanel.getFullScreenFrameDirectory());
                 cleanDataJPanel.setCornerHintDir(new File(projectLocation, CORNERHINT_DIR));
                 cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
+                cleanDataJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
                 add(cleanDataJPanel);
@@ -816,6 +818,7 @@ public class Main extends javax.swing.JFrame {
                 markTrialJPanel.setProjectRoot(projectLocation);
                 markTrialJPanel.setFullScreenFrameDirectory(
                         projectSelectPanel.getFullScreenFrameDirectory());
+                markTrialJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
                 add(markTrialJPanel);
@@ -1038,7 +1041,7 @@ public class Main extends javax.swing.JFrame {
 
         // Assign frame manager to all panel
         synchronizeJPanel.setEyeFrameManager(eyeFrameManager);
-        synchronizeJPanel.setScreenFrameManager(screenFrameManager);
+        synchronizeJPanel.setSceneFrameManager(screenFrameManager);
         calibrateJPanel.setEyeFrameManager(eyeFrameManager);
         calibrateJPanel.setScreenFrameManager(screenFrameManager);
         cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
@@ -1492,14 +1495,14 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         /** Print eye frame name */
-                        if(eyeInfo != null){
-                            exportWriter.print(eyeInfo.getSourceFileName()+"\t");
-                        }else{
+                        if (eyeInfo != null) {
+                            exportWriter.print(eyeInfo.getSourceFileName() + "\t");
+                        } else {
                             exportWriter.print("-\t");
                         }
-                        if(sceneInfo != null){
-                            exportWriter.println(sceneInfo.getSourceFileName()+"\t");
-                        }else{
+                        if (sceneInfo != null) {
+                            exportWriter.println(sceneInfo.getSourceFileName() + "\t");
+                        } else {
                             exportWriter.println("-");
                         }
                     }
