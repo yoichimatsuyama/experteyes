@@ -26,7 +26,7 @@
  */
 /*
  * SynchronizeJPanel.java  
- *
+ * @todo Add clicking on sync list set the eye and scene to the value accordingly
  * Created on September 10, 2007, 11:49 AM
  */
 package eyetrackercalibrator.gui;
