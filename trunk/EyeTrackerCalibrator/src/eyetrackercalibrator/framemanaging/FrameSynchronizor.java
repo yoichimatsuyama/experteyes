@@ -134,29 +134,29 @@ public class FrameSynchronizor {
         }
     }
 
-    private void setCurrentFrame(int currentFrame) {
+    private synchronized SyncBlock getCurrentBlock(int currentFrame) {
         if (this.currentFrame == currentFrame) {
             // Does nothing
-            return;
+            return this.syncBlocks[this.currentBlock];
         } else {
             this.currentFrame = currentFrame;
         }
 
         SyncBlock block = this.syncBlocks[this.currentBlock];
         /* Check if the current frame is in the current block */
-        if (currentFrame > block.start) {
+        if (currentFrame > block.end) {
             // Search to the right
             for (int i = this.currentBlock + 1; i < this.syncBlocks.length; i++) {
                 SyncBlock syncBlock = syncBlocks[i];
                 if (currentFrame >= syncBlock.start && currentFrame <= syncBlock.end) {
                     // Stop searching
                     this.currentBlock = i;
-                    return;
+                    return this.syncBlocks[this.currentBlock];
                 }
             }
             // Stop searching
             this.currentBlock = this.syncBlocks.length - 1;
-            return;
+            return this.syncBlocks[this.currentBlock];
         } else if (currentFrame < block.start) {
             // Search to the left
             for (int i = this.currentBlock - 1; i > 0; i--) {
@@ -164,22 +164,21 @@ public class FrameSynchronizor {
                 if (currentFrame >= syncBlock.start && currentFrame <= syncBlock.end) {
                     // Stop searching
                     this.currentBlock = i;
-                    return;
+                    return this.syncBlocks[this.currentBlock];
                 }
             }
             // Stop searching
             this.currentBlock = 0;
-            return;
+            return this.syncBlocks[this.currentBlock];
         }
         // No need to change block
+        return this.syncBlocks[this.currentBlock];
     }
 
     /** Get eye frame number according to previously set current frame */
-    private int getEyeFrame() {
-        SyncBlock block = this.syncBlocks[this.currentBlock];
-
+    private int getEyeFrame(int currentFrame, SyncBlock block) {
         // Look up from the current block
-        int frame = this.currentFrame - block.start + block.startEyeFrame;
+        int frame = currentFrame - block.start + block.startEyeFrame;
 
         if (frame <= block.endEyeFrame) {
             return frame;
@@ -193,16 +192,15 @@ public class FrameSynchronizor {
      * frame as a new current frame
      */
     public int getEyeFrame(int currentFrame) {
-        setCurrentFrame(currentFrame);
-        return getEyeFrame();
+        return getEyeFrame(currentFrame,getCurrentBlock(currentFrame));
     }
 
     /** Get scene frame number according to previously set current frame */
-    private int getSceneFrame() {
-        SyncBlock block = this.syncBlocks[this.currentBlock];
+    private int getSceneFrame(int currentFrame, SyncBlock block) {
+        //SyncBlock block = this.syncBlocks[this.currentBlock];
 
         // Look up from the current block
-        int frame = this.currentFrame - block.start + block.startSceneFrame;
+        int frame = currentFrame - block.start + block.startSceneFrame;
 
         if (frame <= block.endSceneFrame) {
             return frame;
@@ -216,8 +214,7 @@ public class FrameSynchronizor {
      * frame as a new current frame
      */
     public int getSceneFrame(int currentFrame) {
-        setCurrentFrame(currentFrame);
-        return getSceneFrame();
+        return getSceneFrame(currentFrame, getCurrentBlock(currentFrame));
     }
 
     /**
