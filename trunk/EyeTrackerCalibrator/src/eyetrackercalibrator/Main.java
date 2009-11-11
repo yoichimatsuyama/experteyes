@@ -1024,15 +1024,6 @@ public class Main extends javax.swing.JFrame {
             return OpenProjectError.ERROR_OPENING_DATABASE;
         }
 
-        /* Set offset.  This exists to provide backward compatibility */
-        SynchronizationPoint[] sps = new SynchronizationPoint[1];
-        sps[0] = new SynchronizationPoint(
-                Integer.parseInt(p.getProperty(EYE_OFFSET, "0")),
-                Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
-        this.frameSynchronizor.setSynchronizationPoints(sps,
-                eyeFrameManager.getTotalFrames(),
-                screenFrameManager.getTotalFrames());
-
         // Set up scaling factor of the screen info
         updateFullScreenDimansion();
 
@@ -1087,6 +1078,24 @@ public class Main extends javax.swing.JFrame {
         } else {
             synchronizeJPanel.clear();
         }
+
+        /**
+         * check if sync file is loaded.  If not then try loading from project in case
+         * of old project file.  This exists to provide backward compatibility */
+        SynchronizationPoint[] sps = synchronizeJPanel.getSynchronizationPoints();
+        if (sps == null || sps.length < 1) {
+            sps = new SynchronizationPoint[1];
+            sps[0] = new SynchronizationPoint(
+                    Integer.parseInt(p.getProperty(EYE_OFFSET, "0")),
+                    Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
+            this.synchronizeJPanel.addSyncPoint(sps[1]);
+        }
+        /**--End backward compatimility support---*/
+
+        /** Set frame sync according to */
+        this.frameSynchronizor.setSynchronizationPoints(sps,
+                eyeFrameManager.getTotalFrames(),
+                screenFrameManager.getTotalFrames());
 
         // Link frame manager to update progress to project panel
         eyeFrameManager.setLoadingListener(projectSelectPanel.getEyeFrameLoadingListener());
