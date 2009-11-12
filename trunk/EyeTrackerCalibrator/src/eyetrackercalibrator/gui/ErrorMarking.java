@@ -30,11 +30,12 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.gui.util.FrameMarker;
 import java.awt.Color;
 import org.jdom.Element;
 import org.jfree.chart.plot.IntervalMarker;
 
-public class ErrorMarking {
+public class ErrorMarking extends FrameMarker{
 
     /**
      * THe clone get all except Intervalmarker
@@ -62,11 +63,6 @@ public class ErrorMarking {
     public boolean topright = false;
     public boolean bottomleft = false;
     public boolean bottomright = false;
-    public int startEyeFrame = 0;
-    public int stopEyeFrame = 0;
-    public int startSceneFrame = 0;
-    public int stopSceneFrame = 0;
-    private IntervalMarker intervalMarker = null;
     private int referenceFrame = 0;
 
     public ErrorMarking() {
@@ -95,41 +91,6 @@ public class ErrorMarking {
         bottomright = Boolean.parseBoolean(e.getAttributeValue("bottomrightcorner"));
     }
 
-    /** 
-     * Method for marking end frame and set the interval marker accordingly.  
-     * The method takes care of making sure that starting frame is smaller
-     * than the end frame.  The method only works if you use it after
-     * calling setStartFrame.
-     */
-    public void setEndFrame(int currentFrame, int eyeFrame, int sceneFrame) {
-        int endRef = 0;
-        int startRef = 0;
-
-        if (currentFrame >= referenceFrame) {
-            startRef = referenceFrame;
-            endRef = currentFrame;
-        } else {
-            startRef = currentFrame;
-            endRef = referenceFrame;
-        }
-
-        stopEyeFrame = eyeFrame;
-        stopSceneFrame = sceneFrame;
-        if (intervalMarker != null) {
-            intervalMarker.setEndValue(endRef);
-            intervalMarker.setStartValue(startRef);
-        }
-    }
-
-    public void setStartFrame(int currentFrame, int eyeFrame, int sceneFrame) {
-        startEyeFrame = eyeFrame;
-        startSceneFrame = sceneFrame;
-        if (intervalMarker != null) {
-            intervalMarker.setStartValue(currentFrame);
-        }
-
-        referenceFrame = currentFrame;
-    }
 
     @Override
     public String toString() {
@@ -194,13 +155,9 @@ public class ErrorMarking {
         return root;
     }
 
-    public IntervalMarker getIntervalMarker() {
-        return intervalMarker;
-    }
-
     public void setIntervalMarker(IntervalMarker intervalMarker) {
-        this.intervalMarker = intervalMarker;
-
+        super.setIntervalMarker(intervalMarker);
+        
         if (unrecoverable) {
             // Mark red if unrecoverable
             intervalMarker.setPaint(Color.RED);
@@ -218,8 +175,6 @@ public class ErrorMarking {
             intervalMarker.setPaint(Color.GREEN);
 
         }
-
-        intervalMarker.setAlpha(0.2f);
     }
 
     public int getErrorCode() {
