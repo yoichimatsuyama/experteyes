@@ -18,9 +18,9 @@ public class FrameMarker {
     public int stopSceneFrame = 0;
     protected IntervalMarker intervalMarker = null;
     /** Used for adjusting start and stop */
-    private int referenceFrame = 0;
-    private int referenceEyeFrame = 0;
-    private int referenceSceneFrame = 0;
+    protected int referenceFrame = 0;
+    protected int referenceEyeFrame = 0;
+    protected int referenceSceneFrame = 0;
 
     @Override
     public boolean equals(Object obj) {

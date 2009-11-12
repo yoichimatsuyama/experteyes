@@ -63,7 +63,6 @@ public class ErrorMarking extends FrameMarker{
     public boolean topright = false;
     public boolean bottomleft = false;
     public boolean bottomright = false;
-    private int referenceFrame = 0;
 
     public ErrorMarking() {
     }
