@@ -122,7 +122,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         // Set total frame for control
         screenFrameScrollingJPanel.setTotalFrame(screenFrameManager.getTotalFrames());
         timer.setScreenFrameManager(screenFrameManager);
-        
+
         setSynchSystem();
     }
 
@@ -310,6 +310,11 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         });
 
         synchronizePointList.setModel(synchPointSet);
+        synchronizePointList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                synchronizePointListMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(synchronizePointList);
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -397,6 +402,21 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
             this.synchPointSet.removeElement(objs[i]);
         }
     }//GEN-LAST:event_removeSynchPointButtonActionPerformed
+
+    private void synchronizePointListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_synchronizePointListMouseClicked
+
+        // Get info
+        SynchronizationPoint point = 
+                (SynchronizationPoint) this.synchronizePointList.getSelectedValue();
+
+        // Check if it is double click or not
+        if (evt.getClickCount() >= 2) {
+            //Move to the frame
+            this.eyeFrameScrollingJPanel.setCurrentFrame(point.eyeFrame);
+            this.screenFrameScrollingJPanel.setCurrentFrame(point.sceneFrame);
+        }
+
+    }//GEN-LAST:event_synchronizePointListMouseClicked
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel SynchPointList;
     private javax.swing.JButton addSynchPointButton;

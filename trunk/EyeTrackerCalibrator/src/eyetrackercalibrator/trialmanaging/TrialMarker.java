@@ -32,7 +32,6 @@ package eyetrackercalibrator.trialmanaging;
 
 import eyetrackercalibrator.gui.util.FrameMarker;
 import org.jdom.Element;
-import org.jfree.chart.plot.IntervalMarker;
 
 /**
  *
