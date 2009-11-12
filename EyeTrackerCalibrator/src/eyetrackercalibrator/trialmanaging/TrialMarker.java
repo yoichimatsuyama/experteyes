@@ -44,9 +44,6 @@ public class TrialMarker extends FrameMarker implements Comparable {
     public String label;
     public boolean isBadTrial = false;
 
-    /** Object management information */
-    private int referenceFrame;
-
     /** For storing and loading information to the XML format */
     public final static String ELEMENT_NAME = "Trial";
     public final static String EYE_FRAME_ELEMENT_NAME = "EyeFrames";

@@ -46,10 +46,6 @@ public class CalibrationInfo extends FrameMarker{
      */
     public Point2D selectedCalibrationPointPosition;
     public boolean isCalibrationPointPositionLocated = false;
-    /** Used for adjusting start and stop */
-    private int referenceFrame = 0;
-    private int referenceEyeFrame = 0;
-    private int referenceSceneFrame = 0;
     
     public enum CalibrationType {
 
