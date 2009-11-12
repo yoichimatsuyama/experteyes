@@ -42,17 +42,20 @@ public class CalibrationInfo {
 
     public int startEyeFrame = 0;
     public int stopEyeFrame = 0;
-    public int startScreenFrame = 0;
-    public int stopScreenFrame = 0;
+    public int startSceneFrame = 0;
+    public int stopSceneFrame = 0;
     /** 
      * Contains a calibration point position of the first frame selected
      * by user
      */
     public Point2D selectedCalibrationPointPosition;
     private IntervalMarker intervalMarker = null;
-    private int referenceFrame = 0;
     public boolean isCalibrationPointPositionLocated = false;
-
+    /** Used for adjusting start and stop */
+    private int referenceFrame = 0;
+    private int referenceEyeFrame = 0;
+    private int referenceSceneFrame = 0;
+    
     public enum CalibrationType {
 
         Primary, Secondary, Testing
@@ -69,8 +72,8 @@ public class CalibrationInfo {
             CalibrationType calibrationType) {
         this.startEyeFrame = startEyeFrame;
         this.stopEyeFrame = stopEyeFrame;
-        this.startScreenFrame = startScreenFrame;
-        this.stopScreenFrame = stopScreenFrame;
+        this.startSceneFrame = startScreenFrame;
+        this.stopSceneFrame = stopScreenFrame;
         this.selectedCalibrationPointPosition = selectedCalibrationPointPosition;
         this.isCalibrationPointPositionLocated = isCalibrationPointPositionLocated;
         this.calibrationType = calibrationType;
@@ -92,8 +95,8 @@ public class CalibrationInfo {
                 show += "Primary calibration<br>";
         }
 
-        show += "From:" + startEyeFrame + ":" + startScreenFrame + "(eye:screen)<br>" +
-                "To:" + stopEyeFrame + ":" + stopScreenFrame + "(eye:screen)<br>" +
+        show += "From:" + startEyeFrame + ":" + startSceneFrame + "(eye:screen)<br>" +
+                "To:" + stopEyeFrame + ":" + stopSceneFrame + "(eye:screen)<br>" +
                 "First point: (" + selectedCalibrationPointPosition.getX() + "," +
                 selectedCalibrationPointPosition.getY() + ")";
         if (isCalibrationPointPositionLocated) {
@@ -109,8 +112,8 @@ public class CalibrationInfo {
         CalibrationInfo o = (CalibrationInfo) obj;
         return (o.startEyeFrame == startEyeFrame &&
                 o.stopEyeFrame == stopEyeFrame &&
-                o.startScreenFrame == startScreenFrame &&
-                o.stopScreenFrame == stopScreenFrame);
+                o.startSceneFrame == startSceneFrame &&
+                o.stopSceneFrame == stopSceneFrame);
     }
 
     @Override
@@ -118,8 +121,8 @@ public class CalibrationInfo {
         int hash = 3;
         hash = 53 * hash + this.startEyeFrame;
         hash = 53 * hash + this.stopEyeFrame;
-        hash = 53 * hash + this.startScreenFrame;
-        hash = 53 * hash + this.stopScreenFrame;
+        hash = 53 * hash + this.startSceneFrame;
+        hash = 53 * hash + this.stopSceneFrame;
         return hash;
     }
 
@@ -129,36 +132,43 @@ public class CalibrationInfo {
      * than the end frame.  The method only works if you use it after
      * calling setStartFrame.
      */
-    public void setEndFrame(int currentFrame, int eyeOffset, int screenOffset) {
+    public void setEndFrame(int currentFrame, int eyeFrame, int sceneFrame) {
         int endRef = 0;
         int startRef = 0;
 
-        if (currentFrame >= referenceFrame) {
-            startRef = referenceFrame;
+        if (currentFrame >= this.referenceFrame) {
+            /** Normal start and end case */
+            startRef = this.referenceFrame;
             endRef = currentFrame;
+            this.startEyeFrame = this.referenceEyeFrame;
+            this.stopEyeFrame = eyeFrame;
+            this.startSceneFrame = this.referenceSceneFrame;
+            this.stopSceneFrame = sceneFrame;
         } else {
             startRef = currentFrame;
-            endRef = referenceFrame;
+            endRef = this.referenceFrame;
+            this.startEyeFrame = eyeFrame;
+            this.stopEyeFrame = this.referenceEyeFrame;
+            this.startSceneFrame = sceneFrame;
+            this.stopSceneFrame = this.referenceSceneFrame;
         }
-
-        stopEyeFrame = endRef + eyeOffset;
-        stopScreenFrame = endRef + screenOffset;
-        startEyeFrame = startRef + eyeOffset;
-        startScreenFrame = startRef + screenOffset;
-        if (intervalMarker != null) {
-            intervalMarker.setEndValue(endRef);
-            intervalMarker.setStartValue(startRef);
+        
+        if (this.intervalMarker != null) {
+            this.intervalMarker.setEndValue(endRef);
+            this.intervalMarker.setStartValue(startRef);
         }
     }
 
-    public void setStartFrame(int currentFrame, int eyeOffset, int screenOffset) {
-        startEyeFrame = currentFrame + eyeOffset;
-        startScreenFrame = currentFrame + screenOffset;
-        if (intervalMarker != null) {
-            intervalMarker.setStartValue(currentFrame);
+    public void setStartFrame(int currentFrame, int eyeFrame, int sceneFrame) {
+        this.startEyeFrame = eyeFrame;
+        this.startSceneFrame = sceneFrame;
+        if (this.intervalMarker != null) {
+            this.intervalMarker.setStartValue(currentFrame);
         }
 
-        referenceFrame = currentFrame;
+        this.referenceFrame = currentFrame;
+        this.referenceEyeFrame = eyeFrame;
+        this.referenceSceneFrame = sceneFrame;
     }
 
     public IntervalMarker getIntervalMarker() {

@@ -104,7 +104,7 @@ public class CalibrationPointPositionFinderRunner extends Thread {
                     // Load full screen view image for zoom panel
                     // Get first frame
                     String fileName = screenFrameManager.getFrameFileName(
-                            info.startScreenFrame);
+                            info.startSceneFrame);
 
                     screen = ImageTools.loadImage(
                             new File(this.fullScreenFrameDirectory, fileName));
@@ -116,11 +116,11 @@ public class CalibrationPointPositionFinderRunner extends Thread {
 
                         // Create array of all frame location to be procesed
                         File[] screenFileArray =
-                                new File[info.stopScreenFrame - info.startScreenFrame + 1];
+                                new File[info.stopSceneFrame - info.startSceneFrame + 1];
 
                         for (int j = 0; j < screenFileArray.length; j++) {
                             fileName = screenFrameManager.getFrameFileName(
-                                    info.startScreenFrame + j);
+                                    info.startSceneFrame + j);
 
                             screenFileArray[j] = new File(
                                     fullScreenFrameDirectory, fileName);
@@ -190,7 +190,7 @@ public class CalibrationPointPositionFinderRunner extends Thread {
                 for (int j = 0; j < this.calibrationPointFound.length; j++) {
                     ScreenViewFrameInfo screenInfo =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(
-                            info.startScreenFrame + j);
+                            info.startSceneFrame + j);
                     if (screenInfo == null) {
                         screenInfo = new ScreenViewFrameInfo();
                     }
@@ -206,7 +206,7 @@ public class CalibrationPointPositionFinderRunner extends Thread {
 
                     // Put back to database
                     screenFrameManager.setFrameInfo(
-                            info.startScreenFrame + j, screenInfo);
+                            info.startSceneFrame + j, screenInfo);
                 }
 
                 // Set completion

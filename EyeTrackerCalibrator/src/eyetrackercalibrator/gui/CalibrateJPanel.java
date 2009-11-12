@@ -252,7 +252,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 // For testing lets just propagate the first frames coor to all
                 final FrameManager screenFrameManager = timer.getScreenFrameManager();
 
-                int startScreenFrame = this.currentCalibrationInfo.startScreenFrame;
+                int startScreenFrame = this.currentCalibrationInfo.startSceneFrame;
 
                 // Create array of screen view Files 
                 ScreenViewFrameInfo screenInfo =
@@ -365,7 +365,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             // Create element
             CalibrationInfo info = (CalibrationInfo) en.nextElement();
 
-            int amount = info.stopScreenFrame - info.startScreenFrame + 1;
+            int amount = info.stopSceneFrame - info.startSceneFrame + 1;
 
             switch (info.calibrationType) {
                 case Testing:
@@ -467,7 +467,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Load full screen view image for zoom panel
         String fileName = timer.getScreenFrameManager().getFrameFileName(
-                this.currentCalibrationInfo.startScreenFrame);
+                this.currentCalibrationInfo.startSceneFrame);
 
         if (fileName != null) {
             File fullScreenImageFile = new File(this.fullScreenFrameDirectory, fileName);
@@ -478,7 +478,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             } else {
                 // Default to normal image
                 image = timer.getScreenFrameManager().getFrame(
-                        this.currentCalibrationInfo.startScreenFrame);
+                        this.currentCalibrationInfo.startSceneFrame);
             }
 
             zoomPanel.setImage(image);
@@ -493,7 +493,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         } else {
             JOptionPane.showMessageDialog(this,
                     "Screen image file for frame " +
-                    this.currentCalibrationInfo.startScreenFrame +
+                    this.currentCalibrationInfo.startSceneFrame +
                     " is missing", "Cannot mark calibration",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -725,8 +725,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         en.hasMoreElements();) {
                     // Create element
                     CalibrationInfo info = (CalibrationInfo) en.nextElement();
-                    if (screenFrameNumber >= info.startScreenFrame &&
-                            screenFrameNumber <= info.stopScreenFrame) {
+                    if (screenFrameNumber >= info.startSceneFrame &&
+                            screenFrameNumber <= info.stopSceneFrame) {
                         point = new Point(x, y);
                     }
                 }
@@ -787,9 +787,9 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     range.setAttribute("stopeyeframe",
                             String.valueOf(info.stopEyeFrame));
                     range.setAttribute("startscreenframe",
-                            String.valueOf(info.startScreenFrame));
+                            String.valueOf(info.startSceneFrame));
                     range.setAttribute("stopscreenframe",
-                            String.valueOf(info.stopScreenFrame));
+                            String.valueOf(info.stopSceneFrame));
                     range.setAttribute("iscalibrationpointpositionlocated",
                             String.valueOf(info.isCalibrationPointPositionLocated));
                     range.setAttribute("pointtype",
@@ -798,8 +798,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                             String.valueOf(info.selectedCalibrationPointPosition.getX()));
                     range.setAttribute("selectedy",
                             String.valueOf(info.selectedCalibrationPointPosition.getY()));
-                    for (int i = info.startScreenFrame; i <=
-                            info.stopScreenFrame; i++) {
+                    for (int i = info.startSceneFrame; i <=
+                            info.stopSceneFrame; i++) {
                         ScreenViewFrameInfo screenInfo =
                                 (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
                         if (screenInfo != null) {
@@ -892,9 +892,9 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 // Add calibration points
                 CalibrationInfo info = (CalibrationInfo) en.nextElement();
 
-                int screenFrame = info.startScreenFrame;
+                int screenFrame = info.startSceneFrame;
                 int eyeFrame = info.startEyeFrame;
-                while (screenFrame <= info.stopScreenFrame) {
+                while (screenFrame <= info.stopSceneFrame) {
                     // Get screen info
                     ScreenViewFrameInfo screenFrameInfo =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(screenFrame);
@@ -993,7 +993,12 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Set panel size
         //int size = (int) (512 / displayJPanel.getGazeScaleFactor());
-        panel.setDisplayArea((int) this.fullScreenDim.getWidth(), (int) this.fullScreenDim.getWidth());
+        if (this.fullScreenDim != null) {
+            panel.setDisplayArea((int) this.fullScreenDim.getWidth(), (int) this.fullScreenDim.getWidth());
+        } else {
+            /** Default display size */
+            panel.setDisplayArea(250, 250);
+        }
 
         t.start();
 
@@ -1360,7 +1365,7 @@ private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         info = (CalibrationInfo) selected[i];
         calibrationSet[this.calibrationIndex].removeElement(selected[i]);
         // Remove marked point from each frame as well
-        for (int j = info.startScreenFrame; j <= info.stopScreenFrame; j++) {
+        for (int j = info.startSceneFrame; j <= info.stopSceneFrame; j++) {
 
             ScreenViewFrameInfo frameInfo =
                     (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(j);
