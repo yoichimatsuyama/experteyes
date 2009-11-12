@@ -30,6 +30,7 @@
  */
 package eyetrackercalibrator.trialmanaging;
 
+import eyetrackercalibrator.gui.util.FrameMarker;
 import org.jdom.Element;
 import org.jfree.chart.plot.IntervalMarker;
 
@@ -37,19 +38,14 @@ import org.jfree.chart.plot.IntervalMarker;
  *
  * @author eeglab
  */
-public class TrialMarker implements Comparable{
+public class TrialMarker extends FrameMarker implements Comparable {
 
     /** Trial information */
-    public int startEyeFrame = 0;
-    public int stopEyeFrame = 0;
-    public int startSceneFrame = 0;
-    public int stopSceneFrame = 0;
     public String label;
     public boolean isBadTrial = false;
 
     /** Object management information */
     private int referenceFrame;
-    private IntervalMarker intervalMarker = null;
 
     /** For storing and loading information to the XML format */
     public final static String ELEMENT_NAME = "Trial";
@@ -104,33 +100,6 @@ public class TrialMarker implements Comparable{
         }
     }
 
-    public void setEndFrame(int currentFrame, int eyeFrame, int screenFrame) {
-        int endRef = 0;
-        int startRef = 0;
-
-        if (currentFrame >= referenceFrame) {
-            startRef = referenceFrame;
-            endRef = currentFrame;
-        } else {
-            startRef = currentFrame;
-            endRef = referenceFrame;
-        }
-
-        stopEyeFrame = eyeFrame;
-        stopSceneFrame = screenFrame;
-        if (intervalMarker != null) {
-            intervalMarker.setEndValue(endRef);
-        }
-    }
-
-    public void setStartFrame(int currentFrame, int eyeFrame, int screenFrame) {
-        startEyeFrame = eyeFrame;
-        startSceneFrame = screenFrame;
-        if (intervalMarker != null) {
-            intervalMarker.setStartValue(currentFrame);
-        }
-        referenceFrame = currentFrame;
-    }
 
     @Override
     public String toString() {
@@ -167,18 +136,6 @@ public class TrialMarker implements Comparable{
         root.setAttribute(BAD_TRIAL_ATTRIBUTE, String.valueOf(isBadTrial));
 
         return root;
-    }
-
-    public IntervalMarker getIntervalMarker() {
-        return intervalMarker;
-    }
-
-    /** 
-     * Only set intervalmarker.  It will not change start and end value
-     * of the marker
-     */
-    public void setIntervalMarker(IntervalMarker intervalMarker) {
-        this.intervalMarker = intervalMarker;
     }
 
     public int compareTo(Object o) {
