@@ -53,6 +53,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
     private double sceneWidthCM;
     private int synchronizedEyeFrame = 1;
     private int synchronizedSceneFrame = 1;
+    private String cornerHintsDirectory;
 
     /** Creates new form ProjectSelectPanel */
     public ProjectSelectPanel() {
@@ -486,6 +487,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         dialog.setSceneHeight(this.sceneHeightCM);
         dialog.setSceneWidth(this.sceneWidthCM);
         dialog.setLocationByPlatform(true);
+        dialog.setCornerHintsDirectory(this.cornerHintsDirectory);
 
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
@@ -494,6 +496,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
                 distanceFromMeasuredScene = dialog.getDistanceFromMonitor();
                 sceneHeightCM = dialog.getSceneHeight();
                 sceneWidthCM = dialog.getSceneWidth();
+                cornerHintsDirectory = dialog.getCornerHintsDirectory();
             }
         });
 
@@ -629,6 +632,10 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         return eyeInfoDirectoryTextField.getText();
     }
 
+    public String getCornerHintsDirectory() {
+        return cornerHintsDirectory;
+    }
+
     public void setEyeFrameDirectory(String dir) {
         eyeDirectoryTextField.setText(dir);
     }
@@ -647,6 +654,10 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
 
     public void setEyeInfoDirectory(String dir) {
         eyeInfoDirectoryTextField.setText(dir);
+    }
+
+    public void setCornerHintsDirectory(String cornerHintsDirectory) {
+        this.cornerHintsDirectory = cornerHintsDirectory;
     }
 
     public FrameLoadingListener getScreenFrameLoadingListener() {
