@@ -43,8 +43,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  * For giving where to search for monitor's corners in scenes.  The class provides
@@ -69,6 +72,28 @@ public class CornerSelector extends javax.swing.JFrame {
         /** The user canceled the operation */
         CANCEL
     }
+
+    class FrameRateInputVerifier extends InputVerifier{
+
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String s = textField.getText();
+            try {
+                int v = Integer.parseInt(s.trim());
+                if (v < 1) {
+                    return false;
+                }
+            } catch (NumberFormatException numberFormatException) {
+                return false;
+            }
+
+            return true;
+        }
+        
+    }
+
+
     private TerminationCause terminationCause = TerminationCause.CANCEL;
     public static final int NOT_CODED = -666;    // enumeration of directions for handleEvent
     /** Top Left Index */
@@ -373,9 +398,13 @@ public class CornerSelector extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         cornerGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        frameRateTextField = new javax.swing.JTextField();
         frameScrollingJPanel = new cornerselector.FrameScrollingJPanel();
         jPanel2 = new javax.swing.JPanel();
         topleftRadioButton = new javax.swing.JRadioButton();
@@ -398,6 +427,26 @@ public class CornerSelector extends javax.swing.JFrame {
                 formWindowClosed(evt);
             }
         });
+
+        jPanel4.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Frame Rate");
+        jPanel4.add(jLabel1, new java.awt.GridBagConstraints());
+
+        frameRateTextField.setText("1");
+        frameRateTextField.setInputVerifier(new FrameRateInputVerifier());
+        frameRateTextField.setMinimumSize(new java.awt.Dimension(60, 28));
+        frameRateTextField.setPreferredSize(new java.awt.Dimension(60, 28));
+        frameRateTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                frameRateTextFieldActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanel4.add(frameRateTextField, gridBagConstraints);
 
         frameScrollingJPanel.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -462,10 +511,12 @@ public class CornerSelector extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
+            .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 838, Short.MAX_VALUE)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 90, Short.MAX_VALUE)
+                .add(40, 40, 40)
+                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 102, Short.MAX_VALUE)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -475,23 +526,26 @@ public class CornerSelector extends javax.swing.JFrame {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 46, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 46, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
 
         cornerSelectLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         cornerSelectLabel.setText("N/A");
         cornerSelectLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        cornerSelectLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                cornerSelectLabelMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                cornerSelectLabelMouseExited(evt);
-            }
-        });
         cornerSelectLabel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 cornerSelectLabelMouseMoved(evt);
+            }
+        });
+        cornerSelectLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cornerSelectLabelMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cornerSelectLabelMouseEntered(evt);
             }
         });
         jScrollPane1.setViewportView(cornerSelectLabel);
@@ -501,7 +555,7 @@ public class CornerSelector extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 838, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -589,6 +643,10 @@ private void cancleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     dispose();
 }//GEN-LAST:event_cancleButtonActionPerformed
 
+private void frameRateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_frameRateTextFieldActionPerformed
+    this.frameScrollingJPanel.setFrameRate(Integer.parseInt(this.frameRateTextField.getText().trim()));
+}//GEN-LAST:event_frameRateTextFieldActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -623,10 +681,13 @@ private void cancleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.ButtonGroup cornerGroup;
     private cornerselector.CornerSelectLabel cornerSelectLabel;
     private javax.swing.JButton doneButton;
+    private javax.swing.JTextField frameRateTextField;
     private cornerselector.FrameScrollingJPanel frameScrollingJPanel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToggleButton reviewToggleButton;
     private javax.swing.JButton saveButton;
