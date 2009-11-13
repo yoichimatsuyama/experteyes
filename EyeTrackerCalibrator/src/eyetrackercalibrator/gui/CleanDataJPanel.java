@@ -186,6 +186,35 @@ public class CleanDataJPanel extends javax.swing.JPanel {
 
         // Disable button to prevent double clicking
         this.detectCornerButton.setEnabled(false);
+
+        // Ask for framerate
+        int skipRate = 1;
+        String skipRateStr = JOptionPane.showInputDialog("Please specify skip frame rate for providing corner hints.", 1);
+        if (skipRateStr == null) {
+            // User cancels so quit
+            this.detectCornerButton.setEnabled(true);
+            return;
+        } else {            
+            // Check if the rate is more than 1
+            try {
+                skipRate = Integer.parseInt(skipRateStr.trim());
+                if (skipRate < 1) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please specify a positive integer for a skip rate.",
+                            "Unsupport Skip Rate", JOptionPane.ERROR_MESSAGE);
+                    this.detectCornerButton.setEnabled(true);
+
+                    return;
+                }
+            } catch (NumberFormatException numberFormatException) {
+                JOptionPane.showMessageDialog(this,
+                        "Please specify a positive integer for a skip rate.",
+                        "Unsupport Skip Rate", JOptionPane.ERROR_MESSAGE);
+                this.detectCornerButton.setEnabled(true);
+                return;
+            }
+        }
+
         DetectCornerRunner detectCornerRunner = new DetectCornerRunner(
                 this.timer.getScreenFrameManager(), ranges,
                 this.fullScreenFrameDirectory,
@@ -198,6 +227,8 @@ public class CleanDataJPanel extends javax.swing.JPanel {
                         detectCornerButton.setEnabled(true);
                     }
                 });
+        // Set skip rate
+        detectCornerRunner.setFrameRate(skipRate);
 
         detectCornerRunner.start();
     }
