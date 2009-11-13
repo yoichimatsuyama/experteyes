@@ -93,7 +93,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         this.totalProcess = totalExport + 1;
 
         this.progressBar.setStringPainted(true);
-        File defaultPath = new File(currentDir, "MovieFrames");
+        File defaultPath = new File(currentDir.getParentFile(), "MovieFrames");
         this.exportLocationTextField.setText(defaultPath.getAbsolutePath());
         repaint();
 
