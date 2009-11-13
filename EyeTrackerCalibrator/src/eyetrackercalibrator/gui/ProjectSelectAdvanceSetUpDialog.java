@@ -10,6 +10,8 @@
  */
 package eyetrackercalibrator.gui;
 
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
@@ -23,6 +25,14 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     double distanceFromScene = 0;
     double sceneHeightCM = 0;
     double sceneWidthCM = 0;
+
+    public void setCornerHintsDirectory(String dir){
+        this.cornerHintDirTextField.setText(dir);
+    }
+
+    public String getCornerHintsDirectory(){
+        return this.cornerHintDirTextField.getText();
+    }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
     public double getDistanceFromMonitor() {
@@ -103,6 +113,9 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
         jLabel10 = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        cornerHintDirTextField = new javax.swing.JTextField();
+        cornerHintLocationBrowseButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -183,6 +196,15 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
             }
         });
 
+        jLabel2.setText("Corner Hints Location:");
+
+        cornerHintLocationBrowseButton.setText("Browse");
+        cornerHintLocationBrowseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cornerHintLocationBrowseButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -190,14 +212,26 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(saveButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(cancelButton))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(cornerHintDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE))
+                    .add(saveButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(cancelButton)
+                    .add(cornerHintLocationBrowseButton)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(cornerHintDirTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(cornerHintLocationBrowseButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(cancelButton)
@@ -218,16 +252,36 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    private void cornerHintLocationBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cornerHintLocationBrowseButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cornerHintLocationBrowseButtonActionPerformed
 
+    private void browseDirectory(JTextField targetField) {
+        // Set text box with directory that user chose.
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (targetField.getText().length() > 1) {
+            // Get current selection from text field
+            fileChooser.setSelectedFile(new File(targetField.getText()));
+        }
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            // Save current position
+            targetField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JTextField cornerHintDirTextField;
+    private javax.swing.JButton cornerHintLocationBrowseButton;
     private javax.swing.JTextField distanceFromSceneTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton saveButton;
