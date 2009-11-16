@@ -44,15 +44,13 @@ import javax.swing.JTextField;
 /**
  * @author  SQ
  */
-public class ProjectSelectPanel extends javax.swing.JPanel {
+public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJPanel.DefaultValueAppliedListener{
 
     // Storing the last directory selected by browse action
     File lastSelectedLocation = new File(".");
     private double distanceFromMeasuredScene;
     private double sceneHeightCM;
     private double sceneWidthCM;
-    private int synchronizedEyeFrame = 1;
-    private int synchronizedSceneFrame = 1;
     private String cornerHintsDirectory;
 
     /** Creates new form ProjectSelectPanel */
@@ -774,5 +772,17 @@ public class ProjectSelectPanel extends javax.swing.JPanel {
         } catch (NumberFormatException numberFormatException) {
             this.sceneHeightCM = 0;
         }
+    }
+
+    public void useDefaultCornerHintDir(String dir) {
+        setCornerHintsDirectory(dir);
+    }
+
+    public void useDefaultScreenInfoDir(String dir) {
+        setScreenInfoDirectory(dir);
+    }
+
+    public void useDefaultFullScreenFrameDir(String dir) {
+        setFullScreenFrameDirectory(dir);
     }
 }

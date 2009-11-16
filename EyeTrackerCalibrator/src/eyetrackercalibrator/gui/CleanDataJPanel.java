@@ -84,8 +84,9 @@ public class CleanDataJPanel extends javax.swing.JPanel {
     DefaultListModel errorSet = new DefaultListModel();
     IntervalMarkerManager intervalMarkerManager = null;
     String fullScreenFrameDirectory = ".";
-    private File cornerHintDir;
+    private String cornerHintDir;
     private String screenInfoDir;
+    private DefaultValueAppliedListener defaultValueAppliedListener = null;
 
     /** Creates new form ScreenEstimationJPanel */
     public CleanDataJPanel() {
@@ -137,7 +138,7 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         this.fullScreenFrameDirectory = fullScreenFrameDirectory;
     }
 
-    public void setCornerHintDir(File cornerHintDir) {
+    public void setCornerHintDir(String cornerHintDir) {
         this.cornerHintDir = cornerHintDir;
     }
 
@@ -145,7 +146,21 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         this.screenInfoDir = screenInfoDir;
     }
 
+    public interface DefaultValueAppliedListener {
+
+        void useDefaultCornerHintDir(String dir);
+
+        void useDefaultScreenInfoDir(String dir);
+
+        void useDefaultFullScreenFrameDir(String dir);
+    }
+
+    public void setDefaultValueAppliedListener(DefaultValueAppliedListener listener) {
+        this.defaultValueAppliedListener = listener;
+    }
+
     protected void handleDetectCornerButton() throws HeadlessException {
+
         Object[] errors = errorList.getSelectedValues();
         if (errors.length < 1) {
             // Shows warning if nothing is selected
@@ -159,66 +174,93 @@ public class CleanDataJPanel extends javax.swing.JPanel {
             ranges[i] = (ErrorMarking) errors[i];
         }
 
+        String message = "";
+        boolean needAttention = false;
+
         // Sanity check the output dir
-        if (this.screenInfoDir == null || this.screenInfoDir.length() < 1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please specify screen info directory in project set up.",
-                    "No Screen Info Directory", JOptionPane.ERROR_MESSAGE);
-            return;
+        String preApprovedscreenInfoDir = this.screenInfoDir;
+        if (preApprovedscreenInfoDir == null || preApprovedscreenInfoDir.length() < 1) {
+            needAttention = true;
+
+            // Create default screen info dir
+            File dir = new File(this.timer.getScreenFrameManager().getFrameDirectory());
+            dir = new File(dir.getParent(), "Corners");
+
+            preApprovedscreenInfoDir = dir.getAbsolutePath();
+
+            message = "Scene (corner) information will be stored in \n   " +
+                    preApprovedscreenInfoDir + "\n\n";
+
         }
-        File screenInfoDirFile = new File(this.screenInfoDir);
+
+        String preApprovedCornerHintDir = this.cornerHintDir;
+        if (preApprovedCornerHintDir == null || preApprovedCornerHintDir.length() < 1) {
+            needAttention = true;
+
+            // Create default corner hints info dir
+            File dir = new File(preApprovedscreenInfoDir);
+            dir = new File(dir.getParent(), "CornerHints");
+
+            preApprovedCornerHintDir = dir.getAbsolutePath();
+
+            message += "Corner hints will be stored in \n   " +
+                    preApprovedCornerHintDir + "\n\n";
+
+        }
 
         // Sanity check the large scene dir
-        if (this.fullScreenFrameDirectory == null ||
-                this.fullScreenFrameDirectory.length() < 1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please specify screen full view directory in project set up.",
-                    "No Screen Full View Directory", JOptionPane.ERROR_MESSAGE);
-            return;
+        String preApprovedFullScreenFrameDirectory = this.fullScreenFrameDirectory;
+        if (preApprovedFullScreenFrameDirectory == null ||
+                preApprovedFullScreenFrameDirectory.length() < 1) {
+            needAttention = true;
+
+            // Create default full scene dir
+            preApprovedFullScreenFrameDirectory = this.timer.getScreenFrameManager().getFrameDirectory();
+
+            message += "Scene full size location is not specify, the scene view location will be used instead.\n\n";
         }
-        File fullViewFile = new File(this.fullScreenFrameDirectory);
+        File fullViewFile = new File(preApprovedFullScreenFrameDirectory);
         if (!fullViewFile.exists()) {
-            JOptionPane.showMessageDialog(this,
-                    "Please specify correct screen full view directory in project set up.",
-                    "Screen Full View Directory Does Not Exists", JOptionPane.ERROR_MESSAGE);
-            return;
+            needAttention = true;
+
+            // Create default full scene dir
+            preApprovedFullScreenFrameDirectory = this.timer.getScreenFrameManager().getFrameDirectory();
+
+            message += "Scene full size location does not exists, the scene view location will be used instead.\n\n";
         }
+
+        if (needAttention) {
+            message += "If you wish to use other values, please return to project panel and change the values accordingly.";
+
+            /**  Show approve message */
+            int reply = JOptionPane.showConfirmDialog(this, message,
+                    "Default Values Applied", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE);
+            if (reply != JOptionPane.OK_OPTION) {
+                return;
+            } else {
+                /** Set values */
+                this.cornerHintDir = preApprovedCornerHintDir;
+                this.screenInfoDir = preApprovedscreenInfoDir;
+                this.fullScreenFrameDirectory = preApprovedFullScreenFrameDirectory;
+
+                if (this.defaultValueAppliedListener != null) {
+                    this.defaultValueAppliedListener.useDefaultCornerHintDir(preApprovedCornerHintDir);
+                    this.defaultValueAppliedListener.useDefaultFullScreenFrameDir(preApprovedFullScreenFrameDirectory);
+                    this.defaultValueAppliedListener.useDefaultScreenInfoDir(preApprovedscreenInfoDir);
+                }
+            }
+        }
+
+        File screenInfoDirFile = new File(this.screenInfoDir);
 
         // Disable button to prevent double clicking
         this.detectCornerButton.setEnabled(false);
 
-        // Ask for framerate
-        int skipRate = 1;
-        String skipRateStr = JOptionPane.showInputDialog("Please specify skip frame rate for providing corner hints.", 1);
-        if (skipRateStr == null) {
-            // User cancels so quit
-            this.detectCornerButton.setEnabled(true);
-            return;
-        } else {            
-            // Check if the rate is more than 1
-            try {
-                skipRate = Integer.parseInt(skipRateStr.trim());
-                if (skipRate < 1) {
-                    JOptionPane.showMessageDialog(this,
-                            "Please specify a positive integer for a skip rate.",
-                            "Unsupport Skip Rate", JOptionPane.ERROR_MESSAGE);
-                    this.detectCornerButton.setEnabled(true);
-
-                    return;
-                }
-            } catch (NumberFormatException numberFormatException) {
-                JOptionPane.showMessageDialog(this,
-                        "Please specify a positive integer for a skip rate.",
-                        "Unsupport Skip Rate", JOptionPane.ERROR_MESSAGE);
-                this.detectCornerButton.setEnabled(true);
-                return;
-            }
-        }
-
         DetectCornerRunner detectCornerRunner = new DetectCornerRunner(
                 this.timer.getScreenFrameManager(), ranges,
                 this.fullScreenFrameDirectory,
-                this.cornerHintDir,
+                new File(this.cornerHintDir),
                 screenInfoDirFile,
                 new CompletionListener() {
 
@@ -227,9 +269,6 @@ public class CleanDataJPanel extends javax.swing.JPanel {
                         detectCornerButton.setEnabled(true);
                     }
                 });
-        // Set skip rate
-        detectCornerRunner.setFrameRate(skipRate);
-
         detectCornerRunner.start();
     }
 
@@ -540,12 +579,6 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         // Any click to select and enable corner correction
         // Enable corner correction when some thing is slected
         int[] select = errorList.getSelectedIndices();
-//        if (select.length > 0) {
-//            correctCornerButton.setEnabled(true);
-//        } else {
-//            // Else turn off the corner correction
-//            correctCornerButton.setEnabled(false);
-//        }
 
         // Two click to move to the starting frame
         // Check if it is double click or not

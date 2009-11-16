@@ -74,6 +74,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -793,11 +794,12 @@ public class Main extends javax.swing.JFrame {
                         screenFrameManager.getScreenInfoScalefactor());
 
                 // need this to set the stat for frame playing (total frame and what not)
+                cleanDataJPanel.setDefaultValueAppliedListener(projectSelectPanel);
                 cleanDataJPanel.setEyeFrameManager(eyeFrameManager);
                 cleanDataJPanel.setScreenFrameManager(screenFrameManager);
                 cleanDataJPanel.setFullScreenFrameDirectory(
                         projectSelectPanel.getFullScreenFrameDirectory());
-                cleanDataJPanel.setCornerHintDir(new File(projectLocation, CORNERHINT_DIR));
+                cleanDataJPanel.setCornerHintDir(projectSelectPanel.getCornerHintsDirectory());
                 cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
                 cleanDataJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
