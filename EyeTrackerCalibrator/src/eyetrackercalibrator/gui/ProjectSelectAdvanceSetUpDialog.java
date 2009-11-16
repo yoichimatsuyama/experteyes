@@ -25,13 +25,15 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     double distanceFromScene = 0;
     double sceneHeightCM = 0;
     double sceneWidthCM = 0;
+    String cornerHintDir = "";
 
     public void setCornerHintsDirectory(String dir){
+        this.cornerHintDir = dir;
         this.cornerHintDirTextField.setText(dir);
     }
 
     public String getCornerHintsDirectory(){
-        return this.cornerHintDirTextField.getText();
+        return this.cornerHintDir;
     }
 
     /** @return 0 if anything is wrong. Positive double otherwise */
@@ -245,6 +247,7 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
         distanceFromScene = getTextFieldDoubleValue(distanceFromSceneTextField);
         sceneHeightCM = getTextFieldDoubleValue(sceneHeightCMTextField);
         sceneWidthCM = getTextFieldDoubleValue(sceneWidthCMTextField);
+        cornerHintDir = this.cornerHintDirTextField.getText();
         this.dispose();
 }//GEN-LAST:event_saveButtonActionPerformed
 
@@ -253,7 +256,7 @@ public class ProjectSelectAdvanceSetUpDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void cornerHintLocationBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cornerHintLocationBrowseButtonActionPerformed
-        // TODO add your handling code here:
+        browseDirectory(cornerHintDirTextField);
     }//GEN-LAST:event_cornerHintLocationBrowseButtonActionPerformed
 
     private void browseDirectory(JTextField targetField) {
