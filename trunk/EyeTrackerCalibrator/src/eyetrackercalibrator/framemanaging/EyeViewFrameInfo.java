@@ -34,6 +34,7 @@
  */
 package eyetrackercalibrator.framemanaging;
 
+import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,12 +49,12 @@ public class EyeViewFrameInfo implements FrameInfo {
 
     private static final long serialVersionUID = 4547267706325691722L;
     private String sourceFileName = null;
-    private double corniaX = 0;
-    private double corniaY = 0;
-    private double reflectX = 0;
-    private double reflectY = 0;
-    private double[] reflectFit = null;
-    private double[] corniaFit = null;
+    private double pupilX = 0;
+    private double pupilY = 0;
+    private double corneaReflectX = 0;
+    private double corniaReflectY = 0;
+    private double[] corniaReflectFit = null;
+    private double[] pupilFit = null;
     private double pupilAngle = 0;
 
     /** Creates a new instance of EyeViewFrameInfo */
@@ -67,8 +68,8 @@ public class EyeViewFrameInfo implements FrameInfo {
     /**
      * File format is
      * <filename> <pupil X position> <pupil Y position> <reflect X position> <reflect Y position>
-     * <pupil fit top left x> <pupil fit top left y> <pupil fit bottom right x> <pupil fit bottom right y> [optional: <cornia reflect fit top left x> <cornia reflect fit top left y> <cornia reflect fit bottom right x> <cornia reflect fit bottom right y>
-     * <fit error> <pupil fit angle> <cornia reflect fit angle>
+     * <pupil fit top left x> <pupil fit top left y> <pupil fit bottom right x> <pupil fit bottom right y> [optional: <cornea reflect fit top left x> <cornea reflect fit top left y> <cornea reflect fit bottom right x> <cornea reflect fit bottom right y>
+     * <fit error> <pupil fit angle> <cornea reflect fit angle>
      */
     public FrameInfo getInstance(File inputFile, File frameFile, FrameInfo oldInstance) {
         EyeViewFrameInfo info = null;
@@ -101,15 +102,15 @@ public class EyeViewFrameInfo implements FrameInfo {
 
             // Parse pupil
             if (coorString.length > 2) {
-                info.corniaX = Double.parseDouble(coorString[1]);
-                info.corniaY = Double.parseDouble(coorString[2]);
+                info.pupilX = Double.parseDouble(coorString[1]);
+                info.pupilY = Double.parseDouble(coorString[2]);
             }
 
             // Parse reflection
             coorString = line.split("\\p{Space}+");
             if (coorString.length > 4) {
-                info.reflectX = Double.parseDouble(coorString[3]);
-                info.reflectY = Double.parseDouble(coorString[4]);
+                info.corneaReflectX = Double.parseDouble(coorString[3]);
+                info.corniaReflectY = Double.parseDouble(coorString[4]);
             }
 
             // Read in cornia and reflect fit
@@ -126,22 +127,22 @@ public class EyeViewFrameInfo implements FrameInfo {
 
                 // check for cornia set
                 if (coorString.length >= 4) {
-                    info.setCorniaFit(new double[4]);
-                    info.corniaFit[0] = Double.parseDouble(coorString[0]);
-                    info.corniaFit[1] = Double.parseDouble(coorString[1]);
-                    info.corniaFit[2] = Double.parseDouble(coorString[2]) - info.corniaFit[0];
-                    info.corniaFit[3] = Double.parseDouble(coorString[3]) - info.corniaFit[1];
+                    info.setPupilFit(new double[4]);
+                    info.pupilFit[0] = Double.parseDouble(coorString[0]);
+                    info.pupilFit[1] = Double.parseDouble(coorString[1]);
+                    info.pupilFit[2] = Double.parseDouble(coorString[2]) - info.pupilFit[0];
+                    info.pupilFit[3] = Double.parseDouble(coorString[3]) - info.pupilFit[1];
                 }
                 // check for reflect set
                 if (coorString.length >= 7) {
-                    info.setReflectFit(new double[4]);
-                    info.reflectFit[0] = Double.parseDouble(coorString[4]);
-                    info.reflectFit[1] = Double.parseDouble(coorString[5]);
-                    info.reflectFit[2] = Double.parseDouble(coorString[6]) - info.reflectFit[0];
+                    info.setCorneaReflectFit(new double[4]);
+                    info.corniaReflectFit[0] = Double.parseDouble(coorString[4]);
+                    info.corniaReflectFit[1] = Double.parseDouble(coorString[5]);
+                    info.corniaReflectFit[2] = Double.parseDouble(coorString[6]) - info.corniaReflectFit[0];
                     if (coorString.length >= 8) {
-                        info.reflectFit[3] = Double.parseDouble(coorString[7]) - info.reflectFit[1];
+                        info.corniaReflectFit[3] = Double.parseDouble(coorString[7]) - info.corniaReflectFit[1];
                     } else {
-                        info.reflectFit[3] = info.reflectFit[2];
+                        info.corniaReflectFit[3] = info.corniaReflectFit[2];
                     }
                 }
             }
@@ -165,35 +166,35 @@ public class EyeViewFrameInfo implements FrameInfo {
     }
 
     public double getPupilX() {
-        return corniaX;
+        return pupilX;
     }
 
-    public void setCorniaX(double corniaX) {
-        this.corniaX = corniaX;
+    public void setPupilX(double corniaX) {
+        this.pupilX = corniaX;
     }
 
     public double getPupilY() {
-        return corniaY;
+        return pupilY;
     }
 
-    public void setCorniaY(double corniaY) {
-        this.corniaY = corniaY;
+    public void setPupilY(double corniaY) {
+        this.pupilY = corniaY;
     }
 
-    public double getReflectX() {
-        return reflectX;
+    public double getCorneaReflectX() {
+        return corneaReflectX;
     }
 
-    public void setReflectX(double reflectX) {
-        this.reflectX = reflectX;
+    public void setCorneaReflectX(double reflectX) {
+        this.corneaReflectX = reflectX;
     }
 
-    public double getReflectY() {
-        return reflectY;
+    public double getCorneaReflectY() {
+        return corniaReflectY;
     }
 
-    public void setReflectY(double reflectY) {
-        this.reflectY = reflectY;
+    public void setCorneaReflectY(double reflectY) {
+        this.corniaReflectY = reflectY;
     }
 
     public String getSourceFileName() {
@@ -216,32 +217,32 @@ public class EyeViewFrameInfo implements FrameInfo {
      * Set bounding box of eye reflection fit (coordinate is top left screen = 0,0)
      * {top left x, top left y, bottom right x, bottom right y}
      */
-    public double[] getReflectFit() {
-        return reflectFit;
+    public double[] getCorneaReflectFit() {
+        return corniaReflectFit;
     }
 
     /**
      * Set bounding box of eye reflection fit (coordinate is top left screen = 0,0)
      * {top left x, top left y, bottom right x, bottom right y}
      */
-    public void setReflectFit(double[] reflectFit) {
-        this.reflectFit = reflectFit;
+    public void setCorneaReflectFit(double[] reflectFit) {
+        this.corniaReflectFit = reflectFit;
     }
 
     /**
      * get bounding box of eye cornia fit (coordinate is top left screen = 0,0)
      * {top left x, top left y, bottom right x, bottom right y}
      */
-    public double[] getCorniaFit() {
-        return corniaFit;
+    public double[] getPupilFit() {
+        return pupilFit;
     }
 
     /**
      * Set bounding box of eye cornia fit (coordinate is top left screen = 0,0)
      * {top left x, top left y, bottom right x, bottom right y}
      */
-    public void setCorniaFit(double[] corniaFit) {
-        this.corniaFit = corniaFit;
+    public void setPupilFit(double[] corniaFit) {
+        this.pupilFit = corniaFit;
     }
 
     public double getPupilAngle() {
@@ -251,4 +252,5 @@ public class EyeViewFrameInfo implements FrameInfo {
     public void setPupilAngle(double pupilAngle) {
         this.pupilAngle = pupilAngle;
     }
+
 }

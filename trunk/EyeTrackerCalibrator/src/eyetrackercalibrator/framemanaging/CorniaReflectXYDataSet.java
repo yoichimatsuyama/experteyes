@@ -69,10 +69,10 @@ public class CorniaReflectXYDataSet extends PupilXYDataset{
         if(info != null){
             switch(series){
                 case 0: // This is X value of pupil
-                    result = info.getReflectX();
+                    result = info.getCorneaReflectX();
                     break;
                 case 1: // This is Y value pf pupil
-                    result = info.getReflectY();
+                    result = info.getCorneaReflectY();
             }
         }
         return result;

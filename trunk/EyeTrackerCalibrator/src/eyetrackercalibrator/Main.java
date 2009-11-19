@@ -115,6 +115,7 @@ public class Main extends javax.swing.JFrame {
     private File projectLocation = null;
     static final public String EYE_OFFSET = "eyeoffset";
     static final public String SCREEN_OFFSET = "screenoffset";
+    static final public String USING_CORNEA_REFLECTION = "usigCorneaReflection";
     static final public String EYE_VIEW_DIRECTORY = "eyedirectory";
     static final public String EYE_INFO_DIRECTORY = "eyeinfodirectory";
     static final public String SCREEN_VIEW_DIRECTORY = "screendirectory";
@@ -286,9 +287,7 @@ public class Main extends javax.swing.JFrame {
                                 frameSynchronizor.getEyeFrame(i));
 
                         if (eyeInfo != null) {
-                            Point2D.Double gazeVec = Computation.computeEyeVector(
-                                    eyeInfo.getPupilX(), eyeInfo.getPupilY(),
-                                    eyeInfo.getReflectX(), eyeInfo.getReflectY());
+                            Point2D.Double gazeVec = this.eyeGazeComputing.getEyeVector(eyeInfo);
                             // Computer eye gaze point
                             Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
                                     i, gazeVec.x, gazeVec.y);
@@ -986,13 +985,14 @@ public class Main extends javax.swing.JFrame {
         // Set project location
         this.projectLocation = projectLocation;
 
+
         // Load project properties if exists
         Properties p = new Properties();
         try {
             p.loadFromXML(new FileInputStream(new File(projectLocation, PROJECT_PROPERTY_FILE_NAME)));
         } catch (FileNotFoundException ex) {
-            System.err.println("Cannot load project property file.");
             if (!create) {
+                System.err.println("Cannot load project property file.");
                 return OpenProjectError.PROJECT_FILE_NOT_FOUND;
             }
         } catch (IOException ex) {
@@ -1056,6 +1056,9 @@ public class Main extends javax.swing.JFrame {
         // Set up eye gaze coeff
         this.eyeGazeComputing.setPrimaryEyeCoeff(calibrateJPanel.getEyeGazeCoefficient(0));
         this.eyeGazeComputing.setSecondaryEyeCoeff(calibrateJPanel.getEyeGazeCoefficient(1));
+        // Check if using cornea reflection
+        this.calibrateJPanel.setUsingCorneaReflect(
+                Boolean.parseBoolean(p.getProperty(USING_CORNEA_REFLECTION, "true")));
 
         // Load error file if exists
         File errorFile = new File(projectLocation, ERROR_FILE_NAME);
@@ -1090,10 +1093,9 @@ public class Main extends javax.swing.JFrame {
             sps[0] = new SynchronizationPoint(
                     Integer.parseInt(p.getProperty(EYE_OFFSET, "0")),
                     Integer.parseInt(p.getProperty(SCREEN_OFFSET, "0")));
-            this.synchronizeJPanel.addSyncPoint(sps[1]);
+            this.synchronizeJPanel.addSyncPoint(sps[0]);
         }
         /**--End backward compatimility support---*/
-
         /** Set frame sync according to */
         this.frameSynchronizor.setSynchronizationPoints(sps,
                 eyeFrameManager.getTotalFrames(),
@@ -1186,6 +1188,8 @@ public class Main extends javax.swing.JFrame {
                 projectSelectPanel.getSceneWidthCM()));
         p.setProperty(DISTANCE_FROM_MONITOR_CM, String.valueOf(
                 projectSelectPanel.getDistanceFromMeasuredScene()));
+        p.setProperty(USING_CORNEA_REFLECTION, String.valueOf(
+                this.eyeGazeComputing.isUsingCorneaReflect()));
         d = projectSelectPanel.getFullSceneDimensionPX();
         if (d != null) {
             p.setProperty(FULL_SCREEN_HEIGHT, String.valueOf(d.height));
@@ -1339,8 +1343,8 @@ public class Main extends javax.swing.JFrame {
                     // Skip a frame when there is no eye information
                     if (eyeInfo != null) {
                         double[] pupilFit = {ERROR_VALUE, ERROR_VALUE, ERROR_VALUE, ERROR_VALUE};
-                        if (eyeInfo.getCorniaFit() != null) {
-                            pupilFit = eyeInfo.getCorniaFit();
+                        if (eyeInfo.getPupilFit() != null) {
+                            pupilFit = eyeInfo.getPupilFit();
                         }
 
                         // Write current Frame, Pupil(x,y)
@@ -1354,8 +1358,8 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         // Write Cornia reflect (x,y), Gaze on screen view (x,y)
-                        exportWriter.print(eyeInfo.getReflectX() + "\t" +
-                                eyeInfo.getReflectX() + "\t");
+                        exportWriter.print(eyeInfo.getCorneaReflectX() + "\t" +
+                                eyeInfo.getCorneaReflectX() + "\t");
 
 
                         // For storing gaze point
@@ -1370,9 +1374,7 @@ public class Main extends javax.swing.JFrame {
                                     ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
                         } else {
                             // Compute eye vector
-                            Point2D.Double vector = Computation.computeEyeVector(
-                                    eyeInfo.getPupilX(), eyeInfo.getPupilY(),
-                                    eyeInfo.getReflectX(), eyeInfo.getReflectY());
+                            Point2D.Double vector = this.eyeGazeComputing.getEyeVector(eyeInfo);
 
                             EyeGazeComputing.ComputingApproach approach =
                                     EyeGazeComputing.ComputingApproach.PRIMARY;
