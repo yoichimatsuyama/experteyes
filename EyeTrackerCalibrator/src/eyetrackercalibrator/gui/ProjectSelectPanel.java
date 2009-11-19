@@ -103,7 +103,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
         jLabel15 = new javax.swing.JLabel();
         fullScreenDirectoryTextField = new javax.swing.JTextField();
         browseScreenFullViewButton = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        advanceConfigPanel = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -236,16 +236,16 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel2Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout advanceConfigPanelLayout = new org.jdesktop.layout.GroupLayout(advanceConfigPanel);
+        advanceConfigPanel.setLayout(advanceConfigPanelLayout);
+        advanceConfigPanelLayout.setHorizontalGroup(
+            advanceConfigPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(advanceConfigPanelLayout.createSequentialGroup()
+                .add(advanceConfigPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(advanceConfigPanelLayout.createSequentialGroup()
                         .add(271, 271, 271)
                         .add(jLabel16))
-                    .add(jPanel2Layout.createSequentialGroup()
+                    .add(advanceConfigPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .add(jLabel9)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -276,12 +276,12 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
                 .add(advanceSetupButton)
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
+        advanceConfigPanelLayout.setVerticalGroup(
+            advanceConfigPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(advanceConfigPanelLayout.createSequentialGroup()
                 .add(jLabel16)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(advanceConfigPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel11)
                     .add(jLabel10)
                     .add(monitorWidthPixelTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -295,7 +295,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
                     .add(fullScreenHeightPixelTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel24)
                     .add(advanceSetupButton)))
-            .add(jPanel2Layout.createSequentialGroup()
+            .add(advanceConfigPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -386,9 +386,8 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
                         .add(6, 6, 6)
                         .add(exportButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(exportMoviesButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(exportMoviesButton))
+                    .add(advanceConfigPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -420,7 +419,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
                     .add(screenInfoDirectoryTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel5))
                 .add(12, 12, 12)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(advanceConfigPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(loadEyeImageButton)
@@ -521,6 +520,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel advanceConfigPanel;
     private javax.swing.JButton advanceSetupButton;
     private javax.swing.JButton browseEyeInfoButton;
     private javax.swing.JButton browseEyeViewButton;
@@ -555,7 +555,6 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton loadEyeImageButton;
@@ -594,6 +593,10 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         Component[] components = getComponents();
+        for (int i = 0; i < components.length; i++) {
+            components[i].setEnabled(enabled);
+        }
+        components = this.advanceConfigPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
             components[i].setEnabled(enabled);
         }

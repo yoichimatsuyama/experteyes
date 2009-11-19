@@ -442,21 +442,6 @@ public class Computation {
                 computeTwoVariablePolynomial(x, y, c[1]));
     }
 
-    /**
-     * 
-     * @param pupilX
-     * @param pupilY
-     * @param corniaReflectX
-     * @param corniaReflectY
-     * @return
-     */
-    public static Point2D.Double computeEyeVector(
-            double pupilX, double pupilY,
-            double corniaReflectX, double corniaReflectY) {
-        return new Point2D.Double(
-                pupilX - corniaReflectX,
-                pupilY - corniaReflectY);
-    }
 
     public static double computeTwoVariablePolynomial(double x, double y, double[] c) {
         return c[0] + c[1] * x + c[2] * y + c[3] * x * y + c[4] * x * x + c[5] * y * y;

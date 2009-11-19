@@ -537,13 +537,7 @@ public class MovieFrameExporter {
     private Point.Double computeEyeGaze(double scaleFactor, int eyeFrame,
             EyeViewFrameInfo info) {
         // Compute and add the gaze point in
-        Point[] eyePoints = new Point[2];
-        eyePoints[0] = new Point();
-        eyePoints[1] = new Point();
-        eyePoints[0].setLocation(info.getPupilX(), info.getPupilY());
-        eyePoints[1].setLocation(info.getReflectX(), info.getReflectY());
-
-        Point.Double eyeVector = new Point2D.Double(eyePoints[0].x - eyePoints[1].x, eyePoints[0].y - eyePoints[1].y);
+        Point.Double eyeVector = this.eyeGazeComputing.getEyeVector(info);
 
         // Compute eye gaze point
         Double eyeGaze = new Point2D.Double(-666, -666);
@@ -633,9 +627,9 @@ public class MovieFrameExporter {
             eyePoints[0] = new Point();
             eyePoints[1] = new Point();
             eyePoints[0].setLocation(info.getPupilX() * scale, info.getPupilY() * scale);
-            eyePoints[1].setLocation(info.getReflectX() * scale, info.getReflectY() * scale);
+            eyePoints[1].setLocation(info.getCorneaReflectX() * scale, info.getCorneaReflectY() * scale);
 
-            Point[] ellisp = makeBoundingBox(info.getCorniaFit(), scale);
+            Point[] ellisp = makeBoundingBox(info.getPupilFit(), scale);
             if (ellisp != null) {
                 g.setColor(Color.GREEN);
                 if (info.getPupilAngle() > 0) {
@@ -654,7 +648,7 @@ public class MovieFrameExporter {
                 }
             }
 
-            ellisp = makeBoundingBox(info.getReflectFit(), scale);
+            ellisp = makeBoundingBox(info.getCorneaReflectFit(), scale);
             if (ellisp != null) {
                 g.setColor(Color.RED);
                 g.drawOval(ellisp[0].x, ellisp[0].y, ellisp[1].x, ellisp[1].y);

@@ -154,20 +154,18 @@ public class AnimationTimer {
                 if (info != null) {
                     eyePoints[0].x = (int) (info.getPupilX() * scale);
                     eyePoints[0].y = (int) (info.getPupilY() * scale);
-                    eyePoints[1].x = (int) (info.getReflectX() * scale);
-                    eyePoints[1].y = (int) (info.getReflectY() * scale);
+                    eyePoints[1].x = (int) (info.getCorneaReflectX() * scale);
+                    eyePoints[1].y = (int) (info.getCorneaReflectY() * scale);
 
                     displayJPanel.setEyeMarkedPoints(eyePoints);
-                    eyeVec = new Point2D.Double(
-                            info.getPupilX() - info.getReflectX(),
-                            info.getPupilY() - info.getReflectY());
-
-                    double[] box = info.getCorniaFit();
+                    eyeVec = eyeGazeComputing.getEyeVector(info);
+                    
+                    double[] box = info.getPupilFit();
                     for (int i = 0; i < box.length; i++) {
                         box[i] *= scale;
                     }
                     displayJPanel.setPupilFit(box, info.getPupilAngle());
-                    box = info.getReflectFit();
+                    box = info.getCorneaReflectFit();
                     for (int i = 0; i < box.length; i++) {
                         box[i] *= scale;
                     }

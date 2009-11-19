@@ -82,17 +82,19 @@ public class DegreeErrorComputer {
 
     private void computeConstants() {
         // Sanity check
-        if (sceneDimensionPixel.height <= 0 ||
-                sceneDimensionPixel.width <= 0 ||
-                distanceFromSceneCM <= 0 ||
-                sceneWidthCM <= 0 || sceneHeightCM <= 0) {
-            cmPerPixWidth = 0;
-            cmPerPixHeight = 0;
-        }
+        if (sceneDimensionPixel != null) {
+            if (sceneDimensionPixel.height <= 0 ||
+                    sceneDimensionPixel.width <= 0 ||
+                    distanceFromSceneCM <= 0 ||
+                    sceneWidthCM <= 0 || sceneHeightCM <= 0) {
+                cmPerPixWidth = 0;
+                cmPerPixHeight = 0;
+            }
 
-        // First find cm length per pixel in scene
-        cmPerPixWidth = sceneWidthCM / sceneDimensionPixel.getWidth();
-        cmPerPixHeight = sceneHeightCM / sceneDimensionPixel.getHeight();
+            // First find cm length per pixel in scene
+            cmPerPixWidth = sceneWidthCM / sceneDimensionPixel.getWidth();
+            cmPerPixHeight = sceneHeightCM / sceneDimensionPixel.getHeight();
+        }
     }
 
     /**

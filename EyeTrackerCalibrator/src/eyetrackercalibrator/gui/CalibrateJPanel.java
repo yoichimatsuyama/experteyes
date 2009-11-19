@@ -96,7 +96,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     // Current calibration point
     int calibrationIndex = 0;
     // @todo remove this
-//    Point calibrationPoint = new Point(1, 1);
+    // Point calibrationPoint = new Point(1, 1);
     FrameInfoGraphTabPanel graphTabPanel = null;
     private Dimension2D fullScreenDim = null;
     private AnimationTimer timer;
@@ -911,8 +911,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                                 screenFrameInfo.getMarkedPoints()[0]);
 
                         Point2D.Double eyeVecPoint = new Point2D.Double(
-                                eyeFrameInfo.getPupilX() - eyeFrameInfo.getReflectX(),
-                                eyeFrameInfo.getPupilY() - eyeFrameInfo.getReflectY());
+                                eyeFrameInfo.getPupilX() - eyeFrameInfo.getCorneaReflectX(),
+                                eyeFrameInfo.getPupilY() - eyeFrameInfo.getCorneaReflectY());
 
                         switch (info.calibrationType) {
                             case Testing:
@@ -1100,6 +1100,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         this.degreeErrorComputer = degreeErrorComputer;
     }
 
+    public void setUsingCorneaReflect(boolean usingCorneaReflect) {
+        this.useCorneaReflectionCheckBox.setSelected(usingCorneaReflect);
+        this.timer.getEyeGazeComputing().setUsingCorneaReflect(usingCorneaReflect);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1115,6 +1120,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         backButton = new javax.swing.JButton();
         calibrateButton = new javax.swing.JButton();
         calibrationPointSelectorJPanel = new eyetrackercalibrator.gui.CalibrationPointSelectorJPanel();
+        useCorneaReflectionCheckBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         displayJPanel = new eyetrackercalibrator.gui.DisplayJPanel();
         controlPanel = new javax.swing.JPanel();
@@ -1138,11 +1144,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         graphHolder.setLayout(graphHolderLayout);
         graphHolderLayout.setHorizontalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 611, Short.MAX_VALUE)
+            .add(0, 644, Short.MAX_VALUE)
         );
         graphHolderLayout.setVerticalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 247, Short.MAX_VALUE)
+            .add(0, 266, Short.MAX_VALUE)
         );
 
         backButton.setText("Back"); // NOI18N
@@ -1154,25 +1160,38 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             }
         });
 
+        useCorneaReflectionCheckBox.setSelected(true);
+        useCorneaReflectionCheckBox.setText("Use Cornia Reflection");
+        useCorneaReflectionCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useCorneaReflectionCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout bottomPanelLayout = new org.jdesktop.layout.GroupLayout(bottomPanel);
         bottomPanel.setLayout(bottomPanelLayout);
         bottomPanelLayout.setHorizontalGroup(
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(calibrationPointSelectorJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(bottomPanelLayout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, bottomPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .add(calibrateButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 319, Short.MAX_VALUE)
-                .add(backButton))
+                .add(18, 18, 18)
+                .add(useCorneaReflectionCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 133, Short.MAX_VALUE)
+                .add(backButton)
+                .addContainerGap())
         );
         bottomPanelLayout.setVerticalGroup(
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(bottomPanelLayout.createSequentialGroup()
                 .add(calibrationPointSelectorJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 25, Short.MAX_VALUE)
                 .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(calibrateButton)
-                    .add(backButton))
-                .addContainerGap(43, Short.MAX_VALUE))
+                    .add(backButton)
+                    .add(useCorneaReflectionCheckBox)
+                    .add(calibrateButton))
+                .add(35, 35, 35))
         );
 
         displayJPanel.setMinimumSize(new java.awt.Dimension(200, 100));
@@ -1266,13 +1285,13 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         controlPanel.setLayout(controlPanelLayout);
         controlPanelLayout.setHorizontalGroup(
             controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, controlPanelLayout.createSequentialGroup()
                 .add(calibrationMarkingToggleButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 77, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 87, Short.MAX_VALUE)
                 .add(deleteButton))
             .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         controlPanelLayout.setVerticalGroup(
             controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1294,17 +1313,17 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
+                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(10, 10, 10)
-                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE)))
+                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 854, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(controlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(controlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1497,6 +1516,12 @@ private void secondaryCalibrationPointsRadioButtonActionPerformed(java.awt.event
 private void primaryCalibrationPointsRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_primaryCalibrationPointsRadioButtonActionPerformed
     setCalibrationType(CalibrationInfo.CalibrationType.Primary);
 }//GEN-LAST:event_primaryCalibrationPointsRadioButtonActionPerformed
+
+private void useCorneaReflectionCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useCorneaReflectionCheckBoxActionPerformed
+    JOptionPane.showMessageDialog(this, "Changing this option makes the current calibration invalid.  You will need to recalibrate.", "Calibration Option Changes", JOptionPane.WARNING_MESSAGE);
+    timer.getEyeGazeComputing().setUsingCorneaReflect(this.useCorneaReflectionCheckBox.isSelected());
+}//GEN-LAST:event_useCorneaReflectionCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
     private javax.swing.JPanel bottomPanel;
@@ -1519,5 +1544,6 @@ private void primaryCalibrationPointsRadioButtonActionPerformed(java.awt.event.A
     private javax.swing.JRadioButton primaryCalibrationPointsRadioButton;
     private javax.swing.JRadioButton secondaryCalibrationPointsRadioButton;
     private javax.swing.JRadioButton testingPointsRadioButton;
+    private javax.swing.JCheckBox useCorneaReflectionCheckBox;
     // End of variables declaration//GEN-END:variables
 }
