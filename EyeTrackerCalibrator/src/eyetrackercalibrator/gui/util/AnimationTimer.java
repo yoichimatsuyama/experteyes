@@ -159,15 +159,19 @@ public class AnimationTimer {
 
                     displayJPanel.setEyeMarkedPoints(eyePoints);
                     eyeVec = eyeGazeComputing.getEyeVector(info);
-                    
+
                     double[] box = info.getPupilFit();
-                    for (int i = 0; i < box.length; i++) {
-                        box[i] *= scale;
+                    if (box != null) {
+                        for (int i = 0; i < box.length; i++) {
+                            box[i] *= scale;
+                        }
                     }
                     displayJPanel.setPupilFit(box, info.getPupilAngle());
                     box = info.getCorneaReflectFit();
-                    for (int i = 0; i < box.length; i++) {
-                        box[i] *= scale;
+                    if (box != null) {
+                        for (int i = 0; i < box.length; i++) {
+                            box[i] *= scale;
+                        }
                     }
                     displayJPanel.setReflectFit(box);
 
