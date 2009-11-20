@@ -158,7 +158,11 @@ public class AnimationTimer {
                     eyePoints[1].y = (int) (info.getCorneaReflectY() * scale);
 
                     displayJPanel.setEyeMarkedPoints(eyePoints);
-                    eyeVec = eyeGazeComputing.getEyeVector(info);
+                    // Compute eye vector when eye gaze computing is available.
+                    //  It usually is during syncing that the computing is not available
+                    if(eyeGazeComputing != null){
+                        eyeVec = eyeGazeComputing.getEyeVector(info);
+                    }
 
                     double[] box = info.getPupilFit();
                     if (box != null) {
