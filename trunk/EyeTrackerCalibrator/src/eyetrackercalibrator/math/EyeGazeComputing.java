@@ -178,9 +178,9 @@ public class EyeGazeComputing {
     public Point2D.Double getEyeVector(EyeViewFrameInfo info) {
         if (this.usingCorneaReflect) {
             return new Point2D.Double(info.getPupilX() - info.getCorneaReflectX(),
-                    info.getCorneaReflectX() - info.getCorneaReflectY());
+                    info.getPupilY() - info.getCorneaReflectY());
         } else {
-            return new Point2D.Double(info.getPupilX(), info.getCorneaReflectX());
+            return new Point2D.Double(info.getPupilX(), info.getPupilY());
         }
     }
 }
