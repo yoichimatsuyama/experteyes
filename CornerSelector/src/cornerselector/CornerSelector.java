@@ -73,7 +73,7 @@ public class CornerSelector extends javax.swing.JFrame {
         CANCEL
     }
 
-    class FrameRateInputVerifier extends InputVerifier{
+    class FrameRateInputVerifier extends InputVerifier {
 
         @Override
         public boolean verify(JComponent input) {
@@ -90,10 +90,7 @@ public class CornerSelector extends javax.swing.JFrame {
 
             return true;
         }
-        
     }
-
-
     private TerminationCause terminationCause = TerminationCause.CANCEL;
     public static final int NOT_CODED = -666;    // enumeration of directions for handleEvent
     /** Top Left Index */
@@ -196,17 +193,24 @@ public class CornerSelector extends javax.swing.JFrame {
         if (oldFrame >= 0 && oldFrame < files.length) {
             Point p = this.cornerSelectLabel.getMousePosition();
             if (!this.reviewToggleButton.isSelected() && p != null) {
+                int cornerPos = 0;
                 if (this.topleftRadioButton.isSelected()) {
-                    corners[TL][oldFrame] = p;
+                    cornerPos = TL;
                 }
                 if (this.topRightRadioButton.isSelected()) {
-                    corners[TR][oldFrame] = p;
+                    cornerPos = TR;
                 }
                 if (this.bottomRightRadioButton.isSelected()) {
-                    corners[BR][oldFrame] = p;
+                    cornerPos = BR;
                 }
                 if (this.bottomLeftRadioButton.isSelected()) {
-                    corners[BL][oldFrame] = p;
+                    cornerPos = BL;
+                }
+
+                /** Change all from this frame to the end of sampling */
+                int skipRange = this.frameScrollingJPanel.getFrameRate();
+                for (int i = 0; i < skipRange && (oldFrame + i) < files.length; i++) {
+                    corners[cornerPos][oldFrame + i] = p;
                 }
             }
         }
@@ -673,7 +677,6 @@ private void frameRateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton bottomLeftRadioButton;
     private javax.swing.JRadioButton bottomRightRadioButton;
