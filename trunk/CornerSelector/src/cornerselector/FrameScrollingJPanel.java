@@ -253,6 +253,6 @@ private void frameViewSliderKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST
     }
 
     public int getFrameRate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.frameRate;
     }
 }
