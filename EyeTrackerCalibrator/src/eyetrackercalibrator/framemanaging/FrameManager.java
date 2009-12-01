@@ -58,7 +58,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -90,7 +89,7 @@ public class FrameManager {
     protected int currentFrameLoaded = 0;
     /** Frame Info class */
     protected FrameInfo frameInfoClass;
-    protected int width,  height;
+    protected int width, height;
     protected FrameLoadingListener frameLoadingListener = null;
     private String frameDirectory = null;
     protected boolean scalePicture = false;
@@ -261,6 +260,12 @@ public class FrameManager {
             // Update progress
             frameLoadingListener.update("Loading file listing", 0, 100);
 
+            // Clear all previous data if load all files
+            if (total == 0) {
+                this.numberToFrameInfoMap.clear();
+                this.numberToFrameMap.clear();
+            }
+
             if (filenames != null && filenames.length > 0) {
                 // Sort file names
                 Arrays.sort(filenames);
@@ -294,7 +299,7 @@ public class FrameManager {
 
                     // Update progress
                     frameLoadingListener.update((i + 1) + " of " + filenames.length, i, filenames.length);
-                //Thread.yield();
+                    //Thread.yield();
                 }
                 // Update the last progress
                 frameLoadingListener.update("Completed " + filenames.length + " frames", filenames.length, filenames.length);
@@ -355,7 +360,7 @@ public class FrameManager {
             try {
                 op = JAI.create("fileload", frameDirectory + picData);
             } catch (java.lang.IllegalArgumentException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 return null;
             }
             try {
@@ -364,9 +369,9 @@ public class FrameManager {
                 e.printStackTrace();
                 return null;
             }
-        //long newtime = System.currentTimeMillis();
-        //System.out.println(newtime-time);
-        //time=newtime;
+            //long newtime = System.currentTimeMillis();
+            //System.out.println(newtime-time);
+            //time=newtime;
 
         } else {
             return null;
