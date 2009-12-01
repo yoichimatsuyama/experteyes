@@ -910,9 +910,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         calPoint.setLocation(
                                 screenFrameInfo.getMarkedPoints()[0]);
 
-                        Point2D.Double eyeVecPoint = new Point2D.Double(
-                                eyeFrameInfo.getPupilX() - eyeFrameInfo.getCorneaReflectX(),
-                                eyeFrameInfo.getPupilY() - eyeFrameInfo.getCorneaReflectY());
+                        Point2D.Double eyeVecPoint = this.timer.getEyeGazeComputing().getEyeVector(eyeFrameInfo);
 
                         switch (info.calibrationType) {
                             case Testing:
@@ -1521,7 +1519,6 @@ private void useCorneaReflectionCheckBoxActionPerformed(java.awt.event.ActionEve
     JOptionPane.showMessageDialog(this, "Changing this option makes the current calibration invalid.  You will need to recalibrate.", "Calibration Option Changes", JOptionPane.WARNING_MESSAGE);
     timer.getEyeGazeComputing().setUsingCorneaReflect(this.useCorneaReflectionCheckBox.isSelected());
 }//GEN-LAST:event_useCorneaReflectionCheckBoxActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
     private javax.swing.JPanel bottomPanel;
