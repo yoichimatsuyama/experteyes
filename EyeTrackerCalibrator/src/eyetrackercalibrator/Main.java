@@ -74,7 +74,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -516,10 +515,7 @@ public class Main extends javax.swing.JFrame {
         boolean switchBack = false;
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Read in synchronize data and set all offset in all panel
-            this.frameSynchronizor.setSynchronizationPoints(
-                    this.synchronizeJPanel.getSynchronizationPoints(),
-                    this.eyeFrameManager.getTotalFrames(),
-                    this.screenFrameManager.getTotalFrames());
+            sync();
 
             switchBack = true;
         } else if ("Cancel".equals(evt.getActionCommand())) {
@@ -778,6 +774,7 @@ public class Main extends javax.swing.JFrame {
                         projectSelectPanel.getDistanceFromMeasuredScene(),
                         projectSelectPanel.getSceneWidthCM(),
                         projectSelectPanel.getSceneHeightCM()));
+                sync();
                 calibrateJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
@@ -800,6 +797,7 @@ public class Main extends javax.swing.JFrame {
                         projectSelectPanel.getFullScreenFrameDirectory());
                 cleanDataJPanel.setCornerHintDir(projectSelectPanel.getCornerHintsDirectory());
                 cleanDataJPanel.setScreenInfoDir(projectSelectPanel.getScreenInfoDirectory());
+                sync();
                 cleanDataJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
@@ -819,6 +817,7 @@ public class Main extends javax.swing.JFrame {
                 markTrialJPanel.setProjectRoot(projectLocation);
                 markTrialJPanel.setFullScreenFrameDirectory(
                         projectSelectPanel.getFullScreenFrameDirectory());
+                sync();
                 markTrialJPanel.setFrameSynchronizor(this.frameSynchronizor);
 
                 remove(projectSelectPanel);
@@ -827,8 +826,10 @@ public class Main extends javax.swing.JFrame {
 
                 markTrialJPanel.start();
             } else if ("Export Data".equals(evt.getActionCommand())) {
+                sync();
                 exportData();
             } else if ("Export Movies".equals(evt.getActionCommand())) {
+                sync();
                 exportMovies();
             }
         }
@@ -845,6 +846,11 @@ public class Main extends javax.swing.JFrame {
         } else if ("Quit".equals(item.getText())) {
             formWindowClosed();
         }
+    }
+
+    private void sync() {
+        // Read in synchronize data and set all offset in all panel
+        this.frameSynchronizor.setSynchronizationPoints(this.synchronizeJPanel.getSynchronizationPoints(), this.eyeFrameManager.getTotalFrames(), this.screenFrameManager.getTotalFrames());
     }
 
     private void viewMenuActionPerformed(ActionEvent evt) {
@@ -1508,15 +1514,19 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         /** Print eye frame name */
-                        if (eyeInfo != null) {
-                            exportWriter.print(eyeInfo.getSourceFileName() + "\t");
+                        String name = eyeFrameManager.getFrameFileName(
+                            this.frameSynchronizor.getEyeFrame(i));
+                        if (name != null) {
+                            exportWriter.print("\t" + name);
                         } else {
-                            exportWriter.print("-\t");
+                            exportWriter.print("\t-");
                         }
-                        if (sceneInfo != null) {
-                            exportWriter.println(sceneInfo.getSourceFileName() + "\t");
+                        name = screenFrameManager.getFrameFileName(
+                                this.frameSynchronizor.getSceneFrame(i));
+                        if (name != null) {
+                            exportWriter.println("\t" + name);
                         } else {
-                            exportWriter.println("-");
+                            exportWriter.println("\t-");
                         }
                     }
                 }
