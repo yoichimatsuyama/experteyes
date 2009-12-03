@@ -642,6 +642,9 @@ public class Main extends javax.swing.JFrame {
             waitThread.start();
 
         } else if ("Load Screen Images".equals(evt.getActionCommand())) {
+            // Invalidate all processed calibration points
+            this.calibrateJPanel.setAllCalibrationPointsUnprocessed();
+
             projectSelectPanel.setScreenLoadButtonsEnable(false);
 
             final Thread screenThread = new Thread(new Runnable() {
@@ -694,6 +697,10 @@ public class Main extends javax.swing.JFrame {
             });
             waitThread.start();
         } else if ("Reload Screen Information".equals(evt.getActionCommand())) {
+             // Invalidate all processed calibration points
+            this.calibrateJPanel.setAllCalibrationPointsUnprocessed();
+
+            
             projectSelectPanel.setScreenLoadButtonsEnable(false);
 
             final Thread screenThread = new Thread(new Runnable() {
