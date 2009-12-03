@@ -1103,6 +1103,17 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         this.timer.getEyeGazeComputing().setUsingCorneaReflect(usingCorneaReflect);
     }
 
+    public void setAllCalibrationPointsUnprocessed() {
+        for (int i = 0; i < this.calibrationSet.length; i++) {
+            for (Enumeration en = calibrationSet[i].elements();
+                    en.hasMoreElements();) {
+                // Create element
+                CalibrationInfo info = (CalibrationInfo) en.nextElement();
+                info.isCalibrationPointPositionLocated = false;
+            }
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1404,11 +1415,33 @@ private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_deleteButtonActionPerformed
 
 private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calibrateButtonActionPerformed
-    // Done calibrating allow button to be pressed
-    calibrateButton.setEnabled(false);
-    backButton.setEnabled(false);
 
-    calibrate();
+    boolean process = true;
+    for (int i = 0; i < this.calibrationSet.length && process; i++) {
+        for (Enumeration en = calibrationSet[i].elements();
+                en.hasMoreElements() && process;) {
+            // Create element
+            CalibrationInfo info = (CalibrationInfo) en.nextElement();
+            process = process && info.isCalibrationPointPositionLocated;
+        }
+    }
+
+    // Check if we have unprocessed calibration points.  If not then we warn
+    // the user before proceeding
+    int result = JOptionPane.OK_OPTION;
+    
+    if(!process){
+        result = JOptionPane.showConfirmDialog(this,
+            "You have some unprocessed calibration points.  The calibration results may be incorrect.  Select OK to proceed with calibration.",
+            "Unprocess Calibration Points Exist", JOptionPane.OK_CANCEL_OPTION);
+    }
+    if (result == JOptionPane.OK_OPTION) {
+        // Done calibrating allow button to be pressed
+        calibrateButton.setEnabled(false);
+        backButton.setEnabled(false);
+
+        calibrate();
+    }
 }//GEN-LAST:event_calibrateButtonActionPerformed
 
 private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locateCalibrationPointsPositionsButtonActionPerformed
