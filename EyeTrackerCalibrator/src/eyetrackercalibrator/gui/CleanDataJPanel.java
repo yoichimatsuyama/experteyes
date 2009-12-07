@@ -170,8 +170,16 @@ public class CleanDataJPanel extends javax.swing.JPanel {
 
 
         ErrorMarking[] ranges = new ErrorMarking[errors.length];
+        int frameCount = 0;
         for (int i = 0; i < ranges.length; i++) {
             ranges[i] = (ErrorMarking) errors[i];
+            frameCount += ranges[i].stopSceneFrame - ranges[i].stopSceneFrame + 1;
+        }
+
+        if(frameCount < 2){
+            // Shows warning if nothing is selected
+            JOptionPane.showMessageDialog(this, "You need at least two scene frames to detect corners.", "Not Enough Scene Frames", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         String message = "";
