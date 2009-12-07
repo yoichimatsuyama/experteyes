@@ -697,10 +697,10 @@ public class Main extends javax.swing.JFrame {
             });
             waitThread.start();
         } else if ("Reload Screen Information".equals(evt.getActionCommand())) {
-             // Invalidate all processed calibration points
+            // Invalidate all processed calibration points
             this.calibrateJPanel.setAllCalibrationPointsUnprocessed();
 
-            
+
             projectSelectPanel.setScreenLoadButtonsEnable(false);
 
             final Thread screenThread = new Thread(new Runnable() {
@@ -1055,17 +1055,6 @@ public class Main extends javax.swing.JFrame {
         markTrialJPanel.setEyeFrameManager(eyeFrameManager);
         markTrialJPanel.setScreenFrameManager(screenFrameManager);
 
-        // Load calibration file if exists
-        File calibrationFile = new File(projectLocation, CALIBRATION_FILE_NAME);
-        if (calibrationFile.exists()) {
-            calibrateJPanel.loadCalibrationPoints(calibrationFile);
-        } else {
-            calibrateJPanel.clearCalibrationInfo();
-        }
-        // Set up calibration full screen dia
-        calibrateJPanel.setFullScreenDim(d);
-
-
         // Set up eye gaze coeff
         this.eyeGazeComputing.setPrimaryEyeCoeff(calibrateJPanel.getEyeGazeCoefficient(0));
         this.eyeGazeComputing.setSecondaryEyeCoeff(calibrateJPanel.getEyeGazeCoefficient(1));
@@ -1073,22 +1062,7 @@ public class Main extends javax.swing.JFrame {
         this.calibrateJPanel.setUsingCorneaReflect(
                 Boolean.parseBoolean(p.getProperty(USING_CORNEA_REFLECTION, "true")));
 
-        // Load error file if exists
-        File errorFile = new File(projectLocation, ERROR_FILE_NAME);
-        if (errorFile.exists()) {
-            cleanDataJPanel.loadErrors(errorFile);
-        } else {
-            cleanDataJPanel.clear();
-        }
-
-        // Load trial file if exists
-        File trialMarkFile = new File(projectLocation, TRIAL_FILE_NAME);
-        if (trialMarkFile.exists()) {
-            markTrialJPanel.loadTrialMarks(trialMarkFile);
-        } else {
-            markTrialJPanel.clear();
-        }
-
+        
         // Load synch file if exists
         File syncFile = new File(projectLocation, SYNC_FILE_NAME);
         if (syncFile.exists()) {
@@ -1109,7 +1083,8 @@ public class Main extends javax.swing.JFrame {
             this.synchronizeJPanel.addSyncPoint(sps[0]);
         }
         /**--End backward compatimility support---*/
-        /** Set frame sync according to */
+
+        /** Set frame sync accordingly.  This must be done before we load any other things */
         this.frameSynchronizor.setSynchronizationPoints(sps,
                 eyeFrameManager.getTotalFrames(),
                 screenFrameManager.getTotalFrames());
@@ -1117,6 +1092,36 @@ public class Main extends javax.swing.JFrame {
         // Link frame manager to update progress to project panel
         eyeFrameManager.setLoadingListener(projectSelectPanel.getEyeFrameLoadingListener());
         screenFrameManager.setLoadingListener(projectSelectPanel.getScreenFrameLoadingListener());
+
+        this.calibrateJPanel.setFrameSynchronizor(frameSynchronizor);
+        this.markTrialJPanel.setFrameSynchronizor(frameSynchronizor);
+        this.cleanDataJPanel.setFrameSynchronizor(frameSynchronizor);
+
+        // Load calibration file if exists
+        File calibrationFile = new File(projectLocation, CALIBRATION_FILE_NAME);
+        if (calibrationFile.exists()) {
+            calibrateJPanel.loadCalibrationPoints(calibrationFile);
+        } else {
+            calibrateJPanel.clearCalibrationInfo();
+        }
+        // Set up calibration full screen dia
+        calibrateJPanel.setFullScreenDim(d);
+
+        // Load trial file if exists
+        File trialMarkFile = new File(projectLocation, TRIAL_FILE_NAME);
+        if (trialMarkFile.exists()) {
+            markTrialJPanel.loadTrialMarks(trialMarkFile);
+        } else {
+            markTrialJPanel.clear();
+        }
+
+        // Load error file if exists
+        File errorFile = new File(projectLocation, ERROR_FILE_NAME);
+        if (errorFile.exists()) {
+            cleanDataJPanel.loadErrors(errorFile);
+        } else {
+            cleanDataJPanel.clear();
+        }
 
         // SEt project title
         this.setTitle(projectLocation.getName());
@@ -1522,7 +1527,7 @@ public class Main extends javax.swing.JFrame {
 
                         /** Print eye frame name */
                         String name = eyeFrameManager.getFrameFileName(
-                            this.frameSynchronizor.getEyeFrame(i));
+                                this.frameSynchronizor.getEyeFrame(i));
                         if (name != null) {
                             exportWriter.print("\t" + name);
                         } else {
