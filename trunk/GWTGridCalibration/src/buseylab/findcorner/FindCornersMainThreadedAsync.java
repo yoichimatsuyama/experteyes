@@ -144,6 +144,9 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             // termination condition
             int totalThread = this.numThreads;
 
+            /** Sanity check.  You only need CPU equal or less than a jog you have */
+            totalThread = Math.min(totalThread, this.sceneFiles.length);
+
             /** Mechanic for waiting for all threads to finish (+1 because 0 is still block) */
             this.completionSemaphore = new Semaphore(-totalThread + 1);
 
