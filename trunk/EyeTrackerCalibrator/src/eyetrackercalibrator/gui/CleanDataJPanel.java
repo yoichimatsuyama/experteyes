@@ -803,14 +803,22 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
                 int frame = error.startEyeFrame;
                 if (frame < 1) {
                     frame = error.startSceneFrame;
+                    intervalMarker.setStartValue(
+                            this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(frame));
+                } else {
+                    intervalMarker.setStartValue(
+                            this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(frame));
                 }
+
                 frame = error.stopEyeFrame;
                 if (frame < 1) {
                     frame = error.stopSceneFrame;
+                    intervalMarker.setEndValue(
+                            this.timer.getFrameSynchronizor().sceneFrameToSyncFrame(frame));
+                } else {
+                    intervalMarker.setEndValue(
+                            this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(frame));
                 }
-                intervalMarker.setEndValue(
-                        this.timer.getFrameSynchronizor().eyeFrameToSyncFrame(frame));
-
                 error.setIntervalMarker(intervalMarker);
 
                 // Add marker to the list
