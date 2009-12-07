@@ -151,6 +151,7 @@ public class DetectCornerRunner extends Thread {
         // Register to corner selector to detect its termination
         cornerSelector.addWindowListener(new java.awt.event.WindowAdapter() {
 
+            @Override
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 // Signal termination
                 sem.release();
