@@ -531,7 +531,7 @@ public class CalibratingViewJDialog
                     Point2D.Double point = Computation.computeEyeGazePoint(
                             eyeVector[i][j].x, eyeVector[i][j].y, coeff[pos]);
                     estimatedTestPoints[pos][m].setLocation(point);
-                    if (this.degreeErrorComputer != null) {
+                    if (this.degreeErrorComputer != null && this.combinedTestPoints[pos][m] != null) {
                         totalTestDegreeError += this.degreeErrorComputer.degreeError(
                                 this.combinedTestPoints[pos][m], point);
                     }
