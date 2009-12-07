@@ -86,7 +86,7 @@ public class FrameScrollingJPanel extends javax.swing.JPanel
     public void setTotalFrame(int totalFrame) {
         // Cap total frame for sanity
         totalFrame = Math.max(1, totalFrame);
-        frameViewSlider.setMaximum(totalFrame-1);
+        frameViewSlider.setMaximum(totalFrame);
 
         this.totalFrame = totalFrame;
 
@@ -99,7 +99,8 @@ public class FrameScrollingJPanel extends javax.swing.JPanel
     void setFrameRate(int frameRate) {
         this.frameRate = frameRate;
         /* Reset total frame to match frame skip, don't use totalFrame since
-         * it may not be a real maximum        */
+         * it may not be a real maximum.  
+         */
         setTotalFrame(this.frameViewSlider.getMaximum());
         this.frameViewSlider.setMinorTickSpacing(frameRate);
         this.frameViewSlider.setMajorTickSpacing(frameRate);
