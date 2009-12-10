@@ -1295,24 +1295,32 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 // Load image
                 paintedImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
 
+                // Get proper search space
+                Rectangle searchRect = ImageUtils.clipRectangle(paintedImg,
+                        this.interactivePanel.searchRect);
+
                 if (this.colorSelectionPanel1.getSigma() > 0) {
                     // Avoid avoid loading image from image plus directly since
                     // it cannot load some tiff compression
 
                     // Limit sharpen to the search space area to increase the speed
-                    Rectangle r = this.interactivePanel.searchRect;
-                    BufferedImage img = paintedImg.getSubimage(r.x, r.y, r.width, r.height);
+                    
+                        // Clip the size just to make sure
+                        BufferedImage img = paintedImg.getSubimage(
+                                searchRect.x, searchRect.y,
+                                searchRect.width, searchRect.height);
 
-                    ImagePlus imagePlus = new ImagePlus("", img);
+                        ImagePlus imagePlus = new ImagePlus("", img);
 
-                    ImageUtils.unsharpMask(imagePlus.getProcessor(),
-                            this.colorSelectionPanel1.getSigma(),
-                            this.colorSelectionPanel1.getSharpeningFactor());
+                        ImageUtils.unsharpMask(imagePlus.getProcessor(),
+                                this.colorSelectionPanel1.getSigma(),
+                                this.colorSelectionPanel1.getSharpeningFactor());
 
 
-                    paintedImg.getGraphics().drawImage(
-                            ImageUtils.toBufferedImage(imagePlus.getImage()),
-                            r.x, r.y, null);
+                        paintedImg.getGraphics().drawImage(
+                                ImageUtils.toBufferedImage(imagePlus.getImage()),
+                                searchRect.x, searchRect.y, null);
+                    
                 }
                 // user should be able to scroll through sequence with threshold on,
                 // so check to see what kind of threshold is set in the thresh panel
@@ -1324,7 +1332,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     case CR_THRESH_TYPE:
                         // find the cr
                         RotatedEllipse2D foundCR = FitEyeModel.findCR(paintedImg,
-                                this.interactivePanel.searchRect,
+                                searchRect,
                                 this.thresholdPanel1.getCRThresh());
 
                         // draw into the image
@@ -1335,7 +1343,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     case PUPIL_THRESH_TYPE:
 
                         RotatedEllipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
-                                this.interactivePanel.searchRect,
+                                searchRect,
                                 this.thresholdPanel1.getPupilThresh(),
                                 false);
 
@@ -1630,7 +1638,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             addVoronoiSource(info.point);
         }
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private gui.ColorSelectionPanel colorSelectionPanel1;
