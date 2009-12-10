@@ -66,6 +66,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
     private FittingListener listener;
     // pupil/cr search space
     Rectangle searchRect;
+    Rectangle originalSearchRect;
     // the eye model, actual eye image, and a pointer to which image to draw 
     BufferedImage eyeModel, eyeImg, imgToDraw;
     Graphics eyeModelGraphics;
@@ -105,6 +106,16 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
 
     public void initModel(BufferedImage eyeImg) {
         this.eyeImg = eyeImg;
+
+        // Create usable search rec
+        this.searchRect = new Rectangle(this.originalSearchRect);
+        this.searchRect.width = Math.min(
+                this.eyeImg.getWidth() - this.searchRect.x,
+                this.searchRect.width);
+        this.searchRect.height = Math.min(
+                this.eyeImg.getHeight() - this.searchRect.y,
+                this.searchRect.height);
+
         eyeImgPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(eyeImg,
                 (int) searchRect.getX(), (int) searchRect.getY(),
                 (int) searchRect.getWidth(), (int) searchRect.getHeight()));
@@ -190,7 +201,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
     }
 
     public void setSearchRect(Rectangle searchRect) {
-        this.searchRect = searchRect;
+        this.originalSearchRect = searchRect;
     }
 
     public BufferedImage getEyeModel() {

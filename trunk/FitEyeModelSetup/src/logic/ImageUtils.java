@@ -37,6 +37,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -151,6 +152,8 @@ public class ImageUtils {
 
     // get pixels from an image
     public static int[] getPixels(Image I, int x, int y, int width, int height) {
+        /** Cap the width and height to the image size */
+
         int pixels[] = new int[width * height];
         PixelGrabber pg = new PixelGrabber(I, x, y, width, height, pixels, 0, width);
         try {
@@ -557,5 +560,14 @@ public class ImageUtils {
         image.getGraphics().drawImage(buffer, 0, 0, null);
 
         return image;
+    }
+
+    /** 
+     * Return a part of the regtangle that is within in image. The result is
+     * unknown when the rectangle is completely outside of the image
+     */
+    public static Rectangle clipRectangle(Image image, Rectangle rec){
+        Rectangle imRec = new Rectangle(0,0,image.getWidth(null), image.getHeight(null));
+        return imRec.intersection(rec);
     }
 }
