@@ -205,7 +205,6 @@ public class MarkableJLabel extends JLabel {
                             points[i].y + pointMarkLength);
                 }
             }
-
         }
     }
 
