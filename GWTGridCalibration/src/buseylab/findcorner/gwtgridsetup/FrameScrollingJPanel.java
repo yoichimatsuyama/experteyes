@@ -117,8 +117,9 @@ public class FrameScrollingJPanel extends javax.swing.JPanel{
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        frameViewSlider.setMinimum(1);
+        frameViewSlider.setMaximum(99);
         frameViewSlider.setSnapToTicks(true);
+        frameViewSlider.setValue(0);
         frameViewSlider.setMaximum(totalFrame);
         frameViewSlider.setValue(1);
         frameViewSlider.addChangeListener(new javax.swing.event.ChangeListener() {
