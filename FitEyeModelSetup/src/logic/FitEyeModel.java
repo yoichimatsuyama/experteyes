@@ -243,7 +243,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
 public class FitEyeModel implements Runnable {
     // gradient descent step size
 
-    final static int STEP_SIZE = 10;
+    final static int STEP_SIZE = 5;
     // Create instace of class holding function to be minimized
     ImgDiffErr funct = new ImgDiffErr();    // where to save gaze data
     final static String GAZE_ROOT = "Gaze";    // filenames
@@ -450,10 +450,14 @@ public class FitEyeModel implements Runnable {
                 start[7] = cr.getMaxY();
             }
 
-
             double[] end = new double[start.length];
             for (int j = 0; j < end.length; j++) {
                 end[j] = start[j] + STEP_SIZE;
+            }
+
+            // Lets move back from starting point be step size as well
+            for (int j = 0; j < start.length; j++) {
+                start[j] -= STEP_SIZE;
             }
 
             // Set if we are considering CR as circle
