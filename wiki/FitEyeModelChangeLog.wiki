@@ -1,7 +1,7 @@
 ==1.17==
-* Stop sharpening when in threshold selection mode.
-* Change some starting parameters for fitting so the fit will run away less.
-* Fix bug that crashes program when search box is outside the image.  (You still have to keep search space in the image for best result still) 
+ * Stop sharpening when in threshold selection mode.
+ * Change some starting parameters for fitting so the fit will run away less.
+ * Fix bug that crashes program when search box is outside the image.  (You still have to keep search space in the image for best result still) 
 
 ==1.10==
  * Fix incorrect configuration is selected when clicking on the last config in the list
