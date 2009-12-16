@@ -106,6 +106,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     /** For computing voronoi */
     DelaunayTriangulation delaunayTriangulation = null;
     boolean isEyeFittingRunning = false;
+    private boolean isSelectingColor = false;
 
     /** Creates new form FitEyeModelSetup */
     public FitEyeModelSetup() {
@@ -836,6 +837,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         }
 
         if (this.jTabbedPane1.getSelectedComponent().equals(this.colorSelectionPanel1)) {
+            this.isSelectingColor = true;
+
             // Change paint to picture so that we can select color
             this.thresholdPanel1.setNoThreshold();
             // repaint image with new info
@@ -843,6 +846,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         } else {
+            this.isSelectingColor = false;
+
             // Make sure that all droppers are off
             this.colorSelectionPanel1.unselectAllDropperButtons();
             if (this.jTabbedPane1.getSelectedComponent().equals(this.searchSpacePanel1)) {
@@ -852,6 +857,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
 
         }
+
+        if (this.jTabbedPane1.getSelectedComponent().equals(this.thresholdPanel1)) {
+            // Make sure that we are not sharpening here
+            setFrame(getFrame());
+        }
+
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private void loadSettingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSettingButtonActionPerformed
@@ -1299,7 +1310,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                 Rectangle searchRect = ImageUtils.clipRectangle(paintedImg,
                         this.interactivePanel.searchRect);
 
-                if (this.colorSelectionPanel1.getSigma() > 0) {
+                if (this.colorSelectionPanel1.getSigma() > 0 && this.isSelectingColor) {
                     // Avoid avoid loading image from image plus directly since
                     // it cannot load some tiff compression
 

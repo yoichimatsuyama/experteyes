@@ -480,8 +480,8 @@ public class FitEyeModel implements Runnable {
             // Write out when there is an output file
             if (this.outputFile != null) {
                 output = new FileWriter(this.outputFile);
-                output.write(eyeFilename + "\t" + pupilCenterX + "\t" + pupilCenterY + "\t" +
-                        crCenterX + "\t" + crCenterY + "\t" + "\n");
+                output.write(eyeFilename + "\t" + pupilCenterX + "\t" + pupilCenterY + "\t"
+                        + crCenterX + "\t" + crCenterY + "\t" + "\n");
                 // also write out our final parameters
                 // TL = top left, BR = bottom right
                 // pupilTLX, pupilTLY, pupilBRX, pupilBRY, crTLX, crTLY, crBRX, crBRY
@@ -494,8 +494,8 @@ public class FitEyeModel implements Runnable {
                     output.write(params[params.length - 1] + "\t");
                 }
                 // also write out our goodness of fit, pupil angle and cr angle
-                output.write("\n" + funct.getSSE() + "\t" +
-                        pupil.getAngle() + "\t" + cr.getAngle());
+                output.write("\n" + funct.getSSE() + "\t"
+                        + pupil.getAngle() + "\t" + cr.getAngle());
                 output.close();
             }
 
@@ -550,7 +550,8 @@ public class FitEyeModel implements Runnable {
         }
 
         // label the image and get the labels
-        ImageLabel il = new ImageLabel(image.getWidth());
+        //ImageLabel il = new ImageLabel(image.getWidth());
+        ImageLabel il = new ImageLabel();
         int[] labeledEye = il.doLabel(threshPixels,
                 searchArea.width,
                 searchArea.height);
