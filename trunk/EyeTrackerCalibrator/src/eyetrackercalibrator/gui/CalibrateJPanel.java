@@ -53,7 +53,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -126,8 +125,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         this.eyeGazeCoefficient = new double[2][][];
 
         // Create empty calibration storage
-        for (int i = 0; i <
-                calibrationSet.length; i++) {
+        for (int i = 0; i
+                < calibrationSet.length; i++) {
             calibrationSet[i] = new DefaultListModel();
         }
 
@@ -174,7 +173,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         calibrationPointSelectorJPanel.addMarkingButtonActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                calibrationMarkingToggleButtonActionPerformed(e);
+                handleCalibrationMarkingButtonActionPerformed(e);
             }
         });
 
@@ -333,6 +332,52 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     private void eyeViewMouseClickHandle(MouseEvent e) {
     }
 
+    private void handleCalibrationMarkingButtonActionPerformed(ActionEvent evt) {
+        // Start marking
+        JToggleButton button = (JToggleButton) evt.getSource();
+        if (button.isSelected()) {
+            // Set text to stop marking
+            this.calibrationIndex =
+                    this.calibrationPointSelectorJPanel.getMarkingButtonIndex(evt.getSource());
+            // Set proper selection index
+            this.calibrationPointSelectorJPanel.setSelectedLabel(this.calibrationIndex);
+            // Switch to proper calubration list
+            calibrateList.setModel(calibrationSet[this.calibrationIndex]);
+            // Change type to the currently viewing type
+            CalibrationPointSelectorJPanel.CalibrationType viewType =
+                    this.calibrationPointSelectorJPanel.getCurrentView();
+
+            switch(viewType){
+                case PRIMARY:
+                    this.primaryCalibrationPointsRadioButton.setSelected(true);
+                    this.currentCalibrationType = CalibrationType.Primary;
+                    break;
+                case SECONDARY:
+                    this.secondaryCalibrationPointsRadioButton.setSelected(true);
+                    this.currentCalibrationType = CalibrationType.Secondary;
+                    break;
+                case TEST:
+                    this.testingPointsRadioButton.setSelected(true);
+                    this.currentCalibrationType = CalibrationType.Testing;
+                    break;
+            }
+
+            // Block other buttons
+            calibrateButton.setEnabled(false);
+            backButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+            // Start recording information
+            startRecording();
+        } else {
+            // Reenable other buttons
+            calibrateButton.setEnabled(true);
+            backButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+            // Save information
+            stopRecording();
+        }
+    }
+
     private void screenViewMouseClickHandle(MouseEvent e) {
     }
 
@@ -420,8 +465,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
     private synchronized void enableButtons(Component excempt, boolean b) {
         // Disable all other component if all process are cleared
-        if (!this.isRunningCalibrationPointPositionFinding &&
-                !this.isRunningDetectEyeInfo) {
+        if (!this.isRunningCalibrationPointPositionFinding
+                && !this.isRunningDetectEyeInfo) {
             GUIUtil.setEnableAllCompoenentsExcept(controlPanel, excempt, b);
         }
 
@@ -509,9 +554,9 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             zoomPanel.repaint();
         } else {
             JOptionPane.showMessageDialog(this,
-                    "Screen image file for frame " +
-                    this.currentCalibrationInfo.startSceneFrame +
-                    " is missing", "Cannot mark calibration",
+                    "Screen image file for frame "
+                    + this.currentCalibrationInfo.startSceneFrame
+                    + " is missing", "Cannot mark calibration",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -742,8 +787,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         en.hasMoreElements();) {
                     // Create element
                     CalibrationInfo info = (CalibrationInfo) en.nextElement();
-                    if (screenFrameNumber >= info.startSceneFrame &&
-                            screenFrameNumber <= info.stopSceneFrame) {
+                    if (screenFrameNumber >= info.startSceneFrame
+                            && screenFrameNumber <= info.stopSceneFrame) {
                         point = new Point(x, y);
                     }
                 }
@@ -815,8 +860,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                             String.valueOf(info.selectedCalibrationPointPosition.getX()));
                     range.setAttribute("selectedy",
                             String.valueOf(info.selectedCalibrationPointPosition.getY()));
-                    for (int i = info.startSceneFrame; i <=
-                            info.stopSceneFrame; i++) {
+                    for (int i = info.startSceneFrame; i
+                            <= info.stopSceneFrame; i++) {
                         ScreenViewFrameInfo screenInfo =
                                 (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(i);
                         if (screenInfo != null) {
@@ -921,8 +966,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                             (EyeViewFrameInfo) eyeFrameManager.getFrameInfo(eyeFrame);
 
                     // Sanity check
-                    if (screenFrameInfo != null && eyeFrameInfo != null &&
-                            screenFrameInfo.getMarkedPoints() != null) {
+                    if (screenFrameInfo != null && eyeFrameInfo != null
+                            && screenFrameInfo.getMarkedPoints() != null) {
                         Point2D.Double calPoint = new Point2D.Double();
                         calPoint.setLocation(
                                 screenFrameInfo.getMarkedPoints()[0]);
@@ -982,11 +1027,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         final CalibrateEyeGaze primaryCalibrator = new CalibrateEyeGazeQR();
         final CalibrateEyeGaze secondaryCalibrator = new CalibrateEyeGazeQR();
         panel.setTotalProgress(
-                primaryCalibrator.getTotalProgress() +
-                secondaryCalibrator.getTotalProgress());
+                primaryCalibrator.getTotalProgress()
+                + secondaryCalibrator.getTotalProgress());
         panel.setTotalStages(
-                primaryCalibrator.getTotalStages() +
-                secondaryCalibrator.getTotalStages());
+                primaryCalibrator.getTotalStages()
+                + secondaryCalibrator.getTotalStages());
 
         panel.setCorrectPoints(calArray, testArray);
         panel.setEyeVector(primeEyeVecArray, CalibratingViewJDialog.PRIMARY);
@@ -1086,8 +1131,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      * Clear all calibration information 
      */
     public void clearCalibrationInfo() {
-        for (int i = 0; i <
-                calibrationSet.length; i++) {
+        for (int i = 0; i
+                < calibrationSet.length; i++) {
             calibrationSet[i].clear();
         }
         // Clear interval markers
@@ -1156,7 +1201,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         locateCalibrationPointsPositionsButton = new javax.swing.JButton();
-        calibrationMarkingToggleButton = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         testingPointsRadioButton = new javax.swing.JRadioButton();
         secondaryCalibrationPointsRadioButton = new javax.swing.JRadioButton();
@@ -1170,11 +1214,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         graphHolder.setLayout(graphHolderLayout);
         graphHolderLayout.setHorizontalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 644, Short.MAX_VALUE)
+            .add(0, 789, Short.MAX_VALUE)
         );
         graphHolderLayout.setVerticalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 266, Short.MAX_VALUE)
+            .add(0, 349, Short.MAX_VALUE)
         );
 
         backButton.setText("Back"); // NOI18N
@@ -1204,7 +1248,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 .add(calibrateButton)
                 .add(18, 18, 18)
                 .add(useCorneaReflectionCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 133, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 73, Short.MAX_VALUE)
                 .add(backButton)
                 .addContainerGap())
         );
@@ -1212,7 +1256,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(bottomPanelLayout.createSequentialGroup()
                 .add(calibrationPointSelectorJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 25, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 27, Short.MAX_VALUE)
                 .add(bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(backButton)
                     .add(useCorneaReflectionCheckBox)
@@ -1222,7 +1266,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         displayJPanel.setMinimumSize(new java.awt.Dimension(200, 100));
 
-        deleteButton.setText("Delete"); // NOI18N
+        deleteButton.setText("-"); // NOI18N
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteButtonActionPerformed(evt);
@@ -1250,13 +1294,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             }
         });
         jPanel2.add(locateCalibrationPointsPositionsButton);
-
-        calibrationMarkingToggleButton.setText("Start Marking"); // NOI18N
-        calibrationMarkingToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                calibrationMarkingToggleButtonActionPerformed(evt);
-            }
-        });
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1295,7 +1332,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     .add(secondaryCalibrationPointsRadioButton)
                     .add(primaryCalibrationPointsRadioButton)
                     .add(testingPointsRadioButton))
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1311,26 +1348,26 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         controlPanel.setLayout(controlPanelLayout);
         controlPanelLayout.setHorizontalGroup(
             controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, controlPanelLayout.createSequentialGroup()
-                .add(calibrationMarkingToggleButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 87, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+            .add(controlPanelLayout.createSequentialGroup()
+                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 37, Short.MAX_VALUE)
                 .add(deleteButton))
-            .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(controlPanelLayout.createSequentialGroup()
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                .addContainerGap())
         );
         controlPanelLayout.setVerticalGroup(
             controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, controlPanelLayout.createSequentialGroup()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(deleteButton)
-                    .add(calibrationMarkingToggleButton))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(deleteButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -1339,17 +1376,17 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE)
+                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 933, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(10, 10, 10)
-                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 854, Short.MAX_VALUE)))
+                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(controlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(controlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1479,8 +1516,8 @@ private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.even
         // If all complete ask user whether he/she wants to redo everything
         if (isAllCompleted) {
             int answer = JOptionPane.showOptionDialog(this,
-                    "You already processed all calibration points.  " +
-                    "Would you like to reprocess all of them?",
+                    "You already processed all calibration points.  "
+                    + "Would you like to reprocess all of them?",
                     "All calibration points are processed",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, null, JOptionPane.NO_OPTION);
@@ -1525,38 +1562,6 @@ private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.even
     }
 }//GEN-LAST:event_locateCalibrationPointsPositionsButtonActionPerformed
 
-private void calibrationMarkingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calibrationMarkingToggleButtonActionPerformed
-    // Start marking
-    JToggleButton button = (JToggleButton) evt.getSource();
-    if (button.isSelected()) {
-        // Set text to stop marking 
-        calibrationMarkingToggleButton.setText("Stop marking");
-
-        int index = this.calibrationPointSelectorJPanel.getMarkingButtonIndex(evt.getSource());
-        // Set proper selection index
-        this.calibrationPointSelectorJPanel.setSelectedLabel(index);
-
-        // Block other buttons
-        calibrateButton.setEnabled(false);
-        backButton.setEnabled(false);
-        deleteButton.setEnabled(false);
-
-        // Start recording information
-        startRecording();
-    } else {
-        // Set text to start marking 
-        calibrationMarkingToggleButton.setText("Start marking");
-
-        // Reenable other buttons
-        calibrateButton.setEnabled(true);
-        backButton.setEnabled(true);
-        deleteButton.setEnabled(true);
-
-        // Save information
-        stopRecording();
-    }
-}//GEN-LAST:event_calibrationMarkingToggleButtonActionPerformed
-
 private void testingPointsRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testingPointsRadioButtonActionPerformed
     setCalibrationType(CalibrationInfo.CalibrationType.Testing);
 }//GEN-LAST:event_testingPointsRadioButtonActionPerformed
@@ -1578,7 +1583,6 @@ private void useCorneaReflectionCheckBoxActionPerformed(java.awt.event.ActionEve
     private javax.swing.JPanel bottomPanel;
     private javax.swing.JButton calibrateButton;
     private javax.swing.JList calibrateList;
-    private javax.swing.JToggleButton calibrationMarkingToggleButton;
     private eyetrackercalibrator.gui.CalibrationPointSelectorJPanel calibrationPointSelectorJPanel;
     private javax.swing.JPanel controlPanel;
     private javax.swing.JButton deleteButton;
