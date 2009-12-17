@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * CalibrationPointSelectorJPanel.java
  *
@@ -31,11 +31,17 @@
  */
 package eyetrackercalibrator.gui;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
+import javax.swing.border.SoftBevelBorder;
 
 /**
  *
@@ -43,12 +49,29 @@ import javax.swing.JToggleButton;
  */
 public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
-    JLabel[] label = new JLabel[25];
-    JToggleButton[] toggle = new JToggleButton[25];
+    public enum CalibrationType {
+
+        PRIMARY, SECONDARY, TEST
+    };
+    protected int TOTAL_CALIBRATION_AREA = 25;
+    JLabel[] label = new JLabel[TOTAL_CALIBRATION_AREA];
+    JToggleButton[] toggle = new JToggleButton[TOTAL_CALIBRATION_AREA];
+    String[][] labelText = new String[TOTAL_CALIBRATION_AREA][CalibrationType.values().length];
+    Color selectedLabelBackGround = new java.awt.Color(153, 255, 153);
+
+    public Color getSelectedLabelBackGround() {
+        return selectedLabelBackGround;
+    }
+
+    public void setSelectedLabelBackGround(Color selectedLabelBackGround) {
+        this.selectedLabelBackGround = selectedLabelBackGround;
+    }
 
     /** Creates new form CalibrationPointSelectorJPanel */
     public CalibrationPointSelectorJPanel() {
         initComponents();
+
+        // Store labels in array
         label[	0] = jLabel;
         label[	1] = jLabel1;
         label[	2] = jLabel2;
@@ -100,11 +123,78 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
         toggle[	23] = jToggleButton24;
         toggle[	24] = jToggleButton25;
 
-        ActionListener myListener = new ActionListener() {
+        final String toolTipMarkingStart = "<html>Press to start marking calibration<br/>points for this area.</html>";
+        final String toolTipMarkingEnd = "<html>Press to stop marking calibration<br/>points for this area.</html>";
+
+        ActionListener markingListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 // Disable all other tobble points
-                e.getSource();
+                JToggleButton target = (JToggleButton) e.getSource();
+                boolean isEnable = !target.isSelected();
+                // Disable all but the target
+                for (int i = 0; i < toggle.length; i++) {
+                    if (toggle[i] != target) {
+                        toggle[i].setEnabled(isEnable);
+                    }
+                }
+
+                // change tool tip
+                if (isEnable) {
+                    target.setToolTipText(toolTipMarkingStart);
+                } else {
+                    target.setToolTipText(toolTipMarkingEnd);
+                }
+            }
+        };
+
+        // Set up configuration for each toggle
+        for (int i = 0; i < this.toggle.length; i++) {
+            // Set up listener
+            this.toggle[i].addActionListener(markingListener);
+            // Set up default tool tip
+            this.toggle[i].setToolTipText(toolTipMarkingStart);
+        }
+
+        MouseListener labelClickListener = new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JLabel l = (JLabel) e.getSource();
+
+                // Search for the label
+                int index = getLabelIndex(l);
+                setSelectedLabel(l);
+            }
+        };
+
+        String labelToolTip = "Click to show c";
+
+        // Set up configuration for each label
+        for (int i = 0; i < this.label.length; i++) {
+            // Set up listener
+            this.label[i].addMouseListener(labelClickListener);
+            // Set up default tool tip
+            this.label[i].setToolTipText(labelToolTip);
+        }
+    }
+
+    public void setSelectedLabel(int index) {
+        if (index >= 0 && index < this.label.length) {
+            setSelectedLabel(this.label[index]);
+        }
+    }
+
+    private void setSelectedLabel(JLabel l) {
+        // Change all label to raise and this one to low and change
+        // background color as well.
+        l.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
+        l.setBackground(selectedLabelBackGround);
+        SoftBevelBorder raisedBorder = new SoftBevelBorder(SoftBevelBorder.RAISED);
+        for (int i = 0; i < label.length; i++) {
+            if (l != label[i]) {
+                label[i].setBorder(raisedBorder);
+                label[i].setBackground(getBackground());
             }
         }
     }
@@ -113,61 +203,107 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
      *  Command code for each button is <row>_<column> from 1_1 ... 3_3 according
      *  to position of the button
      */
-    public void addActionListener(ActionListener listener) {
+    public void addMarkingButtonActionListener(ActionListener listener) {
         for (int i = 0; i < toggle.length; i++) {
-            toggle[i].addActionListener(listener);
+            this.toggle[i].addActionListener(listener);
         }
     }
-    
-    /** Return selected index */
-    public int getSelectedPointIndex(){
+
+    /**
+     *  Command code for each button is <row>_<column> from 1_1 ... 3_3 according
+     *  to position of the button
+     */
+    public void addLabelMouseClickListener(MouseListener listener) {
         for (int i = 0; i < toggle.length; i++) {
-            if(toggle[i].isSelected()){
-                return i;
+            this.label[i].addMouseListener(listener);
+        }
+    }
+
+    public void setLabelText(int index, CalibrationType calibrationType, String text) {
+        if (index >= 0 && index < this.label.length) {
+            this.labelText[index][calibrationType.ordinal()] = text;
+            // Check if we need to update the display
+            if (calibrationType == getCurrentView()) {
+                this.label[index].setText(text);
             }
         }
-        return -1;
     }
-    
-    public void setLabelText(int index, String text){
-        if(index >= 0 && index < this.label.length){
-            this.label[index].setText(text);
+
+    public CalibrationType getCurrentView() {
+        if (this.showPrimaryRadioButton.isSelected()) {
+            return CalibrationType.PRIMARY;
+        } else if (this.showSecondaryRadioButton.isSelected()) {
+            return CalibrationType.SECONDARY;
         }
+        // By default
+        return CalibrationType.TEST;
     }
-    
+
     /** @return null if index if out of bound */
-    public String getLabelText(int index){
-        if(index >= 0 && index < this.label.length){
+    public String getLabelText(int index) {
+        if (index >= 0 && index < this.label.length) {
             return this.label[index].getText();
         }
         return null;
     }
-    
+
     /**
      * @return null when index is out of bound.  Otherwise return the location
      * of the index in the grid with topleft coor of (1,1)
      */
-    public Point indexToCalibrationPoint(int index){
-        if(index >= 0 && index < this.label.length){
-            Point p = new Point(index % 5 + 1, 
+    public Point indexToCalibrationPoint(int index) {
+        if (index >= 0 && index < this.label.length) {
+            Point p = new Point(index % 5 + 1,
                     (index - index % 5) / 5 + 1);
             return p;
         }
         return null;
     }
-    
+
+    /** Return -1 if not found */
+    public int getLabelIndex(Object label) {
+        int i = 0;
+        while (i < this.label.length && label != this.label[i]) {
+            i++;
+        }
+        if (i >= this.label.length) {
+            return -1;
+        } else {
+            return i;
+        }
+    }
+
+    public int getMarkingButtonIndex(Object button) {
+        int i = 0;
+        while (i < this.toggle.length && button != this.toggle[i]) {
+            i++;
+        }
+        if (i >= this.toggle.length) {
+            return -1;
+        } else {
+            return i;
+        }
+    }
+
     /**
      * Convert point coordinate to array index
      * @param x Range from 1 to 5
      * @param y Range from 1 to 5
      * @return -1 if point is out of bound
      */
-    public int pointToIndex(int x, int y){
+    public int pointToIndex(int x, int y) {
         int index = (x - 1) + (y - 1) * 5;
-        if(index >= 0 && index < this.label.length){
+        if (index >= 0 && index < this.label.length) {
             return index;
         }
         return -1;
+    }
+
+    private void setLabelDisplay(CalibrationType calibrationType) {
+        int type = calibrationType.ordinal();
+        for (int i = 0; i < label.length; i++) {
+            label[i].setText(labelText[i][type]);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -242,10 +378,10 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
         jLabel19 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
-        primaryShowRadioButton2 = new javax.swing.JRadioButton();
-        primaryShowRadioButton = new javax.swing.JRadioButton();
+        showTestRadioButton = new javax.swing.JRadioButton();
+        showPrimaryRadioButton = new javax.swing.JRadioButton();
         jLabel25 = new javax.swing.JLabel();
-        primaryShowRadioButton1 = new javax.swing.JRadioButton();
+        showSecondaryRadioButton = new javax.swing.JRadioButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Calibration Point"));
 
@@ -253,120 +389,152 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
         jToggleButton1.setText("M");
         jToggleButton1.setToolTipText("Start marking trial");
+        jToggleButton1.setIconTextGap(0);
+        jToggleButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel1.add(jToggleButton1);
 
         jToggleButton6.setText("M");
+        jToggleButton6.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel1.add(jToggleButton6);
 
         jToggleButton11.setText("M");
+        jToggleButton11.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel1.add(jToggleButton11);
 
         jToggleButton16.setText("M");
+        jToggleButton16.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel1.add(jToggleButton16);
 
         jToggleButton21.setText("M");
+        jToggleButton21.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel1.add(jToggleButton21);
 
         jPanel3.setMinimumSize(new java.awt.Dimension(20, 100));
         jPanel3.setPreferredSize(new java.awt.Dimension(20, 161));
         jPanel3.setLayout(new java.awt.GridLayout(6, 1));
 
+        jLabel.setBackground(new java.awt.Color(153, 255, 153));
         jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel.setText("0");
-        jLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jLabel.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel.setOpaque(true);
         jPanel3.add(jLabel);
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("0");
-        jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel5.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel5.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel5.setOpaque(true);
         jPanel3.add(jLabel5);
 
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel10.setText("0");
-        jLabel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel10.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel10.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel10.setOpaque(true);
         jPanel3.add(jLabel10);
 
         jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel15.setText("0");
-        jLabel15.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel15.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel15.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel15.setOpaque(true);
         jPanel3.add(jLabel15);
 
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel20.setText("0");
-        jLabel20.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel20.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel20.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel20.setOpaque(true);
         jPanel3.add(jLabel20);
 
         buttonPanel2.setLayout(new java.awt.GridLayout(6, 1));
 
         jToggleButton2.setText("M");
+        jToggleButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel2.add(jToggleButton2);
 
         jToggleButton7.setText("M");
+        jToggleButton7.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel2.add(jToggleButton7);
 
         jToggleButton12.setText("M");
+        jToggleButton12.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel2.add(jToggleButton12);
 
         jToggleButton17.setText("M");
+        jToggleButton17.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel2.add(jToggleButton17);
 
         jToggleButton22.setText("M");
+        jToggleButton22.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel2.add(jToggleButton22);
 
         buttonPanel3.setLayout(new java.awt.GridLayout(6, 1));
 
         jToggleButton3.setText("M");
+        jToggleButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel3.add(jToggleButton3);
 
         jToggleButton8.setText("M");
+        jToggleButton8.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel3.add(jToggleButton8);
 
         jToggleButton13.setText("M");
+        jToggleButton13.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel3.add(jToggleButton13);
 
         jToggleButton18.setText("M");
+        jToggleButton18.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel3.add(jToggleButton18);
 
         jToggleButton23.setText("M");
+        jToggleButton23.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel3.add(jToggleButton23);
 
         buttonPanel4.setLayout(new java.awt.GridLayout(6, 1));
 
         jToggleButton4.setText("M");
+        jToggleButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel4.add(jToggleButton4);
 
         jToggleButton9.setText("M");
+        jToggleButton9.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel4.add(jToggleButton9);
 
         jToggleButton14.setText("M");
+        jToggleButton14.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel4.add(jToggleButton14);
 
         jToggleButton19.setText("M");
+        jToggleButton19.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel4.add(jToggleButton19);
 
         jToggleButton24.setText("M");
+        jToggleButton24.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel4.add(jToggleButton24);
 
         buttonPanel5.setLayout(new java.awt.GridLayout(6, 1));
 
         jToggleButton5.setText("M");
+        jToggleButton5.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel5.add(jToggleButton5);
 
         jToggleButton10.setText("M");
+        jToggleButton10.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel5.add(jToggleButton10);
 
         jToggleButton15.setText("M");
+        jToggleButton15.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel5.add(jToggleButton15);
 
         jToggleButton20.setText("M");
+        jToggleButton20.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel5.add(jToggleButton20);
 
         jToggleButton25.setText("M");
+        jToggleButton25.setMargin(new java.awt.Insets(0, 0, 0, 0));
         buttonPanel5.add(jToggleButton25);
 
         jPanel8.setMinimumSize(new java.awt.Dimension(20, 100));
@@ -375,32 +543,37 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("0");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel1.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel1.setOpaque(true);
         jPanel8.add(jLabel1);
 
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("0");
-        jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel6.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel6.setOpaque(true);
         jPanel8.add(jLabel6);
 
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel11.setText("0");
-        jLabel11.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel11.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel11.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel11.setOpaque(true);
         jPanel8.add(jLabel11);
 
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel16.setText("0");
-        jLabel16.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel16.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel16.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel16.setOpaque(true);
         jPanel8.add(jLabel16);
 
         jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel21.setText("0");
-        jLabel21.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel21.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel21.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel21.setOpaque(true);
         jPanel8.add(jLabel21);
 
         jPanel9.setMinimumSize(new java.awt.Dimension(20, 120));
@@ -409,32 +582,37 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("0");
-        jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel2.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel2.setOpaque(true);
         jPanel9.add(jLabel2);
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("0");
-        jLabel7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel7.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel7.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel7.setOpaque(true);
         jPanel9.add(jLabel7);
 
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("0");
-        jLabel12.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel12.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel12.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel12.setOpaque(true);
         jPanel9.add(jLabel12);
 
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel17.setText("0");
-        jLabel17.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel17.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel17.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel17.setOpaque(true);
         jPanel9.add(jLabel17);
 
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel22.setText("0");
-        jLabel22.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel22.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel22.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel22.setOpaque(true);
         jPanel9.add(jLabel22);
 
         jPanel10.setMinimumSize(new java.awt.Dimension(20, 120));
@@ -443,32 +621,37 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("0");
-        jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel3.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel3.setOpaque(true);
         jPanel10.add(jLabel3);
 
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("0");
-        jLabel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel8.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel8.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel8.setOpaque(true);
         jPanel10.add(jLabel8);
 
         jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel13.setText("0");
-        jLabel13.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel13.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel13.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel13.setOpaque(true);
         jPanel10.add(jLabel13);
 
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel18.setText("0");
-        jLabel18.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel18.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel18.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel18.setOpaque(true);
         jPanel10.add(jLabel18);
 
         jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel23.setText("0");
-        jLabel23.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel23.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel23.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel23.setOpaque(true);
         jPanel10.add(jLabel23);
 
         jPanel11.setMinimumSize(new java.awt.Dimension(20, 120));
@@ -477,72 +660,38 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("0");
-        jLabel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel4.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel4.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel4.setOpaque(true);
         jPanel11.add(jLabel4);
 
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("0");
-        jLabel9.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel9.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel9.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel9.setOpaque(true);
         jPanel11.add(jLabel9);
 
         jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel14.setText("0");
-        jLabel14.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel14.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel14.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel14.setOpaque(true);
         jPanel11.add(jLabel14);
 
         jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel19.setText("0");
-        jLabel19.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel19.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel19.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel19.setOpaque(true);
         jPanel11.add(jLabel19);
 
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel24.setText("0");
-        jLabel24.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel24.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel24.setMaximumSize(new java.awt.Dimension(15, 15));
+        jLabel24.setOpaque(true);
         jPanel11.add(jLabel24);
-
-        pointTypeViewGroup.add(primaryShowRadioButton2);
-        primaryShowRadioButton2.setText("Test Points");
-
-        pointTypeViewGroup.add(primaryShowRadioButton);
-        primaryShowRadioButton.setSelected(true);
-        primaryShowRadioButton.setText("Primary Points");
-
-        jLabel25.setText("Show :");
-
-        pointTypeViewGroup.add(primaryShowRadioButton1);
-        primaryShowRadioButton1.setText("Secondary Points");
-
-        org.jdesktop.layout.GroupLayout jPanel12Layout = new org.jdesktop.layout.GroupLayout(jPanel12);
-        jPanel12.setLayout(jPanel12Layout);
-        jPanel12Layout.setHorizontalGroup(
-            jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel12Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel25)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(primaryShowRadioButton)
-                .add(21, 21, 21)
-                .add(primaryShowRadioButton1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(primaryShowRadioButton2)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel12Layout.setVerticalGroup(
-            jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel25)
-                    .add(primaryShowRadioButton)
-                    .add(primaryShowRadioButton1)
-                    .add(primaryShowRadioButton2))
-                .addContainerGap())
-        );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -568,41 +717,104 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
                 .add(buttonPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(6, 6, 6)
                 .add(jPanel11, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))
-            .add(jPanel12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel11, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, buttonPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 132, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, buttonPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 132, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, buttonPanel2, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, buttonPanel3, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel9, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, buttonPanel4, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE))
+            .add(jPanel11, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+            .add(buttonPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+            .add(buttonPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+            .add(jPanel3, 0, 0, Short.MAX_VALUE)
+            .add(buttonPanel2, 0, 0, Short.MAX_VALUE)
+            .add(jPanel8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+            .add(buttonPanel3, 0, 0, Short.MAX_VALUE)
+            .add(jPanel9, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+            .add(buttonPanel4, 0, 0, Short.MAX_VALUE)
+            .add(jPanel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+        );
+
+        pointTypeViewGroup.add(showTestRadioButton);
+        showTestRadioButton.setText("Test Points");
+        showTestRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showRadioButtonActionPerformed(evt);
+            }
+        });
+
+        pointTypeViewGroup.add(showPrimaryRadioButton);
+        showPrimaryRadioButton.setSelected(true);
+        showPrimaryRadioButton.setText("Primary Points");
+        showPrimaryRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showRadioButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel25.setText("Show :");
+
+        pointTypeViewGroup.add(showSecondaryRadioButton);
+        showSecondaryRadioButton.setText("Secondary Points");
+        showSecondaryRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showRadioButtonActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel12Layout = new org.jdesktop.layout.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel12Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel25)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(showPrimaryRadioButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showSecondaryRadioButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showTestRadioButton)
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel12Layout.createSequentialGroup()
+                .addContainerGap(11, Short.MAX_VALUE)
+                .add(jPanel12Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel25)
+                    .add(showPrimaryRadioButton)
+                    .add(showSecondaryRadioButton)
+                    .add(showTestRadioButton))
+                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(jPanel12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel12, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         getAccessibleContext().setAccessibleName("Select Calibration Point");
     }// </editor-fold>//GEN-END:initComponents
+
+    private void showRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showRadioButtonActionPerformed
+        // Change the output accordingly
+        JRadioButton b = (JRadioButton) evt.getSource();
+        if (b == this.showPrimaryRadioButton) {
+            setLabelDisplay(CalibrationType.PRIMARY);
+        } else if (b == this.showSecondaryRadioButton) {
+            setLabelDisplay(CalibrationType.SECONDARY);
+        } else if (b == this.showTestRadioButton) {
+            setLabelDisplay(CalibrationType.TEST);
+        }
+    }//GEN-LAST:event_showRadioButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel1;
     private javax.swing.JPanel buttonPanel2;
@@ -669,8 +881,8 @@ public class CalibrationPointSelectorJPanel extends javax.swing.JPanel {
     private javax.swing.JToggleButton jToggleButton9;
     private javax.swing.ButtonGroup pointSelectButtonGroup;
     private javax.swing.ButtonGroup pointTypeViewGroup;
-    private javax.swing.JRadioButton primaryShowRadioButton;
-    private javax.swing.JRadioButton primaryShowRadioButton1;
-    private javax.swing.JRadioButton primaryShowRadioButton2;
+    private javax.swing.JRadioButton showPrimaryRadioButton;
+    private javax.swing.JRadioButton showSecondaryRadioButton;
+    private javax.swing.JRadioButton showTestRadioButton;
     // End of variables declaration//GEN-END:variables
 }
