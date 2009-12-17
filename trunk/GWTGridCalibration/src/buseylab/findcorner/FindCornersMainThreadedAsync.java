@@ -132,13 +132,7 @@ public class FindCornersMainThreadedAsync implements Runnable, FindCorners.Compl
             ois.close();
             fis.close();
 
-            this.currentScene = getIndexOfFirstFrame(this.sceneFiles);
-            // Check if we can find the first frame
-            if (this.currentScene < 0) {
-                // Signal completion and return
-                this.listener.completed();
-                return;
-            }
+            this.currentScene = 0;
 
             // Here to make sure that any change to this.numThreads won't effect
             // termination condition
