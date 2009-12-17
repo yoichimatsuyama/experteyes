@@ -53,6 +53,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -170,9 +171,17 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         });
 
         // Add listener to calibration point selector
-        calibrationPointSelectorJPanel.addActionListener(new ActionListener() {
+        calibrationPointSelectorJPanel.addMarkingButtonActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+                calibrationMarkingToggleButtonActionPerformed(e);
+            }
+        });
+
+        calibrationPointSelectorJPanel.addLabelMouseClickListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 calibrationPointSelectHandle(e);
             }
         });
@@ -312,9 +321,10 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     }
 
     // Handle when calibration point selector is select
-    private void calibrationPointSelectHandle(ActionEvent e) {
+    private void calibrationPointSelectHandle(MouseEvent e) {
         // get selected calibration point index
-        this.calibrationIndex = this.calibrationPointSelectorJPanel.getSelectedPointIndex();
+        this.calibrationIndex =
+                this.calibrationPointSelectorJPanel.getLabelIndex(e.getSource());
 
         // Switch to the list
         calibrateList.setModel(calibrationSet[this.calibrationIndex]);
@@ -380,8 +390,15 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         }
 
         // Set label accordingly
-        this.calibrationPointSelectorJPanel.setLabelText(index,
-                totalPrimeCal + "/" + totalSecondaryCal + "/" + totalTest);
+        this.calibrationPointSelectorJPanel.setLabelText(
+                index, CalibrationPointSelectorJPanel.CalibrationType.PRIMARY,
+                String.valueOf(totalPrimeCal));
+        this.calibrationPointSelectorJPanel.setLabelText(
+                index, CalibrationPointSelectorJPanel.CalibrationType.SECONDARY,
+                String.valueOf(totalSecondaryCal));
+        this.calibrationPointSelectorJPanel.setLabelText(
+                index, CalibrationPointSelectorJPanel.CalibrationType.TEST,
+                String.valueOf(totalTest));
     }
 
     private void setCalibrationType(CalibrationInfo.CalibrationType type) {
@@ -1429,11 +1446,11 @@ private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     // Check if we have unprocessed calibration points.  If not then we warn
     // the user before proceeding
     int result = JOptionPane.OK_OPTION;
-    
-    if(!process){
+
+    if (!process) {
         result = JOptionPane.showConfirmDialog(this,
-            "You have some unprocessed calibration points.  The calibration results may be incorrect.  Select OK to proceed with calibration.",
-            "Unprocess Calibration Points Exist", JOptionPane.OK_CANCEL_OPTION);
+                "You have some unprocessed calibration points.  The calibration results may be incorrect.  Select OK to proceed with calibration.",
+                "Unprocess Calibration Points Exist", JOptionPane.OK_CANCEL_OPTION);
     }
     if (result == JOptionPane.OK_OPTION) {
         // Done calibrating allow button to be pressed
@@ -1514,6 +1531,10 @@ private void calibrationMarkingToggleButtonActionPerformed(java.awt.event.Action
     if (button.isSelected()) {
         // Set text to stop marking 
         calibrationMarkingToggleButton.setText("Stop marking");
+
+        int index = this.calibrationPointSelectorJPanel.getMarkingButtonIndex(evt.getSource());
+        // Set proper selection index
+        this.calibrationPointSelectorJPanel.setSelectedLabel(index);
 
         // Block other buttons
         calibrateButton.setEnabled(false);
