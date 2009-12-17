@@ -173,7 +173,7 @@ public class CleanDataJPanel extends javax.swing.JPanel {
         int frameCount = 0;
         for (int i = 0; i < ranges.length; i++) {
             ranges[i] = (ErrorMarking) errors[i];
-            frameCount += ranges[i].stopSceneFrame - ranges[i].stopSceneFrame + 1;
+            frameCount += ranges[i].stopSceneFrame - ranges[i].startEyeFrame + 1;
         }
 
         if(frameCount < 2){
