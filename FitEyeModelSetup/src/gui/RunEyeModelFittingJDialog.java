@@ -97,6 +97,7 @@ public class RunEyeModelFittingJDialog extends javax.swing.JDialog {
 
         runButton.setText("Run");
 
+        redoCheckBox.setSelected(true);
         redoCheckBox.setText("Redo completed frames");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
