@@ -333,7 +333,9 @@ public class Main extends javax.swing.JFrame {
         if (p != null) {
             point.setLocation(p);
             // Check the range and mark is with ERROR_VALUE,ERROR_VALUE if out of screen
-            if (point.x < 0 || point.y < 0 || point.x > screenViewFullSize.width || point.y > screenViewFullSize.height) {
+            if (point.x < 0 || point.y < 0
+                    || point.x > screenViewFullSize.width
+                    || point.y > screenViewFullSize.height) {
                 point.setLocation(ERROR_VALUE, ERROR_VALUE);
             }
         }
