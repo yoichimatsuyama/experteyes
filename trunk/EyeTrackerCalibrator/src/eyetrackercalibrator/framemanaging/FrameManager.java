@@ -261,10 +261,10 @@ public class FrameManager {
             frameLoadingListener.update("Loading file listing", 0, 100);
 
             // Clear all previous data if load all files
-            if (total == 0) {
-                this.numberToFrameInfoMap.clear();
-                this.numberToFrameMap.clear();
-            }
+//            if (total == 0) {
+//                this.numberToFrameInfoMap.clear();
+//                this.numberToFrameMap.clear();
+//            }
 
             if (filenames != null && filenames.length > 0) {
                 // Sort file names
@@ -301,6 +301,17 @@ public class FrameManager {
                     frameLoadingListener.update((i + 1) + " of " + filenames.length, i, filenames.length);
                     //Thread.yield();
                 }
+
+                // Clear the left over information in case there are less files
+                int currentSize = Math.max(numberToFrameInfoMap.size(), numberToFrameMap.size());
+                if(currentSize > filenames.length){
+                    // Get rid of the excess
+                    for (int i = filenames.length + 1; i <= currentSize; i++) {
+                        numberToFrameInfoMap.remove(i);
+                        numberToFrameMap.remove(i);
+                    }
+                }
+
                 // Update the last progress
                 frameLoadingListener.update("Completed " + filenames.length + " frames", filenames.length, filenames.length);
             } else {
