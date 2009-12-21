@@ -200,8 +200,8 @@ public class Main extends javax.swing.JFrame {
                 out = new PrintWriter(chooser.getSelectedFile());
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(this, "Cannot open " +
-                        chooser.getSelectedFile().getAbsolutePath() + " for writing.",
+                JOptionPane.showMessageDialog(this, "Cannot open "
+                        + chooser.getSelectedFile().getAbsolutePath() + " for writing.",
                         "File Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -214,22 +214,22 @@ public class Main extends javax.swing.JFrame {
 
             // Print header
             out.println(
-                    "Frame\t" +
-                    "Scene X\t" +
-                    "Scene Y\t" +
-                    "Top Left X\t" +
-                    "Top Left Y\t" +
-                    "Top Right X\t" +
-                    "Top Right Y\t" +
-                    "Bottom Left X\t" +
-                    "Bottom Left Y\t" +
-                    "Bottom Right X\t" +
-                    "Bottom Right Y\t" +
-                    "Eye Gaze X\t" +
-                    "Eye Gaze Y\t" +
-                    "Error Angle\t" +
-                    "Eye Frame File\t" +
-                    "Scene Frame File");
+                    "Frame\t"
+                    + "Scene X\t"
+                    + "Scene Y\t"
+                    + "Top Left X\t"
+                    + "Top Left Y\t"
+                    + "Top Right X\t"
+                    + "Top Right Y\t"
+                    + "Bottom Left X\t"
+                    + "Bottom Left Y\t"
+                    + "Bottom Right X\t"
+                    + "Bottom Right Y\t"
+                    + "Eye Gaze X\t"
+                    + "Eye Gaze Y\t"
+                    + "Error Angle\t"
+                    + "Eye Frame File\t"
+                    + "Scene Frame File");
 
             int totalFrame = this.frameSynchronizor.getTotalFrame();
 
@@ -242,7 +242,8 @@ public class Main extends javax.swing.JFrame {
             for (int i = 1; i <= totalFrame; i++) {
 
                 Point calibrationPoint =
-                        calibrateJPanel.frameToCalibrationPoint(i);
+                        calibrateJPanel.frameToCalibrationPoint(
+                        this.frameSynchronizor.getSceneFrame(i));
                 if (calibrationPoint != null) {
                     // Found calibration points so output info
                     ScreenViewFrameInfo info =
@@ -291,12 +292,16 @@ public class Main extends javax.swing.JFrame {
                             Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
                                     i, gazeVec.x, gazeVec.y);
 
-                            // Compute error angel
-                            double errorAngle = dec.degreeError(
-                                    scenePos, gazePoint);
+                            if (scenePos != null) {
+                                // Compute error angel
+                                double errorAngle = dec.degreeError(
+                                        scenePos, gazePoint);
 
-                            if (errorAngle >= 0) {
-                                out.print("\t" + errorAngle);
+                                if (errorAngle >= 0) {
+                                    out.print("\t" + errorAngle);
+                                } else {
+                                    out.print("\t" + ERROR_VALUE);
+                                }
                             } else {
                                 out.print("\t" + ERROR_VALUE);
                             }
@@ -1062,7 +1067,7 @@ public class Main extends javax.swing.JFrame {
         this.calibrateJPanel.setUsingCorneaReflect(
                 Boolean.parseBoolean(p.getProperty(USING_CORNEA_REFLECTION, "true")));
 
-        
+
         // Load synch file if exists
         File syncFile = new File(projectLocation, SYNC_FILE_NAME);
         if (syncFile.exists()) {
@@ -1083,7 +1088,6 @@ public class Main extends javax.swing.JFrame {
             this.synchronizeJPanel.addSyncPoint(sps[0]);
         }
         /**--End backward compatimility support---*/
-
         /** Set frame sync accordingly.  This must be done before we load any other things */
         this.frameSynchronizor.setSynchronizationPoints(sps,
                 eyeFrameManager.getTotalFrames(),
@@ -1229,19 +1233,6 @@ public class Main extends javax.swing.JFrame {
     private void exportData() {
         // Gather information 
 
-        // Get offset
-//        int eyeSynchFrame = 0;
-//        String s = projectSelectPanel.getSynchronizedEyeFrame();
-//        if (s != null) {
-//            eyeSynchFrame = Integer.parseInt(s);
-//        }
-//        int screenSynchFrame = 0;
-//        s = projectSelectPanel.getSynchronizedScreenFrame();
-//        if (s != null) {
-//            screenSynchFrame = Integer.parseInt(s);
-//        }
-//        int eyeToScreen = -eyeSynchFrame + screenSynchFrame;
-
         // Get screen dimension
         Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
         Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
@@ -1272,36 +1263,36 @@ public class Main extends javax.swing.JFrame {
 
                 // Print header
                 exportWriter.println(
-                        "Screen Frame\t" +
-                        "Pupil x\t" +
-                        "Pupil y\t" +
-                        "Pupil fit top left x\t" +
-                        "Pupil fit topleft y\t" +
-                        "Pupil fit bottom right x\t" +
-                        "Pupil fit bottom right y\t" +
-                        "Cornia reflect x\t" +
-                        "Cornia reflect y\t" +
-                        "Raw primary x\t" + // This is a gaze coor on the screen view
-                        "Raw primary y\t" +
-                        "Raw secondary x\t" + // This is a gaze coor on the screen view
-                        "Raw secondary y\t" +
-                        "Raw linear interpolated x\t" + // This is a gaze coor on the screen view
-                        "Raw linear interpolated y\t" +
-                        "Scene primary x\t" +
-                        "Scene primary y\t" +
-                        "Scene secondary x\t" +
-                        "Scene secondary y\t" +
-                        "Scene linear interpolated x\t" +
-                        "Scene linear interpolated y\t" +
-                        "Similarity of topleft\t" +
-                        "Similarity of topright\t" +
-                        "Similarity of bottomleft\t" +
-                        "Similarity of bottomright\t" +
-                        "Error\t" +
-                        "Trial file name\t" +
-                        "Trial number\t" +
-                        "Eye Frame File\t" +
-                        "Scene Frame File");
+                        "Screen Frame\t"
+                        + "Pupil x\t"
+                        + "Pupil y\t"
+                        + "Pupil fit top left x\t"
+                        + "Pupil fit topleft y\t"
+                        + "Pupil fit bottom right x\t"
+                        + "Pupil fit bottom right y\t"
+                        + "Cornia reflect x\t"
+                        + "Cornia reflect y\t"
+                        + "Raw primary x\t" + // This is a gaze coor on the screen view
+                        "Raw primary y\t"
+                        + "Raw secondary x\t" + // This is a gaze coor on the screen view
+                        "Raw secondary y\t"
+                        + "Raw linear interpolated x\t" + // This is a gaze coor on the screen view
+                        "Raw linear interpolated y\t"
+                        + "Scene primary x\t"
+                        + "Scene primary y\t"
+                        + "Scene secondary x\t"
+                        + "Scene secondary y\t"
+                        + "Scene linear interpolated x\t"
+                        + "Scene linear interpolated y\t"
+                        + "Similarity of topleft\t"
+                        + "Similarity of topright\t"
+                        + "Similarity of bottomleft\t"
+                        + "Similarity of bottomright\t"
+                        + "Error\t"
+                        + "Trial file name\t"
+                        + "Trial number\t"
+                        + "Eye Frame File\t"
+                        + "Scene Frame File");
 
                 // Variables
                 Point2D fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
@@ -1323,14 +1314,14 @@ public class Main extends javax.swing.JFrame {
 
                 for (int i = 1; i <= this.frameSynchronizor.getTotalFrame(); i++) {
                     // Get the current trial number
-                    while (trialNumber < trials.length &&
-                            (this.frameSynchronizor.getSceneFrame(i) > trials[trialNumber].stopSceneFrame)) {
+                    while (trialNumber < trials.length
+                            && (this.frameSynchronizor.getSceneFrame(i) > trials[trialNumber].stopSceneFrame)) {
                         // Move to the next trial
                         trialNumber++;
                     }
                     // Get the trial name when appropriate
-                    if (trialNumber < trials.length &&
-                            this.frameSynchronizor.getSceneFrame(i) >= trials[trialNumber].startSceneFrame) {
+                    if (trialNumber < trials.length
+                            && this.frameSynchronizor.getSceneFrame(i) >= trials[trialNumber].startSceneFrame) {
                         // Set new trial name
                         trialName = trials[trialNumber].label;
                     } else {
@@ -1343,11 +1334,11 @@ public class Main extends javax.swing.JFrame {
                         Point calibrationPoint = calibrateJPanel.frameToCalibrationPoint(
                                 this.frameSynchronizor.getSceneFrame(i));
                         if (calibrationPoint != null) {
-                            calibrationName = "C_" + calibrationPoint.x + "_" +
-                                    calibrationPoint.y;
-                            calibrationNumber = -(calibrationPoint.x +
-                                    (calibrationPoint.y - 1) *
-                                    CalibrateJPanel.TOTAL_CALIBRATION_X);
+                            calibrationName = "C_" + calibrationPoint.x + "_"
+                                    + calibrationPoint.y;
+                            calibrationNumber = -(calibrationPoint.x
+                                    + (calibrationPoint.y - 1)
+                                    * CalibrateJPanel.TOTAL_CALIBRATION_X);
                         } else {
                             calibrationName = null;
                         }
@@ -1366,9 +1357,9 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         // Write current Frame, Pupil(x,y)
-                        exportWriter.print(i + "\t" +
-                                eyeInfo.getPupilX() + "\t" +
-                                eyeInfo.getPupilY() + "\t");
+                        exportWriter.print(i + "\t"
+                                + eyeInfo.getPupilX() + "\t"
+                                + eyeInfo.getPupilY() + "\t");
 
                         // Write Pupil fit topleft x,y bottom right (x,y)
                         for (int j = 0; j < pupilFit.length; j++) {
@@ -1376,8 +1367,8 @@ public class Main extends javax.swing.JFrame {
                         }
 
                         // Write Cornia reflect (x,y), Gaze on screen view (x,y)
-                        exportWriter.print(eyeInfo.getCorneaReflectX() + "\t" +
-                                eyeInfo.getCorneaReflectX() + "\t");
+                        exportWriter.print(eyeInfo.getCorneaReflectX() + "\t"
+                                + eyeInfo.getCorneaReflectX() + "\t");
 
 
                         // For storing gaze point
@@ -1387,9 +1378,9 @@ public class Main extends javax.swing.JFrame {
                         if (trialName != null && trials[trialNumber].isBadTrial) {
                             // Just put blank
                             exportWriter.print(
-                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t" +
-                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t" +
-                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t"
+                                    + ERROR_VALUE + "\t" + ERROR_VALUE + "\t"
+                                    + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
                         } else {
                             // Compute eye vector
                             Point2D.Double vector = this.eyeGazeComputing.getEyeVector(eyeInfo);
@@ -1420,9 +1411,9 @@ public class Main extends javax.swing.JFrame {
                         if (sceneInfo != null) {
                             Point2D[] corners = sceneInfo.getCorners();
 
-                            if (corners != null && corners[0] != null &&
-                                    corners[1] != null && corners[2] != null &&
-                                    corners[3] != null) {
+                            if (corners != null && corners[0] != null
+                                    && corners[1] != null && corners[2] != null
+                                    && corners[3] != null) {
                                 for (int j = 0; j < point.length; j++) {
                                     // Only estimate fixation when this is not a bad trial
                                     if (trialName != null && trials[trialNumber].isBadTrial) {
@@ -1440,10 +1431,10 @@ public class Main extends javax.swing.JFrame {
                                         if (fixation == null) {
                                             fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
                                         }
-                                        if ((point[j].x < 0 && point[j].y < 0) ||
-                                                fixation.getX() < 0 || fixation.getY() < 0 ||
-                                                fixation.getX() > realMonitorDimension.width ||
-                                                fixation.getY() > realMonitorDimension.height) {
+                                        if ((point[j].x < 0 && point[j].y < 0)
+                                                || fixation.getX() < 0 || fixation.getY() < 0
+                                                || fixation.getX() > realMonitorDimension.width
+                                                || fixation.getY() > realMonitorDimension.height) {
                                             fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
                                         }
 
@@ -1455,10 +1446,10 @@ public class Main extends javax.swing.JFrame {
                                 double[] similarities = sceneInfo.similarities;
                                 // Write Gaze on monitor (x,y), Similarity (topleft, topright, bottomleft, bottomright)
                                 exportWriter.print(
-                                        similarities[ScreenViewFrameInfo.TOPLEFT] + "\t" +
-                                        similarities[ScreenViewFrameInfo.TOPRIGHT] + "\t" +
-                                        similarities[ScreenViewFrameInfo.BOTTOMLEFT] + "\t" +
-                                        similarities[ScreenViewFrameInfo.BOTTOMRIGHT] + "\t");
+                                        similarities[ScreenViewFrameInfo.TOPLEFT] + "\t"
+                                        + similarities[ScreenViewFrameInfo.TOPRIGHT] + "\t"
+                                        + similarities[ScreenViewFrameInfo.BOTTOMLEFT] + "\t"
+                                        + similarities[ScreenViewFrameInfo.BOTTOMRIGHT] + "\t");
                             } else {
                                 // Just put blank
                                 exportWriter.print(
@@ -1475,24 +1466,24 @@ public class Main extends javax.swing.JFrame {
                         long errorValue = 0;
                         int eyeFrame = this.frameSynchronizor.getEyeFrame(i);
                         int sceneFrame = this.frameSynchronizor.getSceneFrame(i);
-                        if (error != null &&
-                                ((error.startEyeFrame > 0 &&
-                                error.startEyeFrame <= eyeFrame) ||
-                                (error.startSceneFrame > 0 &&
-                                error.startSceneFrame <= sceneFrame))) {
+                        if (error != null
+                                && ((error.startEyeFrame > 0
+                                && error.startEyeFrame <= eyeFrame)
+                                || (error.startSceneFrame > 0
+                                && error.startSceneFrame <= sceneFrame))) {
                             // Check if it's in range
-                            if ((error.stopEyeFrame > 0 &&
-                                    eyeFrame <= error.stopEyeFrame) ||
-                                    (error.stopSceneFrame > 0 &&
-                                    sceneFrame <= error.stopSceneFrame)) {
+                            if ((error.stopEyeFrame > 0
+                                    && eyeFrame <= error.stopEyeFrame)
+                                    || (error.stopSceneFrame > 0
+                                    && sceneFrame <= error.stopSceneFrame)) {
                                 errorValue = error.getErrorCode();
                             } else {
                                 // Mismatch. Try finding the next one
-                                while (errorIter.hasNext() &&
-                                        ((error.stopEyeFrame > 0 &&
-                                        error.stopEyeFrame < eyeFrame) ||
-                                        (error.stopSceneFrame > 0 &&
-                                        error.stopSceneFrame < sceneFrame))) {
+                                while (errorIter.hasNext()
+                                        && ((error.stopEyeFrame > 0
+                                        && error.stopEyeFrame < eyeFrame)
+                                        || (error.stopSceneFrame > 0
+                                        && error.stopSceneFrame < sceneFrame))) {
                                     error = errorIter.next();
                                 }
                                 // Check if we found one
@@ -1553,8 +1544,8 @@ public class Main extends javax.swing.JFrame {
         // Trying to determine full screen dimension
         String filename = screenFrameManager.getFrameFileName(1);
 
-        if (filename != null &&
-                projectSelectPanel.getFullScreenFrameDirectory() != null) {
+        if (filename != null
+                && projectSelectPanel.getFullScreenFrameDirectory() != null) {
             // Use screen screen dir if full screen does not exists
             String fullScreenDir = projectSelectPanel.getFullScreenFrameDirectory();
             if (fullScreenDir.length() < 1) {
