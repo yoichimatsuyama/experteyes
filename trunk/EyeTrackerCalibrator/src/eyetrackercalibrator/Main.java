@@ -1227,11 +1227,19 @@ public class Main extends javax.swing.JFrame {
      * Exporting information to files
      */
     private void exportData() {
-        // Gather information 
-
         // Get screen dimension
         Dimension realMonitorDimension = projectSelectPanel.getMonitorDimensionPX();
         Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
+
+        // Sanity check and warning
+        if(realMonitorDimension == null){
+            JOptionPane.showMessageDialog(this,  
+                    "<html>Monitor dimension is missing.  Data exported will " +
+                    "not have projected monitor coordinates.</html>",
+                    "Monitor dimension is missing.",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+
 
         // Check for eye calibration vector
         double[][] gazeCoefficient = calibrateJPanel.getEyeGazeCoefficient(0);
