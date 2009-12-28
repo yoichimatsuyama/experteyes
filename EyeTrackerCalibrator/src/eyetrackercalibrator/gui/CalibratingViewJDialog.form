@@ -49,14 +49,14 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <Component id="showDegreeErrorCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="464" max="32767" attributes="0"/>
+                  <EmptySpace pref="554" max="32767" attributes="0"/>
                   <Component id="snapShotButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="closeButton" min="-2" max="-2" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="progressBar" pref="863" max="32767" attributes="0"/>
+                  <Component id="progressBar" pref="871" max="32767" attributes="0"/>
                   <EmptySpace min="18" pref="18" max="18" attributes="0"/>
               </Group>
           </Group>

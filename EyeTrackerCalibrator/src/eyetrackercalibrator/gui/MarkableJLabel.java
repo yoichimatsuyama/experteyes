@@ -66,6 +66,7 @@ public class MarkableJLabel extends JLabel {
     private Point[] blueMarkedPoints = null;
     private Point[] greenMarkedPoints = null;
     private Point[] redMarkedPoints = null;
+    private Point[] whiteMarkedPoints = null;
     private Color color = Color.GREEN;
     private RotatedEllipse2D greenEllisp = null;
     private RotatedEllipse2D redEllisp = null;
@@ -89,7 +90,7 @@ public class MarkableJLabel extends JLabel {
 
     public enum MarkColor {
 
-        GREEN, RED, BLUE, YELLOW
+        GREEN, RED, BLUE, YELLOW, WHITE
     }
 
     public enum CornerColor {
@@ -119,6 +120,7 @@ public class MarkableJLabel extends JLabel {
         drawMarks(g, Color.RED, redMarkedPoints);
         drawMarks(g, Color.BLUE, blueMarkedPoints);
         drawMarks(g, Color.YELLOW, yellowMarkedPoints);
+        drawMarks(g, Color.WHITE, whiteMarkedPoints);
 
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform oldTransform = g2d.getTransform();
@@ -253,11 +255,13 @@ public class MarkableJLabel extends JLabel {
     public Point[] getMarkedPoints(MarkableJLabel.MarkColor color) {
         switch (color) {
             case RED:
-                return redMarkedPoints;
+                return this.redMarkedPoints;
             case BLUE:
-                return blueMarkedPoints;
+                return this.blueMarkedPoints;
             case YELLOW:
-                return yellowMarkedPoints;
+                return this.yellowMarkedPoints;
+            case WHITE:
+                return this.whiteMarkedPoints;
             default: // Green by default
                 return greenMarkedPoints;
         }
@@ -273,6 +277,9 @@ public class MarkableJLabel extends JLabel {
                 break;
             case YELLOW:
                 this.yellowMarkedPoints = markedPoints;
+                break;
+            case WHITE:
+                this.whiteMarkedPoints = markedPoints;
                 break;
             default: // Green by default
                 this.greenMarkedPoints = markedPoints;
