@@ -97,10 +97,10 @@ public class CalibratingViewJDialog
         public void update(double[][] c, double cost) {
             coeff[this.calibrationType] = c;
             Point2D accuracy = estimatingPoints(this.calibrationType);
-            this.display.setText("<html><pre>Calibration Accuracy: " +
-                    formatter.format(accuracy.getX()) +
-                    " degrees of visual angle\n    Overall Accuracy: " +
-                    formatter.format(accuracy.getY()) + " degrees of visual angle</pre></html>");
+            this.display.setText("<html><pre>Calibration Accuracy: "
+                    + formatter.format(accuracy.getX())
+                    + " degrees of visual angle\n    Overall Accuracy: "
+                    + formatter.format(accuracy.getY()) + " degrees of visual angle</pre></html>");
             // Advance progress
             progress[this.calibrationType] += progressStep;
 
@@ -461,14 +461,16 @@ public class CalibratingViewJDialog
         if (this.correctPoints[PRIMARY] != null) {
             primaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN);
             primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[PRIMARY], MarkableJLabel.MarkColor.RED);
-            primaryMarkableJLabel.setMarkedPoints(this.combinedTestPoints[PRIMARY], MarkableJLabel.MarkColor.BLUE);
-            primaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[PRIMARY], MarkableJLabel.MarkColor.YELLOW);
+            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
+            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE);
+            primaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[PRIMARY], MarkableJLabel.MarkColor.WHITE);
         }
         if (this.correctPoints[SECONDARY] != null) {
-            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.GREEN);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
             secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[SECONDARY], MarkableJLabel.MarkColor.RED);
-            secondaryMarkableJLabel.setMarkedPoints(this.combinedTestPoints[SECONDARY], MarkableJLabel.MarkColor.BLUE);
-            secondaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE);
+            secondaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[SECONDARY], MarkableJLabel.MarkColor.WHITE);
         }
 
         // Repaint
@@ -582,7 +584,6 @@ public class CalibratingViewJDialog
     public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer) {
         this.degreeErrorComputer = degreeErrorComputer;
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
     private javax.swing.JPanel jPanel1;
