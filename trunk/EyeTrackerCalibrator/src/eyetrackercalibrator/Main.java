@@ -143,6 +143,10 @@ public class Main extends javax.swing.JFrame {
     private int DISPLAY_HEIGHT = 512;
     private InformationDatabase informationDatabase = null;
     private boolean isProjectOpen = false;
+    static final String DEFAULT_EYE_FRAME_PATH = "eye";
+    static final String DEFAULT_EYE_INFO_PATH = "eyeinfo";
+    static final String DEFAULT_SCENE_FRAME_PATH = "scene";
+    static final String DEFAULT_SCENE_INFO_PATH = "sceneinfo";
 
     /** Creates a new instance of Main */
     public Main() {
@@ -186,6 +190,15 @@ public class Main extends javax.swing.JFrame {
         }
 
         return true;
+    }
+
+    private String createPath(String path, File projectLocation, String defaultValue) {
+        String v = path;
+        if (v == null) {
+            File defaultPath = new File(projectLocation.getParentFile(), defaultValue);
+            v = defaultPath.getAbsolutePath();
+        }
+        return v;
     }
 
     private void exportCalibrationPointInfo() {
@@ -1018,11 +1031,20 @@ public class Main extends javax.swing.JFrame {
 
         this.isProjectOpen = true;
 
-        projectSelectPanel.setEyeFrameDirectory(p.getProperty(EYE_VIEW_DIRECTORY));
-        projectSelectPanel.setEyeInfoDirectory(p.getProperty(EYE_INFO_DIRECTORY));
-        projectSelectPanel.setScreenFrameDirectory(p.getProperty(SCREEN_VIEW_DIRECTORY));
+        //Apply default when new
+        projectSelectPanel.setEyeFrameDirectory(
+                createPath(p.getProperty(EYE_VIEW_DIRECTORY),
+                projectLocation, DEFAULT_EYE_FRAME_PATH));
+        projectSelectPanel.setEyeInfoDirectory(
+                createPath(p.getProperty(EYE_INFO_DIRECTORY),
+                projectLocation, DEFAULT_EYE_INFO_PATH));
+        projectSelectPanel.setScreenFrameDirectory(
+                createPath(p.getProperty(SCREEN_VIEW_DIRECTORY),
+                projectLocation, DEFAULT_SCENE_FRAME_PATH));
         projectSelectPanel.setFullScreenFrameDirectory(p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
-        projectSelectPanel.setScreenInfoDirectory(p.getProperty(SCREEN_INFO_DIRECTORY));
+        projectSelectPanel.setScreenInfoDirectory(
+                createPath(p.getProperty(SCREEN_INFO_DIRECTORY),
+                projectLocation, DEFAULT_SCENE_INFO_PATH));
         projectSelectPanel.setMonitorDimensionPX(p.getProperty(MONITOR_TRUE_WIDTH_PX, ""), p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
         projectSelectPanel.setFullSceneDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
         projectSelectPanel.setComment(p.getProperty(COMMENT, ""));
@@ -1232,10 +1254,10 @@ public class Main extends javax.swing.JFrame {
         Dimension screenViewFullSize = projectSelectPanel.getFullSceneDimensionPX();
 
         // Sanity check and warning
-        if(realMonitorDimension == null){
-            JOptionPane.showMessageDialog(this,  
-                    "<html>Monitor dimension is missing.  Data exported will " +
-                    "not have projected monitor coordinates.</html>",
+        if (realMonitorDimension == null) {
+            JOptionPane.showMessageDialog(this,
+                    "<html>Monitor dimension is missing.  Data exported will "
+                    + "not have projected monitor coordinates.</html>",
                     "Monitor dimension is missing.",
                     JOptionPane.WARNING_MESSAGE);
         }
