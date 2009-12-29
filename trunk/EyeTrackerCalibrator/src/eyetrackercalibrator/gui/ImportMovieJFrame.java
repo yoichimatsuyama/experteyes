@@ -36,7 +36,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         movieBrowseButton = new javax.swing.JButton();
         advanceButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        progressTextArea = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -53,15 +53,20 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         });
 
         movieBrowseButton.setText("Browse");
+        movieBrowseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                movieBrowseButtonActionPerformed(evt);
+            }
+        });
 
         advanceButton.setText("Advance Setup");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setVerifyInputWhenFocusTarget(false);
-        jScrollPane1.setViewportView(jTextArea1);
+        progressTextArea.setColumns(20);
+        progressTextArea.setEditable(false);
+        progressTextArea.setLineWrap(true);
+        progressTextArea.setRows(5);
+        progressTextArea.setVerifyInputWhenFocusTarget(false);
+        jScrollPane1.setViewportView(progressTextArea);
 
         jLabel2.setText("If importing fails, try changing advance setup");
 
@@ -126,6 +131,10 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_movieFileTextFieldActionPerformed
 
+    private void movieBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_movieBrowseButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_movieBrowseButtonActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -145,9 +154,9 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JButton movieBrowseButton;
     private javax.swing.JTextField movieFileTextField;
+    private javax.swing.JTextArea progressTextArea;
     // End of variables declaration//GEN-END:variables
 
 }
