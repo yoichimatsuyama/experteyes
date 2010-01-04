@@ -12,6 +12,7 @@ package eyetrackercalibrator.gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
@@ -131,6 +132,11 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         });
 
         advanceButton.setText("Advance Setup");
+        advanceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                advanceButtonActionPerformed(evt);
+            }
+        });
 
         progressTextArea.setColumns(20);
         progressTextArea.setEditable(false);
@@ -248,6 +254,14 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
     private void movieBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_movieBrowseButtonActionPerformed
         browseFile(this.movieFileTextField);
     }//GEN-LAST:event_movieBrowseButtonActionPerformed
+
+    private void advanceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_advanceButtonActionPerformed
+        // Construct advance argument here
+        String advanceArg = creteFFMPEGArguments();
+
+        JOptionPane.showInputDialog("Please enter arguments for ffmpeg.  Do not include \"-i\" and output option.");
+
+    }//GEN-LAST:event_advanceButtonActionPerformed
 
     private void browseFile(JTextField targetField) {
         // Set text box with directory that user chose.

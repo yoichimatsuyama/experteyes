@@ -46,6 +46,7 @@ import eyetrackercalibrator.gui.CalibrateJPanel;
 import eyetrackercalibrator.gui.CleanDataJPanel;
 import eyetrackercalibrator.gui.ErrorMarking;
 import eyetrackercalibrator.gui.ExportMovieJFrame;
+import eyetrackercalibrator.gui.ImportMovieJFrame;
 import eyetrackercalibrator.gui.NewProjectJDialog;
 import eyetrackercalibrator.gui.ProjectSelectPanel;
 import eyetrackercalibrator.gui.SynchronizeJPanel;
@@ -111,6 +112,9 @@ public class Main extends javax.swing.JFrame {
     private JRadioButtonMenuItem linearMenuItem;
     private JMenu exportSelectMenu;
     private JMenuItem calibrationPointsExportMenuItem;
+    private JMenu importSelectMenu;
+    private JMenuItem eyeFrameImportMenuItem;
+    private JMenuItem sceneFrameImportMenuItem;
     private File projectLocation = null;
     static final public String EYE_OFFSET = "eyeoffset";
     static final public String SCREEN_OFFSET = "screenoffset";
@@ -398,6 +402,10 @@ public class Main extends javax.swing.JFrame {
         viewGroup.add(secondaryMenuItem);
         viewGroup.add(linearMenuItem);
 
+        importSelectMenu = new JMenu("Import");
+        eyeFrameImportMenuItem = new JMenuItem("Eye Frames");
+        sceneFrameImportMenuItem = new JMenuItem("Scene Frames");
+
         exportSelectMenu = new JMenu("Export");
         calibrationPointsExportMenuItem = new JMenuItem("Calibration Points");
 
@@ -438,6 +446,16 @@ public class Main extends javax.swing.JFrame {
 
         calibrationPointsExportMenuItem.addActionListener(menuListener);
 
+        menuListener = new java.awt.event.ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importMenuActionPerformed(evt);
+            }
+        };
+
+        eyeFrameImportMenuItem.addActionListener(menuListener);
+        sceneFrameImportMenuItem.addActionListener(menuListener);
+
         projectMenu.add(new_MenuItem);
         projectMenu.add(open_MenuItem);
         projectMenu.add(save_MenuItem);
@@ -449,9 +467,13 @@ public class Main extends javax.swing.JFrame {
 
         exportSelectMenu.add(calibrationPointsExportMenuItem);
 
+        importSelectMenu.add(eyeFrameImportMenuItem);
+        importSelectMenu.add(sceneFrameImportMenuItem);
+
         menuBar.add(projectMenu);
         menuBar.add(viewSelectMenu);
         menuBar.add(exportSelectMenu);
+        menuBar.add(importSelectMenu);
         setJMenuBar(menuBar);
 
         /* Interaction panel */
@@ -893,6 +915,16 @@ public class Main extends javax.swing.JFrame {
         if (calibrationPointsExportMenuItem.getText().equals(item.getText())) {
             // Export menu action
             exportCalibrationPointInfo();
+        }
+    }
+
+    private void importMenuActionPerformed(ActionEvent evt) {
+        JMenuItem item = (JMenuItem) evt.getSource();
+        if (eyeFrameImportMenuItem.getText().equals(item.getText())) {
+            // Import eye frames
+            new ImportMovieJFrame(this.projectSelectPanel.getEyeFrameDirectory(), this.);
+            
+        }else if(sceneFrameImportMenuItem.getText().equals(item.getText())){
         }
     }
 
