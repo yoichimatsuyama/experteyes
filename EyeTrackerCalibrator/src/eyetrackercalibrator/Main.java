@@ -139,8 +139,6 @@ public class Main extends javax.swing.JFrame {
     static final public String FULL_SCREEN_WIDTH = "fullscreenwidth";
     static final public String FULL_SCREEN_HEIGHT = "fullscreenheight";
     static final public String COMMENT = "comment";
-    static final public String PROPERTY_FILE = "eyetrackercalibrator.properties";
-    static final public int ERROR_VALUE = -666;
     private static String DATABASE_NAME = "IlluminationDb";
     static final public String CORNERHINT_DIR = "CornerHints";
     private int DISPLAY_WIDTH = 512;
@@ -293,7 +291,7 @@ public class Main extends javax.swing.JFrame {
                     } else {
                         // Print error
                         for (int j = 0; j < 10; i++) {
-                            out.print("\t" + ERROR_VALUE);
+                            out.print("\t" + GlobalConstants.ERROR_VALUE);
                         }
                     }
 
@@ -317,10 +315,10 @@ public class Main extends javax.swing.JFrame {
                                 if (errorAngle >= 0) {
                                     out.print("\t" + errorAngle);
                                 } else {
-                                    out.print("\t" + ERROR_VALUE);
+                                    out.print("\t" + GlobalConstants.ERROR_VALUE);
                                 }
                             } else {
-                                out.print("\t" + ERROR_VALUE);
+                                out.print("\t" + GlobalConstants.ERROR_VALUE);
                             }
                         }
                     }
@@ -344,16 +342,16 @@ public class Main extends javax.swing.JFrame {
 
     private Point2D.Double exportEyeGazes(PrintWriter exportWriter, int currentFrame,
             Double vector, ComputingApproach approach, Dimension screenViewFullSize) {
-        Double point = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
+        Double point = new Point2D.Double(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
 
         Point2D p = this.eyeGazeComputing.computeEyeGaze(currentFrame, vector.x, vector.y, approach);
         if (p != null) {
             point.setLocation(p);
-            // Check the range and mark is with ERROR_VALUE,ERROR_VALUE if out of screen
+            // Check the range and mark is with GlobalConstants.ERROR_VALUE,GlobalConstants.ERROR_VALUE if out of screen
             if (point.x < 0 || point.y < 0
                     || point.x > screenViewFullSize.width
                     || point.y > screenViewFullSize.height) {
-                point.setLocation(ERROR_VALUE, ERROR_VALUE);
+                point.setLocation(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
             }
         }
         exportWriter.print(point.x + "\t" + point.y + "\t");
@@ -616,7 +614,7 @@ public class Main extends javax.swing.JFrame {
         if (p != null) {
             out.print("\t" + p.getX() + "\t" + p.getY());
         } else {
-            out.print("\t" + ERROR_VALUE + "\t" + ERROR_VALUE);
+            out.print("\t" + GlobalConstants.ERROR_VALUE + "\t" + GlobalConstants.ERROR_VALUE);
         }
     }
 
@@ -893,7 +891,10 @@ public class Main extends javax.swing.JFrame {
 
     private void sync() {
         // Read in synchronize data and set all offset in all panel
-        this.frameSynchronizor.setSynchronizationPoints(this.synchronizeJPanel.getSynchronizationPoints(), this.eyeFrameManager.getTotalFrames(), this.screenFrameManager.getTotalFrames());
+        this.frameSynchronizor.setSynchronizationPoints(
+                this.synchronizeJPanel.getSynchronizationPoints(),
+                this.eyeFrameManager.getTotalFrames(),
+                this.screenFrameManager.getTotalFrames());
     }
 
     private void viewMenuActionPerformed(ActionEvent evt) {
@@ -919,12 +920,30 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void importMenuActionPerformed(ActionEvent evt) {
+        String title;
+        String importLocation = null;
+        String type = null;
+
         JMenuItem item = (JMenuItem) evt.getSource();
         if (eyeFrameImportMenuItem.getText().equals(item.getText())) {
-            // Import eye frames
-            new ImportMovieJFrame(this.projectSelectPanel.getEyeFrameDirectory(), this.);
+            importLocation = this.projectSelectPanel.getEyeFrameDirectory();
+            type = "eye";
+        } else if (sceneFrameImportMenuItem.getText().equals(item.getText())) {
+            importLocation = this.projectSelectPanel.getScreenFrameDirectory();
+            type = "scene";
+        }
+        // Sanity check
+        if (importLocation == null || importLocation.trim().length() < 1) {
+            // Prompt user to enter the location
+            JOptionPane.showMessageDialog(this,
+                    "You need to specify "+type+" frame directoty in the project.",
+                    "Missing Information", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else {
+
+            ImportMovieJFrame importMovieJFrame = new ImportMovieJFrame(new File(importLocation));
+            importMovieJFrame.setVisible(true);
             
-        }else if(sceneFrameImportMenuItem.getText().equals(item.getText())){
         }
     }
 
@@ -969,13 +988,16 @@ public class Main extends javax.swing.JFrame {
             case ERROR_OPENING_DATABASE:
                 // Something is wrong tell user
                 JOptionPane.showMessageDialog(this,
-                        "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
+                        "<html>There is an error opening file databases. The "
+                        + "project may already be open or the project is located "
+                        + "in a network drive.</html>",
                         "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
                 break;
             case ERROR_OPENING_PROJECT_FILE:
                 // Something is wrong tell user
                 JOptionPane.showMessageDialog(this,
-                        "<html>There is an error creating the project file. Please check file permissions.</html>",
+                        "<html>There is an error creating the project file. "
+                        + "Please check file permissions.</html>",
                         "Problem Creating Project", JOptionPane.ERROR_MESSAGE);
                 break;
         }
@@ -1010,19 +1032,23 @@ public class Main extends javax.swing.JFrame {
                     case ERROR_OPENING_DATABASE:
                         // Something is wrong tell user
                         JOptionPane.showMessageDialog(this,
-                                "<html>There is an error opening file databases. The project may already be open or the project is located in a network drive.</html>",
+                                "<html>There is an error opening file databases. "
+                                + "The project may already be open or the project is "
+                                + "located in a network drive.</html>",
                                 "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
                         break;
                     case ERROR_OPENING_PROJECT_FILE:
                         // Something is wrong tell user
                         JOptionPane.showMessageDialog(this,
-                                "<html>There is an error opening the project file. Please check file permission.</html>",
+                                "<html>There is an error opening the project file. "
+                                + "Please check file permission.</html>",
                                 "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
                         break;
                     case PROJECT_FILE_NOT_FOUND:
                         // Something is wrong tell user
                         JOptionPane.showMessageDialog(this,
-                                "<html>This is not a project folder.  Please select a different folder.</html>",
+                                "<html>This is not a project folder.  Please select "
+                                + "a different folder.</html>",
                                 "Problem Opening Project", JOptionPane.ERROR_MESSAGE);
                         break;
                 }
@@ -1073,22 +1099,30 @@ public class Main extends javax.swing.JFrame {
         projectSelectPanel.setScreenFrameDirectory(
                 createPath(p.getProperty(SCREEN_VIEW_DIRECTORY),
                 projectLocation, DEFAULT_SCENE_FRAME_PATH));
-        projectSelectPanel.setFullScreenFrameDirectory(p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
+        projectSelectPanel.setFullScreenFrameDirectory(
+                p.getProperty(FULL_SCREEN_VIEW_DIRECTORY));
         projectSelectPanel.setScreenInfoDirectory(
                 createPath(p.getProperty(SCREEN_INFO_DIRECTORY),
                 projectLocation, DEFAULT_SCENE_INFO_PATH));
-        projectSelectPanel.setMonitorDimensionPX(p.getProperty(MONITOR_TRUE_WIDTH_PX, ""), p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
-        projectSelectPanel.setFullSceneDimensionPX(p.getProperty(FULL_SCREEN_WIDTH, ""), p.getProperty(FULL_SCREEN_HEIGHT, ""));
+        projectSelectPanel.setMonitorDimensionPX(
+                p.getProperty(MONITOR_TRUE_WIDTH_PX, ""),
+                p.getProperty(MONITOR_TRUE_HEIGHT_PX, ""));
+        projectSelectPanel.setFullSceneDimensionPX(
+                p.getProperty(FULL_SCREEN_WIDTH, ""),
+                p.getProperty(FULL_SCREEN_HEIGHT, ""));
         projectSelectPanel.setComment(p.getProperty(COMMENT, ""));
-        projectSelectPanel.setDistanceFromMeasuredScene(p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
+        projectSelectPanel.setDistanceFromMeasuredScene(
+                p.getProperty(DISTANCE_FROM_MONITOR_CM, "0"));
         projectSelectPanel.setSceneHeightCM(p.getProperty(MONITOR_TRUE_HEIGHT_CM, "0"));
         projectSelectPanel.setSceneWidthCM(p.getProperty(MONITOR_TRUE_WIDTH_CM, "0"));
 
         // Trying to determine full screen dimension
         try {
-            eyeFrameManager = new FrameManager(projectLocation.getAbsolutePath() + File.separator + "EyeViewCacheDB", 512, 512, new EyeViewFrameInfo());
+            eyeFrameManager = new FrameManager(projectLocation.getAbsolutePath()
+                    + File.separator + "EyeViewCacheDB", 512, 512, new EyeViewFrameInfo());
             // Open a project
-            screenFrameManager = new ScreenFrameManager(projectLocation.getAbsolutePath() + File.separator + "ScreenViewCacheDB", 512, 512, new ScreenViewFrameInfo());
+            screenFrameManager = new ScreenFrameManager(projectLocation.getAbsolutePath()
+                    + File.separator + "ScreenViewCacheDB", 512, 512, new ScreenViewFrameInfo());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error open project", JOptionPane.ERROR_MESSAGE);
             return OpenProjectError.ERROR_OPENING_DATABASE;
@@ -1353,7 +1387,7 @@ public class Main extends javax.swing.JFrame {
                         + "Scene Frame File");
 
                 // Variables
-                Point2D fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
+                Point2D fixation = new Point2D.Double(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
 
                 // Get a trial set
                 TrialMarker[] trials = this.markTrialJPanel.getTrials();
@@ -1409,7 +1443,7 @@ public class Main extends javax.swing.JFrame {
 
                     // Skip a frame when there is no eye information
                     if (eyeInfo != null) {
-                        double[] pupilFit = {ERROR_VALUE, ERROR_VALUE, ERROR_VALUE, ERROR_VALUE};
+                        double[] pupilFit = {GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE};
                         if (eyeInfo.getPupilFit() != null) {
                             pupilFit = eyeInfo.getPupilFit();
                         }
@@ -1436,9 +1470,9 @@ public class Main extends javax.swing.JFrame {
                         if (trialName != null && trials[trialNumber].isBadTrial) {
                             // Just put blank
                             exportWriter.print(
-                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t"
-                                    + ERROR_VALUE + "\t" + ERROR_VALUE + "\t"
-                                    + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                    GlobalConstants.ERROR_VALUE + "\t" + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t" + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t" + GlobalConstants.ERROR_VALUE + "\t");
                         } else {
                             // Compute eye vector
                             Point2D.Double vector = this.eyeGazeComputing.getEyeVector(eyeInfo);
@@ -1464,7 +1498,7 @@ public class Main extends javax.swing.JFrame {
                                 this.frameSynchronizor.getSceneFrame(i));
 
                         // Set default value for not available
-                        fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
+                        fixation.setLocation(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
 
                         if (sceneInfo != null) {
                             Point2D[] corners = sceneInfo.getCorners();
@@ -1476,7 +1510,7 @@ public class Main extends javax.swing.JFrame {
                                     // Only estimate fixation when this is not a bad trial
                                     if (trialName != null && trials[trialNumber].isBadTrial) {
                                         exportWriter.print(
-                                                ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                                GlobalConstants.ERROR_VALUE + "\t" + GlobalConstants.ERROR_VALUE + "\t");
                                     } else {
                                         // Compute fixation
                                         fixation = Computation.ComputeScreenPositionProjective(
@@ -1487,13 +1521,13 @@ public class Main extends javax.swing.JFrame {
                                                 corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
 
                                         if (fixation == null) {
-                                            fixation = new Point2D.Double(ERROR_VALUE, ERROR_VALUE);
+                                            fixation = new Point2D.Double(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
                                         }
                                         if ((point[j].x < 0 && point[j].y < 0)
                                                 || fixation.getX() < 0 || fixation.getY() < 0
                                                 || fixation.getX() > realMonitorDimension.width
                                                 || fixation.getY() > realMonitorDimension.height) {
-                                            fixation.setLocation(ERROR_VALUE, ERROR_VALUE);
+                                            fixation.setLocation(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
                                         }
 
                                         exportWriter.print(
@@ -1511,12 +1545,30 @@ public class Main extends javax.swing.JFrame {
                             } else {
                                 // Just put blank
                                 exportWriter.print(
-                                        ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                        GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t"
+                                        + GlobalConstants.ERROR_VALUE + "\t");
                             }
                         } else {
                             // Just put blank
                             exportWriter.print(
-                                    ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t" + ERROR_VALUE + "\t");
+                                    GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t"
+                                    + GlobalConstants.ERROR_VALUE + "\t");
                         }
 
 
@@ -1570,7 +1622,7 @@ public class Main extends javax.swing.JFrame {
                             if (calibrationName != null) {
                                 exportWriter.print(calibrationName + "\t" + calibrationNumber);
                             } else {
-                                exportWriter.print("-\t" + ERROR_VALUE);
+                                exportWriter.print("-\t" + GlobalConstants.ERROR_VALUE);
                             }
                         }
 

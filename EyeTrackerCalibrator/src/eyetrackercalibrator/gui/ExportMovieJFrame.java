@@ -37,6 +37,7 @@ import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.math.EyeGazeComputing;
+import eyetrackercalibrator.util.FFMPEGHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -56,7 +57,6 @@ import javax.swing.JOptionPane;
 public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
     private static double CORNER_FRAME_SCALE = 0.3;
-    public static String FFMPEG_LOCATION_PROPERTY_KEY = "ffmpeg location";
     MovieFrameExporter movieFrameExporter = null;
     int start;
     int totalProcess;
@@ -65,24 +65,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     public ExportMovieJFrame(File currentDir, int exportWidth, int exportHeight,
             EyeGazeComputing eyeGazeComputing, FrameSynchronizor frameSynchronizor,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager) {
-
-        // Load ffmpeg location
-        File propertyFile = new File(Main.PROPERTY_FILE);
-        // Default to OSX path
-        File ffmpegFile = null;
-        Properties properties = new Properties();
-        try {
-            FileInputStream fileInputStream = null;
-            fileInputStream = new FileInputStream(propertyFile);
-            properties.loadFromXML(fileInputStream);
-            String ffmpegLocationStr = properties.getProperty(FFMPEG_LOCATION_PROPERTY_KEY);
-            if (ffmpegLocationStr != null) {
-                ffmpegFile = new File(ffmpegLocationStr);
-            }
-            fileInputStream.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         initComponents();
 
@@ -100,7 +82,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         // Set up exporter
         this.movieFrameExporter = new MovieFrameExporter(exportWidth, exportHeight,
                 CORNER_FRAME_SCALE, eyeGazeComputing, frameSynchronizor,
-                eyeFrameManager, screenFrameManager, ffmpegFile,
+                eyeFrameManager, screenFrameManager, null,
                 Integer.parseInt(this.frameRateTextField.getText()), this);
 
     }
@@ -398,11 +380,11 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         }
 
         // Check output type
-        if (!(eyeOnlyCheckBox.isSelected() ||
-                screenOnlyCheckBox.isSelected() ||
-                eyeInCornerCheckBox.isSelected() ||
-                screenInCornerCheckBox.isSelected() ||
-                sideBySideCheckBox.isSelected())) {
+        if (!(eyeOnlyCheckBox.isSelected()
+                || screenOnlyCheckBox.isSelected()
+                || eyeInCornerCheckBox.isSelected()
+                || screenInCornerCheckBox.isSelected()
+                || sideBySideCheckBox.isSelected())) {
             // None is selected so warn the user and do nothing
             // Show warning dialog
             JOptionPane.showMessageDialog(this,
@@ -421,59 +403,14 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         }
 
         // Check if ffmpeg is needed
-        if (this.movieOnlyRadioButton.isSelected() ||
-                this.movieAndFramesRadioButton.isSelected()) {
-            File ffmpegFile = this.movieFrameExporter.getFfmpegExecutable();
-            if (ffmpegFile == null || !ffmpegFile.exists()) {
-                // We don't have valid copy of ffmpeg.  Ask user to give one
-                JFileChooser chooser = new JFileChooser();
-                chooser.setDialogTitle("Please Locate FFMPEG Executable");
-                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    ffmpegFile = chooser.getSelectedFile();
-
-                    // Set ffmpeg file for exporter
-                    this.movieFrameExporter.setFfmpegExecutable(ffmpegFile);
-
-                    // Save the selection
-                    File propertyFile = new File(Main.PROPERTY_FILE);
-                    Properties properties = new Properties();
-
-                    // If old file exists load it
-                    if (propertyFile.exists()) {
-                        try {
-                            FileInputStream fileInputStream = null;
-                            fileInputStream = new FileInputStream(propertyFile);
-                            properties.loadFromXML(fileInputStream);
-                            fileInputStream.close();
-                        } catch (IOException ex) {
-                            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } else {
-                        try {
-                            // Make one
-                            propertyFile.createNewFile();
-                        } catch (IOException ex) {
-                            Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    // Set new property
-                    properties.setProperty(FFMPEG_LOCATION_PROPERTY_KEY, ffmpegFile.getAbsolutePath());
-
-                    // Save the config
-                    FileOutputStream outputStream;
-                    try {
-                        outputStream = new FileOutputStream(Main.PROPERTY_FILE);
-                        properties.storeToXML(outputStream, null);
-                        outputStream.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                } else {
-                    return;
-                }
+        if (this.movieOnlyRadioButton.isSelected()
+                || this.movieAndFramesRadioButton.isSelected()) {
+            File ffmpegFile = FFMPEGHandler.getFFMPEGExecutable(this);
+            if (ffmpegFile == null) {
+                return;
             }
+            // Set ffmpeg file for exporter
+            this.movieFrameExporter.setFfmpegExecutable(ffmpegFile);
         }
 
         this.okButton.setVisible(false);
@@ -523,7 +460,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         // Reset output
         gazeAverageTextField.setText(String.valueOf(value));
 }//GEN-LAST:event_gazeAverageTextFieldActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JButton cancelButton;

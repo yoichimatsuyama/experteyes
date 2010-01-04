@@ -32,6 +32,7 @@
  */
 package eyetrackercalibrator.framemanaging;
 
+import eyetrackercalibrator.GlobalConstants;
 import eyetrackercalibrator.gui.util.StreamGobbler;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.EyeGazeComputing;
@@ -208,7 +209,7 @@ public class MovieFrameExporter {
             if (point != null) {
                 gazePoint.setLocation(point);
             } else {
-                gazePoint.setLocation(-666, -666);
+                gazePoint.setLocation(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
             }
 
             // Get screen frame
@@ -540,7 +541,7 @@ public class MovieFrameExporter {
         Point.Double eyeVector = this.eyeGazeComputing.getEyeVector(info);
 
         // Compute eye gaze point
-        Double eyeGaze = new Point2D.Double(-666, -666);
+        Double eyeGaze = new Point2D.Double(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
         Point2D p = this.eyeGazeComputing.computeEyeGaze(eyeFrame,
                 eyeVector.x, eyeVector.y);
         if (p != null) {
@@ -574,7 +575,7 @@ public class MovieFrameExporter {
      * Render eye image of the given eye frame
      * @param eyeVector Cannot be null.  The content will be replaced by the 
      *        eyeVector computed by the method for the current frame.  
-     *        (-666,-666) is given when eye vector is unavailable.
+     *        (GlobalConstants.ERROR_VALUE,GlobalConstants.ERROR_VALUE) is given when eye vector is unavailable.
      */
     private BufferedImage renderEyeImage(
             int i, FrameManager eyeFrameManager) {
@@ -720,7 +721,7 @@ public class MovieFrameExporter {
             if (info != null) {
                 Point[] corners = new Point[4];
                 for (int j = 0; j < corners.length; j++) {
-                    corners[j] = new Point(-666, -666);
+                    corners[j] = new Point(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
                 }
 
                 if (info.getTopLeft() != null) {

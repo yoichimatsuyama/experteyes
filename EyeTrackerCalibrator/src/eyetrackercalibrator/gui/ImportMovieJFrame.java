@@ -23,24 +23,18 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
 
     protected File lastSelectedLocation = null;
     protected File outputDir = null;
-    protected File ffmpegFile = null;
     protected String ffmpegAdvanceArguments = "";
     public final static String DEINTERLACE_ARG = "-deinterlace";
     public final static String SAME_QALITY_ARG = "-sameq";
     public final static String H264_ARG = "-pix_fmt h264";
 
     /** Creates new form ImportMovieJFrame */
-    public ImportMovieJFrame(File importToDir, File ffmpeg) {
+    public ImportMovieJFrame(File importToDir) {
         if (importToDir == null) {
             throw new NullPointerException("Import target cannot be null");
         }
 
-        if (ffmpeg == null) {
-            throw new NullPointerException("ffmpeg location cannot be null");
-        }
-
         this.outputDir = importToDir;
-        this.ffmpegFile = ffmpeg;
 
         initComponents();
     }

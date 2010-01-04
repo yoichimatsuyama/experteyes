@@ -34,6 +34,7 @@
  */
 package eyetrackercalibrator.gui.util;
 
+import eyetrackercalibrator.GlobalConstants;
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.FrameSynchronizor;
@@ -264,7 +265,7 @@ public class AnimationTimer {
                     if (p != null) {
                         displayJPanel.setEyeGaze(p.getX() * scale, p.getY() * scale);
                     } else {
-                        displayJPanel.setEyeGaze(-666, -666);
+                        displayJPanel.setEyeGaze(GlobalConstants.ERROR_VALUE, GlobalConstants.ERROR_VALUE);
                     }
                 }
 
