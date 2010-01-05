@@ -31,7 +31,6 @@
  */
 package eyetrackercalibrator.gui;
 
-import eyetrackercalibrator.Main;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.FrameSynchronizor;
 import eyetrackercalibrator.framemanaging.MovieFrameExporter;
@@ -41,12 +40,6 @@ import eyetrackercalibrator.util.FFMPEGHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -492,6 +485,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JTextField toTextField;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         int completed = (Integer) evt.getNewValue();
 

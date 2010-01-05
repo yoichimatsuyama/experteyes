@@ -10,7 +10,10 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.util.FFMPEGHandler;
+import java.awt.Component;
 import java.io.File;
+import java.util.LinkedList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -27,6 +30,9 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
     public final static String DEINTERLACE_ARG = "-deinterlace";
     public final static String SAME_QALITY_ARG = "-sameq";
     public final static String H264_ARG = "-pix_fmt h264";
+    public final static int TOTAL_DIGIT_IN_FILENAME = 6;
+    private Process ffmpegProcess = null;
+    private static int TOTAL_TEST_FRAMES = 10;
 
     /** Creates new form ImportMovieJFrame */
     public ImportMovieJFrame(File importToDir) {
@@ -61,21 +67,21 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         // See if we have basic arg in there
         if (advanceArg.contains(DEINTERLACE_ARG)) {
             this.deinterlaceCheckBox.setSelected(true);
-            advanceArg.replaceAll(DEINTERLACE_ARG, "");
+            advanceArg = advanceArg.replaceAll(DEINTERLACE_ARG, "");
         } else {
             this.deinterlaceCheckBox.setSelected(false);
         }
 
         if (advanceArg.contains(SAME_QALITY_ARG)) {
             this.sameQualityCheckBox.setSelected(true);
-            advanceArg.replaceAll(SAME_QALITY_ARG, "");
+            advanceArg = advanceArg.replaceAll(SAME_QALITY_ARG, "");
         } else {
             this.sameQualityCheckBox.setSelected(false);
         }
 
         if (advanceArg.contains(H264_ARG)) {
             this.h264CheckBox.setSelected(true);
-            advanceArg.replaceAll(H264_ARG, "");
+            advanceArg = advanceArg.replaceAll(H264_ARG, "");
         } else {
             this.h264CheckBox.setSelected(false);
         }
@@ -142,10 +148,20 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         jLabel2.setText("If importing fails, try changing advance setup");
 
         cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Progress output");
 
         importButton.setText("Import");
+        importButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importButtonActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Output file type:");
 
@@ -166,44 +182,49 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
 
         testImportButton.setText("Test Import");
         testImportButton.setToolTipText("Try importing one frame to test configuration");
+        testImportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testImportButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(advanceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(movieBrowseButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(importButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jpgRadioButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tiffRadioButton))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(sameQualityCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 176, Short.MAX_VALUE)
                         .addComponent(testImportButton))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(deinterlaceCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(h264CheckBox))
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -233,8 +254,8 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                     .addComponent(testImportButton))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
@@ -253,9 +274,134 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         // Construct advance argument here
         String advanceArg = creteFFMPEGArguments();
 
-        JOptionPane.showInputDialog("Please enter arguments for ffmpeg.  Do not include \"-i\" and output option.");
 
+        advanceArg = (String) JOptionPane.showInputDialog(this,
+                "Please enter arguments for ffmpeg.  Do not include \"-i\" or output destination option.",
+                "FFMPEG Additional Parameters", JOptionPane.PLAIN_MESSAGE,
+                null, null, advanceArg);
+
+        if (advanceArg != null) {
+            this.ffmpegAdvanceArguments = parseAdvanceArgument(advanceArg);
+        }
     }//GEN-LAST:event_advanceButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void testImportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testImportButtonActionPerformed
+
+        if (this.testImportButton.getText().equalsIgnoreCase("stop")) {
+            // Just stop
+            if (this.ffmpegProcess != null) {
+                this.ffmpegProcess.destroy();
+                this.ffmpegProcess = null;
+            }
+        } else {
+            // Get current text
+            final String buttonText = testImportButton.getText();
+
+            // Get advance argument
+            String args = creteFFMPEGArguments();
+            // Add limited frames
+            args = args.concat("-vframes " + TOTAL_TEST_FRAMES);
+            testImportButton.setText("Stop");
+            runFFMPEG(args, new FFMPEGHandler.TerminationListener() {
+
+                @Override
+                public void completed(int exitCode) {
+                    // Change button text back
+                    testImportButton.setText(buttonText);
+                }
+            });
+        }
+    }//GEN-LAST:event_testImportButtonActionPerformed
+
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        if (this.importButton.getText().equalsIgnoreCase("stop")) {
+            // Just stop
+            if (this.ffmpegProcess != null) {
+                this.ffmpegProcess.destroy();
+                this.ffmpegProcess = null;
+            }
+        } else {
+            // Get current text
+            final String buttonText = importButton.getText();
+
+            // Add limited frames
+            importButton.setText("Stop");
+            final Component parent = this;
+            runFFMPEG(creteFFMPEGArguments(), new FFMPEGHandler.TerminationListener() {
+
+                @Override
+                public void completed(int exitCode) {
+                    // Change button text back
+                    importButton.setText(buttonText);
+                    // If complete normally change cancel to finish. and notify the user
+                    if (exitCode == 0) {
+                        cancelButton.setText("Finish");
+                        JOptionPane.showMessageDialog(parent, "Importing is completed.");
+                    }
+                }
+            });
+        }
+    }//GEN-LAST:event_importButtonActionPerformed
+
+    private void runFFMPEG(String advanceArg, FFMPEGHandler.TerminationListener listener) {
+        // Get ffmpeg command
+        File ffmpegCommand = FFMPEGHandler.getFFMPEGExecutable(this);
+
+        // Get input file
+        String input = this.movieFileTextField.getText();
+        // Prepare arguments
+
+        LinkedList<String> argList = new LinkedList<String>();
+        argList.add(ffmpegCommand.getAbsolutePath());
+        // Add input args
+        argList.add("-i");
+        argList.add(input);
+        // Add advance args
+        String[] args = advanceArg.split("\\s+");
+        for (int i = 0; i < args.length; i++) {
+            argList.add(args[i]);
+        }
+        // Add output arg
+        String output = "img%" + TOTAL_DIGIT_IN_FILENAME + "d.";
+        if (this.jpgRadioButton.isSelected()) {
+            output = output + ".jpg";
+        } else {
+            output = output + ".tif";
+        }
+        argList.add(output);
+
+        // If there is old process, kill it first
+        if (this.ffmpegProcess != null) {
+            this.ffmpegProcess.destroy();
+            this.ffmpegProcess = null;
+        }
+
+        // Sanity check output dir before running
+        if (this.outputDir.exists()) {
+            if (!this.outputDir.isDirectory()) {
+                // This is not a dir.  Some thing is wrong. Tell the user
+                listener.completed(1);
+                JOptionPane.showMessageDialog(this, this.outputDir.getAbsoluteFile()
+                        + " is not a directory.", "Error Accessing Output Directory",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else if (!this.outputDir.mkdirs()) {
+            JOptionPane.showMessageDialog(this, "Cannot create " + this.outputDir.getAbsoluteFile(),
+                    "Error Creating Output Directory",
+                    JOptionPane.ERROR_MESSAGE);
+            listener.completed(1);
+            return;
+        }
+
+        this.ffmpegProcess = FFMPEGHandler.startFFMPEG(argList, this.outputDir,
+                this.progressTextArea, listener);
+
+    }
 
     private void browseFile(JTextField targetField) {
         // Set text box with directory that user chose.
