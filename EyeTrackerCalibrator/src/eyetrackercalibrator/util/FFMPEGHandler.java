@@ -24,20 +24,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package eyetrackercalibrator.util;
 
 import eyetrackercalibrator.GlobalConstants;
+import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.gui.ExportMovieJFrame;
+import eyetrackercalibrator.gui.util.StreamGobbler;
+import eyetrackercalibrator.gui.util.StreamToTextAreaGobbler;
 import java.awt.Component;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -115,15 +120,83 @@ public class FFMPEGHandler {
                     Logger.getLogger(ExportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } else {
-            return null;
         }
 
         // Sanity check
         if (ffmpegFile != null && ffmpegFile.exists()) {
             return ffmpegFile;
-        }else{
+        } else {
             return null;
         }
+    }
+
+    public interface TerminationListener {
+
+        public void completed(int exitCode);
+    }
+
+    /** 
+     * Execute ffmpeg according to the command.  Once the ffmpeg is completed
+     * listener will be called to notify about the completion.  
+     * @param outputTextArea not null output will be redirect to the provided JTextArea.
+     * Otherwise, output will be redirected to the System.out
+     * @param listener null is possible is you do not want to be notified.
+     * @return Process through which the ffmpeg can be killed
+     */
+    public static Process startFFMPEG(List<String> ffmpegCommand, File outputDir,
+            JTextArea outputTextArea, final TerminationListener listener) {
+        ProcessBuilder processBuilder = new ProcessBuilder(ffmpegCommand);
+        processBuilder = processBuilder.directory(outputDir);
+        Process process = null;
+        try {
+            process = processBuilder.start();
+            if (outputTextArea != null) {
+                StreamToTextAreaGobbler outputGobbler = new StreamToTextAreaGobbler(process.getInputStream(), outputTextArea);
+                StreamToTextAreaGobbler errorGobbler = new StreamToTextAreaGobbler(process.getErrorStream(), outputTextArea);
+                outputGobbler.start();
+                errorGobbler.start();
+            }else{
+                StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "Output");
+                StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "Error");
+                outputGobbler.start();
+                errorGobbler.start();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+            if (listener != null) {
+                listener.completed(1);
+            }
+            return null;
+        }
+
+        // Spawn a thread to wait for process
+        final Process processToWaitFor = process;
+        Thread waiter = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    if (listener != null) {
+                        listener.completed(processToWaitFor.waitFor());
+                    } else {
+                        processToWaitFor.waitFor();
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(MovieFrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                    if (listener != null) {
+                        listener.completed(1);
+                    }
+                }
+            }
+        });
+        // Wait for process
+        waiter.start();
+
+        return process;
+    }
+
+    /** This method help escape white space in path or file name */
+    public static String makeSpaceSafe(String str){
+        return str.replaceAll("\\s", "\\ ");
     }
 }
