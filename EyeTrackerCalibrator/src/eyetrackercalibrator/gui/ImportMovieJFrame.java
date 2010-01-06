@@ -12,8 +12,12 @@ package eyetrackercalibrator.gui;
 
 import eyetrackercalibrator.util.FFMPEGHandler;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -312,6 +316,12 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                 public void completed(int exitCode) {
                     // Change button text back
                     testImportButton.setText(buttonText);
+                    try {
+                        // Show results
+                        Desktop.getDesktop().open(outputDir);
+                    } catch (IOException ex) {
+                        Logger.getLogger(ImportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             });
         }
