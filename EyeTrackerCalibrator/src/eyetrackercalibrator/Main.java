@@ -942,6 +942,7 @@ public class Main extends javax.swing.JFrame {
         } else {
 
             ImportMovieJFrame importMovieJFrame = new ImportMovieJFrame(new File(importLocation));
+            importMovieJFrame.setTitle("Importing " + type + " movie frames");
             importMovieJFrame.setVisible(true);
             
         }
