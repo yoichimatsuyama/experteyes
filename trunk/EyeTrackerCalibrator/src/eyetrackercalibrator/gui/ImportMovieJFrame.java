@@ -185,7 +185,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         h264CheckBox.setText("input is H.264/MPEG-4");
 
         testImportButton.setText("Test Import");
-        testImportButton.setToolTipText("Try importing one frame to test configuration");
+        testImportButton.setToolTipText("Try importing 10 frames to test configuration");
         testImportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testImportButtonActionPerformed(evt);
@@ -199,15 +199,15 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(advanceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(movieBrowseButton))
                     .addGroup(layout.createSequentialGroup()
