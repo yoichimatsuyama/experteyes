@@ -1119,13 +1119,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        // Clear current frame by pupil location lookup
-        this.pointToFrameByEstimatedPupilLocation.clear();
-
         // Get starting dir from the text box
         if (this.eyeDirTextField.getText().length() > 0) {
             chooser.setCurrentDirectory(new File(this.eyeDirTextField.getText()));
         }
+
+        // Clear current frame by pupil location lookup
+        this.pointToFrameByEstimatedPupilLocation.clear();
 
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -1649,6 +1649,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             addVoronoiSource(info.point);
         }
     }
+
+    /** This method set current eye directory and force the program to load the frames */
+    public void setEyeDirectory(String eyePath){
+        this.eyeDirTextField.setText(eyePath);
+        initProject();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private gui.ColorSelectionPanel colorSelectionPanel1;
