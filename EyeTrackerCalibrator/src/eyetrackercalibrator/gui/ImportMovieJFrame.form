@@ -29,16 +29,16 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="568" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="0" pref="685" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="jLabel2" pref="441" max="32767" attributes="0"/>
+                      <Component id="jLabel2" pref="557" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="advanceButton" min="-2" pref="117" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="movieFileTextField" pref="456" max="32767" attributes="0"/>
+                      <Component id="movieFileTextField" pref="536" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="movieBrowseButton" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -224,7 +224,7 @@
     <Component class="javax.swing.JButton" name="testImportButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Test Import"/>
-        <Property name="toolTipText" type="java.lang.String" value="Try importing one frame to test configuration"/>
+        <Property name="toolTipText" type="java.lang.String" value="Try importing 10 frames to test configuration"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="testImportButtonActionPerformed"/>
