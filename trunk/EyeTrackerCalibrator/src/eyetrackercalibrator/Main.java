@@ -57,6 +57,7 @@ import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.math.EyeGazeComputing.ComputingApproach;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
+import gui.FitEyeModelSetup;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -115,6 +116,8 @@ public class Main extends javax.swing.JFrame {
     private JMenu importSelectMenu;
     private JMenuItem eyeFrameImportMenuItem;
     private JMenuItem sceneFrameImportMenuItem;
+    private JMenu toolsMenu;
+    private JMenuItem fitEyeModelImportMenuItem;
     private File projectLocation = null;
     static final public String EYE_OFFSET = "eyeoffset";
     static final public String SCREEN_OFFSET = "screenoffset";
@@ -407,6 +410,9 @@ public class Main extends javax.swing.JFrame {
         exportSelectMenu = new JMenu("Export");
         calibrationPointsExportMenuItem = new JMenuItem("Calibration Points");
 
+        toolsMenu = new JMenu("Tools");
+        fitEyeModelImportMenuItem = new JMenuItem("Create Eye Model");
+
         new_MenuItem.setMnemonic(KeyEvent.VK_N);
         open_MenuItem.setMnemonic(KeyEvent.VK_O);
         save_MenuItem.setMnemonic(KeyEvent.VK_S);
@@ -414,6 +420,7 @@ public class Main extends javax.swing.JFrame {
 
         ActionListener menuListener = new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuActionPerformed(evt);
             }
@@ -426,6 +433,7 @@ public class Main extends javax.swing.JFrame {
 
         menuListener = new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 viewMenuActionPerformed(evt);
             }
@@ -437,6 +445,7 @@ public class Main extends javax.swing.JFrame {
 
         menuListener = new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportMenuActionPerformed(evt);
             }
@@ -446,6 +455,7 @@ public class Main extends javax.swing.JFrame {
 
         menuListener = new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importMenuActionPerformed(evt);
             }
@@ -453,6 +463,16 @@ public class Main extends javax.swing.JFrame {
 
         eyeFrameImportMenuItem.addActionListener(menuListener);
         sceneFrameImportMenuItem.addActionListener(menuListener);
+
+        menuListener = new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fitEyeModelMenuActionPerformed(evt);
+            }
+        };
+
+        fitEyeModelImportMenuItem.addActionListener(menuListener);
 
         projectMenu.add(new_MenuItem);
         projectMenu.add(open_MenuItem);
@@ -468,13 +488,18 @@ public class Main extends javax.swing.JFrame {
         importSelectMenu.add(eyeFrameImportMenuItem);
         importSelectMenu.add(sceneFrameImportMenuItem);
 
+        toolsMenu.add(fitEyeModelImportMenuItem);
+
         menuBar.add(projectMenu);
         menuBar.add(viewSelectMenu);
-        menuBar.add(exportSelectMenu);
         menuBar.add(importSelectMenu);
+        menuBar.add(toolsMenu);
+        menuBar.add(exportSelectMenu);
         setJMenuBar(menuBar);
 
         /* Interaction panel */
+
+
         calibrateJPanel = new CalibrateJPanel();
         synchronizeJPanel = new SynchronizeJPanel();
         projectSelectPanel = new ProjectSelectPanel();
@@ -483,30 +508,36 @@ public class Main extends javax.swing.JFrame {
 
         calibrateJPanel.addActionListener(new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 calibrateJPanelActionPerformed(evt);
             }
         });
         synchronizeJPanel.addActionListener(new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 synchronizeJPanelActionPerformed(evt);
             }
         });
         projectSelectPanel.addActionListener(new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 projectSelectPanelActionPerformed(evt);
             }
         });
         cleanDataJPanel.addActionListener(new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cleanDataJPanelActionPerformed(evt);
             }
         });
+
         markTrialJPanel.addActionListener(new java.awt.event.ActionListener() {
 
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 markTrialJPanelActionPerformed(evt);
             }
@@ -528,14 +559,35 @@ public class Main extends javax.swing.JFrame {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 new Main().setVisible(true);
             }
         });
     }
 
+    protected void fitEyeModelMenuActionPerformed(ActionEvent evt) {
+        // Sanity check whether we have a directory for eyes or not
+        // Prompt user to enter the location if not there
+        String importLocation = this.projectSelectPanel.getEyeFrameDirectory();
+        if (importLocation == null || importLocation.trim().length() < 1) {
+            JOptionPane.showMessageDialog(this,
+                    "You need to specify eye frame directoty in the project and populate them with movies frames first.",
+                    "Missing Information", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] args = new String[1];
+        args[0] = importLocation;
+
+        // Start fit eye model.
+        FitEyeModelSetup fems = new FitEyeModelSetup();
+        fems.setVisible(true);
+        fems.setEyeDirectory(importLocation);
+    }
+
     /* Handle when "Back" are pressed in calibration panel*/
-    public void calibrateJPanelActionPerformed(java.awt.event.ActionEvent evt) {
+    protected void calibrateJPanelActionPerformed(java.awt.event.ActionEvent evt) {
         if ("Back".equals(evt.getActionCommand())) {
             // Stop animation
             calibrateJPanel.stop();
@@ -551,7 +603,7 @@ public class Main extends javax.swing.JFrame {
      * Handle when "Synchronize" and "Cancel" are pressed in synchronize panel
      * @param evt 
      */
-    public void synchronizeJPanelActionPerformed(java.awt.event.ActionEvent evt) {
+    protected void synchronizeJPanelActionPerformed(java.awt.event.ActionEvent evt) {
         boolean switchBack = false;
         if ("Synchronize".equals(evt.getActionCommand())) {
             // Read in synchronize data and set all offset in all panel
@@ -572,7 +624,7 @@ public class Main extends javax.swing.JFrame {
     }
 
     /** Handle when "Back" are pressed in clean data panel */
-    public void cleanDataJPanelActionPerformed(java.awt.event.ActionEvent evt) {
+    protected void cleanDataJPanelActionPerformed(java.awt.event.ActionEvent evt) {
         if ("Back".equals(evt.getActionCommand())) {
             // Stop animation
             cleanDataJPanel.stop();
@@ -585,7 +637,7 @@ public class Main extends javax.swing.JFrame {
     }
 
     /** Handle when "Back" are pressed in mark trials panel */
-    public void markTrialJPanelActionPerformed(java.awt.event.ActionEvent evt) {
+    protected void markTrialJPanelActionPerformed(java.awt.event.ActionEvent evt) {
         if ("Back".equals(evt.getActionCommand())) {
             // Stop animation
             markTrialJPanel.stop();
@@ -618,18 +670,6 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    private void setOffset() {
-
-        // Set calibration offset
-        calibrateJPanel.setFrameSynchronizor(this.frameSynchronizor);
-
-        // Set clean data offset
-        cleanDataJPanel.setFrameSynchronizor(this.frameSynchronizor);
-
-        // Set mark trial offset
-        markTrialJPanel.setFrameSynchronizor(this.frameSynchronizor);
-    }
-
     /**
      * Handle when "Load Eye Image", "Reload Eye Information",
      * "Load Screen Image", "Reload Screen Information",
@@ -660,6 +700,7 @@ public class Main extends javax.swing.JFrame {
 
             final Thread eyeThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     eyeFrameManager.loadFrames(
                             projectSelectPanel.getEyeFrameDirectory(),
@@ -670,6 +711,7 @@ public class Main extends javax.swing.JFrame {
             // Create a thred to wait and reenable the button
             Thread waitThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         eyeThread.join();
@@ -686,6 +728,7 @@ public class Main extends javax.swing.JFrame {
 
             final Thread screenThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     screenFrameManager.loadFrames(
                             projectSelectPanel.getScreenFrameDirectory(),
@@ -696,6 +739,7 @@ public class Main extends javax.swing.JFrame {
             // Create a thred to wait and reenable the button
             Thread waitThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         screenThread.join();
@@ -712,6 +756,7 @@ public class Main extends javax.swing.JFrame {
             projectSelectPanel.setEyeLoadButtonsEnable(false);
             final Thread eyeThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     eyeFrameManager.loadFrameInfo(
                             projectSelectPanel.getEyeFrameDirectory(),
@@ -723,6 +768,7 @@ public class Main extends javax.swing.JFrame {
             // Create a thred to wait and reenable the button
             Thread waitThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         eyeThread.join();
@@ -739,6 +785,7 @@ public class Main extends javax.swing.JFrame {
 
             final Thread screenThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     screenFrameManager.loadFrameInfo(
                             projectSelectPanel.getScreenFrameDirectory(),
@@ -749,6 +796,7 @@ public class Main extends javax.swing.JFrame {
             // Create a thred to wait and reenable the button
             Thread waitThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         screenThread.join();
@@ -772,6 +820,7 @@ public class Main extends javax.swing.JFrame {
                     informationDatabase, 1, totalFrame,
                     new PropertyChangeListener() {
 
+                        @Override
                         public void propertyChange(PropertyChangeEvent evt) {
                             Integer totalLoaded = (Integer) evt.getNewValue();
                             frameLoadingListener.update(totalLoaded + " of " + totalFrame,
@@ -783,6 +832,7 @@ public class Main extends javax.swing.JFrame {
             // Create a thred to wait and reenable the button
             Thread waitThread = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         computeIlluminationRangeThread.join();
@@ -920,7 +970,7 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void importMenuActionPerformed(ActionEvent evt) {
-        String title;
+
         String importLocation = null;
         String type = null;
 
@@ -936,7 +986,7 @@ public class Main extends javax.swing.JFrame {
         if (importLocation == null || importLocation.trim().length() < 1) {
             // Prompt user to enter the location
             JOptionPane.showMessageDialog(this,
-                    "You need to specify "+type+" frame directoty in the project.",
+                    "You need to specify " + type + " frame directoty in the project.",
                     "Missing Information", JOptionPane.ERROR_MESSAGE);
             return;
         } else {
@@ -944,7 +994,7 @@ public class Main extends javax.swing.JFrame {
             ImportMovieJFrame importMovieJFrame = new ImportMovieJFrame(new File(importLocation));
             importMovieJFrame.setTitle("Importing " + type + " movie frames");
             importMovieJFrame.setVisible(true);
-            
+
         }
     }
 
@@ -964,6 +1014,7 @@ public class Main extends javax.swing.JFrame {
             dialog = d;
         }
 
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (actionEvent.getActionCommand().equals("Create")) {
                 // Check if the directory already exists

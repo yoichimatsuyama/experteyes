@@ -54,6 +54,7 @@ public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
 
     private CalibrateEyeGazeListener listener;
 
+    @Override
     public double[][] calibrate(Point2D[] eyeVector, Point2D[] calibratePoints) {
         final int TOTAL_COEFF = 6;
 
@@ -118,14 +119,17 @@ public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
         return result;
     }
 
+    @Override
     public long getTotalProgress() {
         return 1;
     }
 
+    @Override
     public int getTotalStages() {
         return 1;
     }
 
+    @Override
     public void setCalibrateEyeGazeListener(CalibrateEyeGazeListener listener) {
         this.listener = listener;
     }
