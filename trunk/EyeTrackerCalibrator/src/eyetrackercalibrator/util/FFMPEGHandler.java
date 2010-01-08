@@ -32,7 +32,6 @@ import eyetrackercalibrator.gui.ExportMovieJFrame;
 import eyetrackercalibrator.gui.util.StreamGobbler;
 import eyetrackercalibrator.gui.util.StreamToTextAreaGobbler;
 import java.awt.Component;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

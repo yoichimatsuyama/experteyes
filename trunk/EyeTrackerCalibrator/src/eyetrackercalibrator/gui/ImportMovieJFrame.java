@@ -308,7 +308,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
             // Get advance argument
             String args = creteFFMPEGArguments();
             // Add limited frames
-            args = args.concat("-vframes " + TOTAL_TEST_FRAMES);
+            args = args + " -vframes " + TOTAL_TEST_FRAMES;
             testImportButton.setText("Stop");
             runFFMPEG(args, new FFMPEGHandler.TerminationListener() {
 
@@ -371,16 +371,16 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         argList.add("-i");
         argList.add(input);
         // Add advance args
-        String[] args = advanceArg.split("\\s+");
+        String[] args = advanceArg.trim().split("\\s+");
         for (int i = 0; i < args.length; i++) {
             argList.add(args[i]);
         }
         // Add output arg
         String output = "img%" + TOTAL_DIGIT_IN_FILENAME + "d.";
         if (this.jpgRadioButton.isSelected()) {
-            output = output + ".jpg";
+            output = output + "jpg";
         } else {
-            output = output + ".tif";
+            output = output + "tif";
         }
         argList.add(output);
 
