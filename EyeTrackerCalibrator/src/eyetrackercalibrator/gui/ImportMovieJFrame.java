@@ -371,9 +371,12 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         argList.add("-i");
         argList.add(input);
         // Add advance args
-        String[] args = advanceArg.trim().split("\\s+");
-        for (int i = 0; i < args.length; i++) {
-            argList.add(args[i]);
+        advanceArg = advanceArg.trim();
+        if (advanceArg.length() > 0) {
+            String[] args = advanceArg.split("\\s+");
+            for (int i = 0; i < args.length; i++) {
+                argList.add(args[i]);
+            }
         }
         // Add output arg
         String output = "img%" + TOTAL_DIGIT_IN_FILENAME + "d.";
