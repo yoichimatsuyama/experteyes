@@ -411,7 +411,7 @@ public class Main extends javax.swing.JFrame {
         calibrationPointsExportMenuItem = new JMenuItem("Calibration Points");
 
         toolsMenu = new JMenu("Tools");
-        fitEyeModelImportMenuItem = new JMenuItem("Create Eye Model");
+        fitEyeModelImportMenuItem = new JMenuItem("Find Pupil Locations");
 
         new_MenuItem.setMnemonic(KeyEvent.VK_N);
         open_MenuItem.setMnemonic(KeyEvent.VK_O);
@@ -1059,7 +1059,7 @@ public class Main extends javax.swing.JFrame {
     private void performOpenMenuAction() {
         // Choose new directory to put the project
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File("."));
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             boolean isNotCancel = true;
