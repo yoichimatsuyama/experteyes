@@ -121,15 +121,10 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
+                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="5" pref="5" max="5" attributes="0"/>
-                          <Component id="autoTestModelCheckBox" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="5" pref="5" max="5" attributes="0"/>
-                          <Component id="detectPupilAngleCheckBox" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="autoTestModelCheckBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="detectPupilAngleCheckBox" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="crIsCircleCheckBox" min="-2" max="-2" attributes="0"/>
@@ -180,7 +175,7 @@
         <Property name="majorTickSpacing" type="int" value="30"/>
         <Property name="maximum" type="int" value="255"/>
         <Property name="minorTickSpacing" type="int" value="10"/>
-        <Property name="value" type="int" value="126"/>
+        <Property name="value" type="int" value="38"/>
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="pupilGrayLevelSliderStateChanged"/>
@@ -207,7 +202,7 @@
         <Property name="majorTickSpacing" type="int" value="30"/>
         <Property name="maximum" type="int" value="255"/>
         <Property name="minorTickSpacing" type="int" value="10"/>
-        <Property name="value" type="int" value="126"/>
+        <Property name="value" type="int" value="204"/>
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="crlGrayLevelSliderStateChanged"/>
@@ -305,8 +300,8 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="sharpeningFactorSlider" alignment="0" pref="270" max="32767" attributes="0"/>
-                      <Component id="sigmaSlider" alignment="0" pref="270" max="32767" attributes="0"/>
+                      <Component id="sharpeningFactorSlider" alignment="0" pref="274" max="32767" attributes="0"/>
+                      <Component id="sigmaSlider" alignment="0" pref="274" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">

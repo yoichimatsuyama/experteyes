@@ -13,6 +13,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -48,11 +49,11 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="crThreshButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="crThreshSlider" pref="423" max="32767" attributes="0"/>
-                          <Component id="pupilThreshSlider" alignment="1" pref="423" max="32767" attributes="0"/>
+                          <Component id="crThreshSlider" pref="266" max="32767" attributes="0"/>
+                          <Component id="pupilThreshSlider" alignment="1" pref="266" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="jLabel1" alignment="0" pref="527" max="32767" attributes="0"/>
+                  <Component id="jLabel1" alignment="0" pref="368" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -87,7 +88,7 @@
                   <Component id="loadEstimatedPupilLocationButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="estimatePupilLocationButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="276" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="213" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -139,6 +140,7 @@
     <Component class="javax.swing.JSlider" name="crThreshSlider">
       <Properties>
         <Property name="maximum" type="int" value="255"/>
+        <Property name="value" type="int" value="204"/>
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="crThreshSliderStateChanged"/>
