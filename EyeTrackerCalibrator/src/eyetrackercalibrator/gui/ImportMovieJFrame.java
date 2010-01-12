@@ -178,11 +178,11 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         tiffRadioButton.setText("tiff");
         tiffRadioButton.setToolTipText("Lerger file size but better image quality");
 
-        deinterlaceCheckBox.setText("deinterlace");
+        deinterlaceCheckBox.setText("Deinterlace");
 
-        sameQualityCheckBox.setText("force quality to be the same as movie (Increase file sizes)");
+        sameQualityCheckBox.setText("Force quality to be the same as movie (Increase file sizes)");
 
-        h264CheckBox.setText("input is H.264/MPEG-4");
+        h264CheckBox.setText("Input is H.264/MPEG-4. (Needed if you select tiff output.)");
 
         testImportButton.setText("Test Import");
         testImportButton.setToolTipText("Try importing 10 frames to test configuration");
@@ -222,7 +222,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                         .addComponent(tiffRadioButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(sameQualityCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 176, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
                         .addComponent(testImportButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(deinterlaceCheckBox)
@@ -383,7 +383,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         if (this.jpgRadioButton.isSelected()) {
             output = output + "jpg";
         } else {
-            output = output + "tif";
+            output = output + "tiff";
         }
         argList.add(output);
 
