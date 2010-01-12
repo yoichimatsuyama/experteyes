@@ -462,7 +462,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         interactivePanel = new gui.InteractivePanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -544,7 +544,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
+                .addContainerGap(42, Short.MAX_VALUE)
                 .add(saveSettingButton)
                 .add(18, 18, 18)
                 .add(loadSettingButton)
@@ -559,12 +559,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 179, Short.MAX_VALUE)
+                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(deleteButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -574,7 +574,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(deleteButton)
@@ -603,7 +603,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 468, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .add(loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+            .add(loadingProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -664,7 +664,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, frameSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, frameSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(frameLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -676,10 +676,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     .add(layout.createSequentialGroup()
                         .add(eyeDirLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+                        .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(loadImageButton))
-                    .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE))
+                    .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -691,7 +691,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     .add(eyeDirLabel)
                     .add(eyeDirTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(frameLabel)
@@ -1116,21 +1116,21 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }//GEN-LAST:event_frameSliderMouseWheelMoved
 
     private void initProject() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        JFileChooser chooser = new JFileChooser();
+//        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//
+//        // Get starting dir from the text box
+//        if (this.eyeDirTextField.getText().length() > 0) {
+//            chooser.setCurrentDirectory(new File(this.eyeDirTextField.getText()));
+//        }
+//
+//        // Clear current frame by pupil location lookup
+//        this.pointToFrameByEstimatedPupilLocation.clear();
 
-        // Get starting dir from the text box
-        if (this.eyeDirTextField.getText().length() > 0) {
-            chooser.setCurrentDirectory(new File(this.eyeDirTextField.getText()));
-        }
-
-        // Clear current frame by pupil location lookup
-        this.pointToFrameByEstimatedPupilLocation.clear();
-
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        //int returnVal = chooser.showOpenDialog(null);
+        //if (returnVal == JFileChooser.APPROVE_OPTION) {
             // list the eye files and set the text field to reflect their directory
-            eyeDir = chooser.getSelectedFile();
+            eyeDir = new File(this.eyeDirTextField.getText());//chooser.getSelectedFile();
             eyeDirTextField.setText(eyeDir.getAbsolutePath());
 
             if (!eyeDir.exists()) {
@@ -1149,6 +1149,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             imgProc = new ThreadedImageProcessor(new ThreadedImageProcessorListener() {
 
+            @Override
                 public void progress(int progress) {
                     loadingProgress.setMaximum(eyeFiles.length);
                     loadingProgress.setValue(progress);
@@ -1156,13 +1157,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     repaint();
                 }
 
+            @Override
                 public void complete() {
                     loadingProgress.setString("Computing min, max & avg is completed");
                     searchSpacePanel1.enableComputeMinMaxAvg();
                     repaint();
                 }
             });
-        }
+       // }
 
 
     }

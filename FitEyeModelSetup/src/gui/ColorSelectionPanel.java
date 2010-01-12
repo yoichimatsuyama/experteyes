@@ -124,13 +124,10 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
+                .add(5, 5, 5)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(5, 5, 5)
-                        .add(autoTestModelCheckBox))
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(5, 5, 5)
-                        .add(detectPupilAngleCheckBox)))
+                    .add(autoTestModelCheckBox)
+                    .add(detectPupilAngleCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(crIsCircleCheckBox)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -145,7 +142,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         pupilGrayLevelSlider.setMajorTickSpacing(30);
         pupilGrayLevelSlider.setMaximum(255);
         pupilGrayLevelSlider.setMinorTickSpacing(10);
-        pupilGrayLevelSlider.setValue(126);
+        pupilGrayLevelSlider.setValue(38);
         pupilGrayLevelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 pupilGrayLevelSliderStateChanged(evt);
@@ -165,7 +162,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
         crlGrayLevelSlider.setMajorTickSpacing(30);
         crlGrayLevelSlider.setMaximum(255);
         crlGrayLevelSlider.setMinorTickSpacing(10);
-        crlGrayLevelSlider.setValue(126);
+        crlGrayLevelSlider.setValue(204);
         crlGrayLevelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 crlGrayLevelSliderStateChanged(evt);
@@ -273,8 +270,8 @@ public class ColorSelectionPanel extends javax.swing.JPanel
                     .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
-                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
+                    .add(sharpeningFactorSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                    .add(sigmaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(sigmaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)

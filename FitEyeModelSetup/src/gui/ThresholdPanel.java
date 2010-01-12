@@ -168,6 +168,7 @@ public class ThresholdPanel extends javax.swing.JPanel {
         });
 
         crThreshSlider.setMaximum(255);
+        crThreshSlider.setValue(204);
         crThreshSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 crThreshSliderStateChanged(evt);
@@ -222,9 +223,9 @@ public class ThresholdPanel extends javax.swing.JPanel {
                                 .add(pupilThreshButton)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(crThreshButton))
-                            .add(crThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pupilThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)))
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE))
+                            .add(crThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pupilThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -246,12 +247,12 @@ public class ThresholdPanel extends javax.swing.JPanel {
                         .add(pupilThreshButton)
                         .add(crThreshButton)))
                 .add(32, 32, 32)
-                .add(jLabel1)
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(loadEstimatedPupilLocationButton)
                     .add(estimatePupilLocationButton))
-                .add(276, 276, 276))
+                .add(213, 213, 213))
         );
     }// </editor-fold>//GEN-END:initComponents
     private void crThreshSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_crThreshSliderStateChanged
