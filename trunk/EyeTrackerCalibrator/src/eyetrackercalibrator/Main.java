@@ -149,9 +149,9 @@ public class Main extends javax.swing.JFrame {
     private InformationDatabase informationDatabase = null;
     private boolean isProjectOpen = false;
     static final String DEFAULT_EYE_FRAME_PATH = "eye";
-    static final String DEFAULT_EYE_INFO_PATH = "eyeinfo";
+    static final String DEFAULT_EYE_INFO_PATH = "Gaze";
     static final String DEFAULT_SCENE_FRAME_PATH = "scene";
-    static final String DEFAULT_SCENE_INFO_PATH = "sceneinfo";
+    static final String DEFAULT_SCENE_INFO_PATH = "Corners";
 
     /** Creates a new instance of Main */
     public Main() {

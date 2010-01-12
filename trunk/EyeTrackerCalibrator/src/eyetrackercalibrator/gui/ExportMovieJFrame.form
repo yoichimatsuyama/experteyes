@@ -55,7 +55,7 @@
                               <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="progressBar" alignment="0" pref="612" max="32767" attributes="0"/>
+                          <Component id="progressBar" alignment="0" pref="630" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                   </Group>
@@ -83,8 +83,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="toTextField" alignment="0" pref="150" max="32767" attributes="1"/>
-                          <Component id="fromTextField" alignment="0" pref="150" max="32767" attributes="1"/>
+                          <Component id="toTextField" alignment="0" pref="153" max="32767" attributes="1"/>
+                          <Component id="fromTextField" alignment="0" pref="153" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -361,7 +361,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="outputButtonGroup"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Fram files only"/>
+            <Property name="text" type="java.lang.String" value="Frame files only"/>
           </Properties>
         </Component>
       </SubComponents>

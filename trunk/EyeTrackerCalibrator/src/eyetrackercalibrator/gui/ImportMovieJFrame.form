@@ -56,7 +56,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="sameQualityCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="176" max="32767" attributes="0"/>
+                      <EmptySpace pref="174" max="32767" attributes="0"/>
                       <Component id="testImportButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -208,17 +208,17 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="deinterlaceCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="deinterlace"/>
+        <Property name="text" type="java.lang.String" value="Deinterlace"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="sameQualityCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="force quality to be the same as movie (Increase file sizes)"/>
+        <Property name="text" type="java.lang.String" value="Force quality to be the same as movie (Increase file sizes)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="h264CheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="input is H.264/MPEG-4"/>
+        <Property name="text" type="java.lang.String" value="Input is H.264/MPEG-4. (Needed if you select tiff output.)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="testImportButton">
