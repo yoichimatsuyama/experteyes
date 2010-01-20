@@ -44,7 +44,7 @@ import javax.swing.JTextField;
 public class NewProjectJDialog extends javax.swing.JDialog {
     
     // This holds selected location from File Chooser (Not location in the project Location text field)
-    File selectedLocation = new File(".");
+    File selectedLocation = new File(System.getProperty("user.home"));
     // True when user click on create
     boolean isApproved = false;
     

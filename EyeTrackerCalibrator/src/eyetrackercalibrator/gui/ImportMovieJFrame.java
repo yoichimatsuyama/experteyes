@@ -37,6 +37,15 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
     public final static int TOTAL_DIGIT_IN_FILENAME = 6;
     private Process ffmpegProcess = null;
     private static int TOTAL_TEST_FRAMES = 10;
+    protected String imageFilePrefix = "img";
+
+    public String getImageFilePrefix() {
+        return imageFilePrefix;
+    }
+
+    public void setImageFilePrefix(String imageFilePrefix) {
+        this.imageFilePrefix = imageFilePrefix;
+    }
 
     /** Creates new form ImportMovieJFrame */
     public ImportMovieJFrame(File importToDir) {
@@ -379,7 +388,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
             }
         }
         // Add output arg
-        String output = "img%" + TOTAL_DIGIT_IN_FILENAME + "d.";
+        String output = this.imageFilePrefix +"%" + TOTAL_DIGIT_IN_FILENAME + "d.";
         if (this.jpgRadioButton.isSelected()) {
             output = output + "jpg";
         } else {
@@ -423,9 +432,11 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         if (targetField.getText().length() > 1) {
             // Get current selection from text field
             fileChooser.setSelectedFile(new File(targetField.getText()));
-        } else {
+        } else if(this.lastSelectedLocation != null){
             // Otherwise open to latest location if there is nothing in the field text
             fileChooser.setSelectedFile(lastSelectedLocation);
+        }else{
+            fileChooser.setCurrentDirectory(outputDir.getParentFile());
         }
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {

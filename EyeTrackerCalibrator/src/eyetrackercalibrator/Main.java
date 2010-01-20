@@ -993,6 +993,7 @@ public class Main extends javax.swing.JFrame {
 
             ImportMovieJFrame importMovieJFrame = new ImportMovieJFrame(new File(importLocation));
             importMovieJFrame.setTitle("Importing " + type + " movie frames");
+            importMovieJFrame.setImageFilePrefix(type+"_");
             importMovieJFrame.setVisible(true);
 
         }
