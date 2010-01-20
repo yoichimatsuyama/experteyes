@@ -1395,7 +1395,7 @@ public class Main extends javax.swing.JFrame {
 
             // Get the file to save raw info
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new File("."));
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setDialogTitle("Data export file");
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {

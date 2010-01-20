@@ -427,7 +427,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             fileChooser.setSelectedFile(new File(exportLocationTextField.getText()));
         } else {
             // Otherwise open to latest location if there is nothing in the field text
-            fileChooser.setSelectedFile(new File("."));
+            fileChooser.setSelectedFile(new File(System.getProperty("user.home")));
         }
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
