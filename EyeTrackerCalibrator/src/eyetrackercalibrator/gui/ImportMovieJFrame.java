@@ -115,6 +115,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         fileTypeButtonGroup = new javax.swing.ButtonGroup();
+        importButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         movieFileTextField = new javax.swing.JTextField();
         movieBrowseButton = new javax.swing.JButton();
@@ -124,7 +125,6 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        importButton = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jpgRadioButton = new javax.swing.JRadioButton();
         tiffRadioButton = new javax.swing.JRadioButton();
@@ -132,6 +132,13 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         sameQualityCheckBox = new javax.swing.JCheckBox();
         h264CheckBox = new javax.swing.JCheckBox();
         testImportButton = new javax.swing.JButton();
+
+        importButton.setText("Import");
+        importButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importButtonActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -169,13 +176,6 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
 
         jLabel3.setText("Progress output");
 
-        importButton.setText("Import");
-        importButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importButtonActionPerformed(evt);
-            }
-        });
-
         jLabel4.setText("Output file type:");
 
         fileTypeButtonGroup.add(jpgRadioButton);
@@ -210,19 +210,16 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(advanceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                        .addComponent(movieFileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(movieBrowseButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(importButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton))
+                    .addComponent(cancelButton)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -231,7 +228,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                         .addComponent(tiffRadioButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(sameQualityCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 291, Short.MAX_VALUE)
                         .addComponent(testImportButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(deinterlaceCheckBox)
@@ -270,9 +267,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelButton)
-                    .addComponent(importButton))
+                .addComponent(cancelButton)
                 .addContainerGap())
         );
 
@@ -343,9 +338,14 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                 this.ffmpegProcess.destroy();
                 this.ffmpegProcess = null;
             }
+            // Reenable test button
+            testImportButton.setEnabled(true);
         } else {
             // Get current text
             final String buttonText = importButton.getText();
+
+            // Disable test button
+            this.testImportButton.setEnabled(false);
 
             // Add limited frames
             importButton.setText("Stop");
@@ -361,6 +361,8 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                         cancelButton.setText("Finish");
                         JOptionPane.showMessageDialog(parent, "Importing is completed.");
                     }
+                    // Reenable test button
+                    testImportButton.setEnabled(true);
                 }
             });
         }
@@ -388,7 +390,7 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
             }
         }
         // Add output arg
-        String output = this.imageFilePrefix +"%" + TOTAL_DIGIT_IN_FILENAME + "d.";
+        String output = this.imageFilePrefix + "%" + TOTAL_DIGIT_IN_FILENAME + "d.";
         if (this.jpgRadioButton.isSelected()) {
             output = output + "jpg";
         } else {
@@ -432,10 +434,10 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
         if (targetField.getText().length() > 1) {
             // Get current selection from text field
             fileChooser.setSelectedFile(new File(targetField.getText()));
-        } else if(this.lastSelectedLocation != null){
+        } else if (this.lastSelectedLocation != null) {
             // Otherwise open to latest location if there is nothing in the field text
             fileChooser.setSelectedFile(lastSelectedLocation);
-        }else{
+        } else {
             fileChooser.setCurrentDirectory(outputDir.getParentFile());
         }
 
