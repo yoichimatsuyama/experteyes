@@ -348,7 +348,7 @@ public class FrameManager {
     private class PictureFilenameFilter implements FilenameFilter {
 
         public boolean accept(File file, String string) {
-            return !file.isHidden() && (string.endsWith(".jpg") ||
+            return !file.isHidden() && !string.startsWith(".") && (string.endsWith(".jpg") ||
                     string.endsWith(".png") || string.endsWith(".gif") ||
                     string.endsWith(".tif") || string.endsWith(".tiff"));
         }
