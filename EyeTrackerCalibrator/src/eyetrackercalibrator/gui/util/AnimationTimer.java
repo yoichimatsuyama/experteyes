@@ -298,17 +298,17 @@ public class AnimationTimer {
             ImageIcon icon = null;
             if (image != null) {
                 // Scale image
-                int widthDiff = image.getWidth() - displayDimension.width;
-                int heightDiff = image.getHeight() - displayDimension.height;
+                double widthScale = (double) displayDimension.width / (double) image.getWidth();
+                double heightScale = (double) displayDimension.height / (double) image.getHeight();
                 Image scaledImage = null;
-                if (widthDiff > heightDiff) {
+                if (widthScale < heightScale) {
                     // We should scale by width
-                    scale = (double) displayDimension.width / (double) image.getWidth();
+                    scale = widthScale;
                     scaledImage = image.getScaledInstance(
                             displayDimension.width, -1, Image.SCALE_FAST);
                 } else {
                     // We should scale by height
-                    scale = (double) displayDimension.height / (double) image.getHeight();
+                    scale = heightScale;
                     scaledImage = image.getScaledInstance(
                             -1, displayDimension.height, Image.SCALE_FAST);
                 }

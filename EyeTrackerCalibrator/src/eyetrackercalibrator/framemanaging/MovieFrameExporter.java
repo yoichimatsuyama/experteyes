@@ -256,20 +256,20 @@ public class MovieFrameExporter {
         boolean movieCreatedSuccessfully = true;
         if (createMovieFile && this.ffmpegExecutable != null && this.ffmpegExecutable.exists()) {
 
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(eyeOnly, "Creating eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully
+                    && createMovie(eyeOnly, "Creating eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
 
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(screenOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully
+                    && createMovie(screenOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
 
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(sideBySide, "Creating side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully
+                    && createMovie(sideBySide, "Creating side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
 
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully
+                    && createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
 
-            movieCreatedSuccessfully = movieCreatedSuccessfully &&
-                    createMovie(screenInCorner, "Creating screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
+            movieCreatedSuccessfully = movieCreatedSuccessfully
+                    && createMovie(screenInCorner, "Creating screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
 
             this.processLock.lock();
             this.process = null;
@@ -425,9 +425,9 @@ public class MovieFrameExporter {
     }
 
     private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
-        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r " +
-                this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff " +
-                "-y " + name.trim() + ".mov";
+        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r "
+                + this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff "
+                + "-y " + name.trim() + ".mov";
     }
 
     private LinkedList<String> constructFFMPEGCommandList(String name, int totalDigitInFileName) {
@@ -587,19 +587,18 @@ public class MovieFrameExporter {
         BufferedImage image = eyeFrameManager.getFrame(i);
         double scale = 1d;
         if (image != null) {
-
             // Scale image
-            int widthDiff = image.getWidth() - this.width;
-            int heightDiff = image.getHeight() - this.height;
+            double widthScale = (double) this.width / (double) image.getWidth();
+            double heightScale = (double) this.height / (double) image.getHeight();
             Image scaledImage = null;
-            if (widthDiff > heightDiff) {
+            if (widthScale < heightScale) {
                 // We should scale by width
-                scale = (double) this.width / (double) image.getWidth();
+                scale = widthScale;
                 scaledImage = image.getScaledInstance(
                         this.width, -1, Image.SCALE_FAST);
             } else {
-                // We should scale by width
-                scale = (double) this.height / (double) image.getHeight();
+                // We should scale by height
+                scale = heightScale;
                 scaledImage = image.getScaledInstance(
                         -1, this.height, Image.SCALE_FAST);
             }
@@ -674,17 +673,17 @@ public class MovieFrameExporter {
         if (image != null) {
 
             // Scale image
-            int widthDiff = image.getWidth() - this.width;
-            int heightDiff = image.getHeight() - this.height;
+            double widthScale = (double) this.width / (double) image.getWidth();
+            double heightScale = (double) this.height / (double) image.getHeight();
             Image scaledImage = null;
-            if (widthDiff > heightDiff) {
+            if (widthScale < heightScale) {
                 // We should scale by width
-                scale = (double) this.width / (double) image.getWidth();
+                scale = widthScale;
                 scaledImage = image.getScaledInstance(
                         this.width, -1, Image.SCALE_FAST);
             } else {
-                // We should scale by width
-                scale = (double) this.height / (double) image.getHeight();
+                // We should scale by height
+                scale = heightScale;
                 scaledImage = image.getScaledInstance(
                         -1, this.height, Image.SCALE_FAST);
             }
