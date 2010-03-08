@@ -63,10 +63,15 @@ public class MarkableJLabel extends JLabel {
     private Point[] greenCorners = new Point[4];
     private Point[] redCorners = new Point[4];
     private Point[] yellowMarkedPoints = null;
+    private boolean isReversingYellowMarks = false;
     private Point[] blueMarkedPoints = null;
+    private boolean isReversingBlueMarks = false;
     private Point[] greenMarkedPoints = null;
+    private boolean isReversingGreenMarks = false;
     private Point[] redMarkedPoints = null;
+    private boolean isReversingRedMarks = false;
     private Point[] whiteMarkedPoints = null;
+    private boolean isReversingWhiteMarks = false;
     private Color color = Color.GREEN;
     private RotatedEllipse2D greenEllisp = null;
     private RotatedEllipse2D redEllisp = null;
@@ -116,12 +121,40 @@ public class MarkableJLabel extends JLabel {
         drawCorners(g, Color.GREEN, greenCorners);
         drawCorners(g, Color.RED, redCorners);
 
-        drawMarks(g, Color.GREEN, greenMarkedPoints);
-        drawMarks(g, Color.RED, redMarkedPoints);
-        drawMarks(g, Color.BLUE, blueMarkedPoints);
-        drawMarks(g, Color.YELLOW, yellowMarkedPoints);
-        drawMarks(g, Color.WHITE, whiteMarkedPoints);
+        int width = getWidth();
+        int height = getHeight();
 
+        if (this.isReversingGreenMarks) {
+            drawReverseMarks(g, Color.GREEN, greenMarkedPoints, width, height);
+        } else {
+            drawMarks(g, Color.GREEN, greenMarkedPoints);
+        }
+
+        if (this.isReversingRedMarks) {
+            drawReverseMarks(g, Color.RED, redMarkedPoints, width, height);
+        } else {
+            drawMarks(g, Color.RED, redMarkedPoints);
+        }
+
+        if (this.isReversingBlueMarks) {
+            drawReverseMarks(g, Color.BLUE, blueMarkedPoints, width, height);
+        } else {
+            drawMarks(g, Color.BLUE, blueMarkedPoints);
+        }
+
+        if (this.isReversingYellowMarks) {
+            drawReverseMarks(g, Color.YELLOW, yellowMarkedPoints, width, height);
+        } else {
+            drawMarks(g, Color.YELLOW, yellowMarkedPoints);
+        }
+
+        if (this.isReversingYellowMarks) {
+            drawReverseMarks(g, Color.WHITE, whiteMarkedPoints, width, height);
+        } else {
+
+            drawMarks(g, Color.WHITE, whiteMarkedPoints);
+        }
+        
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform oldTransform = g2d.getTransform();
         if (greenEllisp != null) {
@@ -210,6 +243,34 @@ public class MarkableJLabel extends JLabel {
         }
     }
 
+    private void drawReverseMarks(Graphics g, Color color, Point[] points, int spaceWidth, int spaceHeight) {
+        g.setColor(color);
+        if (points != null) {
+            for (int i = 0; i < points.length; i++) {
+                g.drawLine(
+                        0,
+                        points[i].y,
+                        points[i].x - pointMarkLength - 1,
+                        points[i].y);
+                g.drawLine(
+                        points[i].x + pointMarkLength + 1,
+                        points[i].y,
+                        spaceWidth,
+                        points[i].y);
+                g.drawLine(
+                        points[i].x,
+                        0,
+                        points[i].x,
+                        points[i].y - pointMarkLength - 1);
+                g.drawLine(
+                        points[i].x,
+                        points[i].y + pointMarkLength + 1,
+                        points[i].x,
+                        spaceHeight);
+            }
+        }
+    }
+
     public Point[] getCorners(MarkColor color) {
         switch (color) {
             case RED:
@@ -267,22 +328,27 @@ public class MarkableJLabel extends JLabel {
         }
     }
 
-    public void setMarkedPoints(Point[] markedPoints, MarkableJLabel.MarkColor color) {
+    public void setMarkedPoints(Point[] markedPoints, MarkableJLabel.MarkColor color, boolean isReversed) {
         switch (color) {
             case RED:
                 this.redMarkedPoints = markedPoints;
+                this.isReversingRedMarks = isReversed;
                 break;
             case BLUE:
                 this.blueMarkedPoints = markedPoints;
+                this.isReversingBlueMarks = isReversed;
                 break;
             case YELLOW:
                 this.yellowMarkedPoints = markedPoints;
+                this.isReversingYellowMarks = isReversed;
                 break;
             case WHITE:
                 this.whiteMarkedPoints = markedPoints;
+                this.isReversingWhiteMarks = isReversed;
                 break;
             default: // Green by default
                 this.greenMarkedPoints = markedPoints;
+                this.isReversingGreenMarks = isReversed;
         }
     }
 

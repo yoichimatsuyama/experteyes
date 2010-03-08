@@ -711,7 +711,8 @@ public class MovieFrameExporter {
             // Scale gaze point accordingly
             point[0] = new Point((int) (gazePosition.x * scale),
                     (int) (gazePosition.y * scale));
-            drawMarks(g, Color.RED, point);
+            //drawMarks(g, Color.RED, point);
+            drawReverseMarks(g, Color.yellow, point, this.width, this.height);
         }
 
         if (withCorners) {
@@ -759,6 +760,35 @@ public class MovieFrameExporter {
             }
         }
     }
+
+    private void drawReverseMarks(Graphics2D g, Color color, Point[] points, int spaceWidth, int spaceHeight){
+        g.setColor(color);
+        if (points != null) {
+            for (int i = 0; i < points.length; i++) {
+                g.drawLine(
+                        0,
+                        points[i].y,
+                        points[i].x - pointMarkLength - 1,
+                        points[i].y);
+                g.drawLine(
+                        points[i].x + pointMarkLength + 1,
+                        points[i].y,
+                        spaceWidth,
+                        points[i].y);
+                g.drawLine(
+                        points[i].x,
+                        0,
+                        points[i].x,
+                        points[i].y - pointMarkLength - 1);
+                g.drawLine(
+                        points[i].x,
+                        points[i].y + pointMarkLength + 1,
+                        points[i].x,
+                        spaceHeight);
+            }
+        }
+    }
+
     static final int TOPLEFT = 0;
     static final int BOTTOMLEFT = 1;
     static final int BOTTOMRIGHT = 2;
