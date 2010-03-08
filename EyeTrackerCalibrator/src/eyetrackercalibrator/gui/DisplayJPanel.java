@@ -52,6 +52,8 @@ public class DisplayJPanel extends javax.swing.JPanel {
     /** Creates new form DisplayJPanel */
     public DisplayJPanel() {
         initComponents();
+        //this.eyeViewLabel.setPointMarkLength(4);
+        this.screenViewLabel.setPointMarkLength(4);
         eyeGaze = new Point[1];
         eyeGaze[0] = new Point();
     }
@@ -104,11 +106,11 @@ public class DisplayJPanel extends javax.swing.JPanel {
     }
 
     public void setEyeMarkedPoints(Point[] markedPoints) {
-        eyeViewLabel.setMarkedPoints(markedPoints, MarkableJLabel.MarkColor.GREEN);
+        eyeViewLabel.setMarkedPoints(markedPoints, MarkableJLabel.MarkColor.GREEN, false);
     }
 
     public void setScreenMarkedPoints(Point[] markedPoints) {
-        screenViewLabel.setMarkedPoints(markedPoints, MarkableJLabel.MarkColor.GREEN);
+        screenViewLabel.setMarkedPoints(markedPoints, MarkableJLabel.MarkColor.GREEN, false);
     }
 
     public void clearScreenMarks() {
@@ -130,7 +132,7 @@ public class DisplayJPanel extends javax.swing.JPanel {
     public void setEyeGaze(double x, double y) {
         eyeGaze[0].setLocation(x * gazeScaleFactor, y * gazeScaleFactor);
         // Put a mark on it.
-        screenViewLabel.setMarkedPoints(eyeGaze, MarkableJLabel.MarkColor.RED);
+        screenViewLabel.setMarkedPoints(eyeGaze, MarkableJLabel.MarkColor.RED, true);
     }
 
     public void setPupilFit(double[] boundingBox, double angle) {

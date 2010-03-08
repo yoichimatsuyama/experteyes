@@ -117,6 +117,7 @@ public class AnimationTimer {
         int screenCurrentFrame = 0;
         Point2D.Double eyeVec = null;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             // Holding real frame number in db
             int frameDBLocation;

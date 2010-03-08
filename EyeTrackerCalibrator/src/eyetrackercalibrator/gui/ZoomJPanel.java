@@ -218,7 +218,7 @@ public class ZoomJPanel extends javax.swing.JPanel {
      */
     public void setSelectedPoint(Point2D selectedPoint) {
         if(selectedPoint == null){
-            scrollableMarkableJLable.setMarkedPoints(null, MarkableJLabel.MarkColor.GREEN);
+            scrollableMarkableJLable.setMarkedPoints(null, MarkableJLabel.MarkColor.GREEN, false);
             this.selectedPoint.setLocation(0d,0d);
         }else{
             // Convert selected point to scale
@@ -233,7 +233,7 @@ public class ZoomJPanel extends javax.swing.JPanel {
                 points[0] = new Point();
             }
             points[0].setLocation(selectedPoint);
-            scrollableMarkableJLable.setMarkedPoints(points, MarkableJLabel.MarkColor.GREEN);
+            scrollableMarkableJLable.setMarkedPoints(points, MarkableJLabel.MarkColor.GREEN, false);
         }
         repaint();
     }

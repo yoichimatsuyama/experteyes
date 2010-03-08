@@ -459,18 +459,18 @@ public class CalibratingViewJDialog
 
         // Set display
         if (this.correctPoints[PRIMARY] != null) {
-            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN);
-            primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[PRIMARY], MarkableJLabel.MarkColor.RED);
-            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
-            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE);
-            primaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[PRIMARY], MarkableJLabel.MarkColor.WHITE);
+            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN, false);
+            primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[PRIMARY], MarkableJLabel.MarkColor.RED, false);
+            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW, false);
+            primaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE, false);
+            primaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[PRIMARY], MarkableJLabel.MarkColor.WHITE, false);
         }
         if (this.correctPoints[SECONDARY] != null) {
-            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN);
-            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW);
-            secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[SECONDARY], MarkableJLabel.MarkColor.RED);
-            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE);
-            secondaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[SECONDARY], MarkableJLabel.MarkColor.WHITE);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[PRIMARY], MarkableJLabel.MarkColor.GREEN, false);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[SECONDARY], MarkableJLabel.MarkColor.YELLOW, false);
+            secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[SECONDARY], MarkableJLabel.MarkColor.RED, false);
+            secondaryMarkableJLabel.setMarkedPoints(this.correctPoints[TEST], MarkableJLabel.MarkColor.BLUE, false);
+            secondaryMarkableJLabel.setMarkedPoints(this.estimatedTestPoints[SECONDARY], MarkableJLabel.MarkColor.WHITE, false);
         }
 
         // Repaint
