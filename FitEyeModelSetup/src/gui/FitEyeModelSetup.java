@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.concurrent.Semaphore;
@@ -154,8 +155,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             public void stateChanged(ChangeEvent e) {
                 JSlider slider = (JSlider) e.getSource();
-                if (ColorSelectionPanel.SIGMA_SLIDER_NAME.equals(slider.getName()) ||
-                        ColorSelectionPanel.SHARPENINGFACTOR_SLIDER_NAME.equals(slider.getName())) {
+                if (ColorSelectionPanel.SIGMA_SLIDER_NAME.equals(slider.getName())
+                        || ColorSelectionPanel.SHARPENINGFACTOR_SLIDER_NAME.equals(slider.getName())) {
                     // SEt frame to trigger change
                     setFrame(frameNum);
                 }
@@ -199,8 +200,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 int decision = JOptionPane.showConfirmDialog(parent,
-                        "<html><p>Plase make sure that your current search space covers all pupil locations, and\n" +
-                        "pupil threshold is set properly.  Otherwise, estimations may not be correct.",
+                        "<html><p>Plase make sure that your current search space covers all pupil locations, and\n"
+                        + "pupil threshold is set properly.  Otherwise, estimations may not be correct.",
                         "Before you start", JOptionPane.OK_CANCEL_OPTION);
 
                 if (decision == JOptionPane.OK_OPTION) {
@@ -297,8 +298,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             // Set up progress bar for this
             this.loadingProgress.setValue(0);
-            this.loadingProgress.setString("Estimating pupil location: 0/" +
-                    this.loadingProgress.getMaximum());
+            this.loadingProgress.setString("Estimating pupil location: 0/"
+                    + this.loadingProgress.getMaximum());
 
             // Sanity check
             if (eyeFiles == null) {
@@ -313,8 +314,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     progress++;
                     loadingProgress.setMaximum(eyeFiles.length);
                     loadingProgress.setValue(progress);
-                    loadingProgress.setString("Estimating pupil location: " +
-                            progress + "/" + eyeFiles.length);
+                    loadingProgress.setString("Estimating pupil location: "
+                            + progress + "/" + eyeFiles.length);
                 }
             });
 
@@ -828,10 +829,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         // Give warning when threshold is dirty
         if (this.thresholdPanel1.isDirty()) {
             JOptionPane.showMessageDialog(this,
-                    "Threshold values have been changed.  The changes \n" +
-                    "may invalidate the estimated pupil locations.  \n" +
-                    "You may need to restimate the locations or load \n" +
-                    "another appropriate estimation.",
+                    "Threshold values have been changed.  The changes \n"
+                    + "may invalidate the estimated pupil locations.  \n"
+                    + "You may need to restimate the locations or load \n"
+                    + "another appropriate estimation.",
                     "Pupil locations may be invalid!", JOptionPane.WARNING_MESSAGE);
             this.thresholdPanel1.setDirty(false);
         }
@@ -953,8 +954,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         // Remove entries from list
         Object[] selected = configList.getSelectedValues();
 
-        for (int i = 0; i <
-                selected.length; i++) {
+        for (int i = 0; i
+                < selected.length; i++) {
             configListModel.removeElement(selected[i]);
         }
 
@@ -989,8 +990,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         if (this.isEyeFittingRunning) {
             int choice = JOptionPane.showConfirmDialog(this,
-                    "Would you like to terminate eye model fitting? " +
-                    "Termination may take sometime to complete.",
+                    "Would you like to terminate eye model fitting? "
+                    + "Termination may take sometime to complete.",
                     "Abort Eye Model Fitting",
                     JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
@@ -1129,42 +1130,50 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
         //int returnVal = chooser.showOpenDialog(null);
         //if (returnVal == JFileChooser.APPROVE_OPTION) {
-            // list the eye files and set the text field to reflect their directory
-            eyeDir = new File(this.eyeDirTextField.getText());//chooser.getSelectedFile();
-            eyeDirTextField.setText(eyeDir.getAbsolutePath());
+        // list the eye files and set the text field to reflect their directory
+        eyeDir = new File(this.eyeDirTextField.getText());//chooser.getSelectedFile();
+        eyeDirTextField.setText(eyeDir.getAbsolutePath());
 
-            if (!eyeDir.exists()) {
-                // Give warning when file not exists
-                JOptionPane.showMessageDialog(this,
-                        eyeDirTextField.getText() + " directory does not exists, please select a directory",
-                        "Error accessing the direcory", JOptionPane.ERROR_MESSAGE);
-                return;
+        if (!eyeDir.exists()) {
+            // Give warning when file not exists
+            JOptionPane.showMessageDialog(this,
+                    eyeDirTextField.getText() + " directory does not exists, please select a directory",
+                    "Error accessing the direcory", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // list the eye files and set the text field to reflect their directory
+        eyeFiles = eyeDir.listFiles(new NotHiddenPictureFilter());
+        // Sort the input
+        Arrays.sort(eyeFiles, new Comparator<File>() {
+
+            @Override
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
+        // Set correct total images
+        this.frameSlider.setMaximum(eyeFiles.length - 1);
+
+        imgProc = new ThreadedImageProcessor(new ThreadedImageProcessorListener() {
+
+            @Override
+            public void progress(int progress) {
+                loadingProgress.setMaximum(eyeFiles.length);
+                loadingProgress.setValue(progress);
+                loadingProgress.setString("Computing min, max & avg " + progress + "/" + eyeFiles.length);
+                repaint();
             }
 
-            // list the eye files and set the text field to reflect their directory
-            eyeFiles = eyeDir.listFiles(new NotHiddenPictureFilter());
-
-            // Set correct total images
-            this.frameSlider.setMaximum(eyeFiles.length - 1);
-
-            imgProc = new ThreadedImageProcessor(new ThreadedImageProcessorListener() {
-
             @Override
-                public void progress(int progress) {
-                    loadingProgress.setMaximum(eyeFiles.length);
-                    loadingProgress.setValue(progress);
-                    loadingProgress.setString("Computing min, max & avg " + progress + "/" + eyeFiles.length);
-                    repaint();
-                }
-
-            @Override
-                public void complete() {
-                    loadingProgress.setString("Computing min, max & avg is completed");
-                    searchSpacePanel1.enableComputeMinMaxAvg();
-                    repaint();
-                }
-            });
-       // }
+            public void complete() {
+                loadingProgress.setString("Computing min, max & avg is completed");
+                searchSpacePanel1.enableComputeMinMaxAvg();
+                repaint();
+            }
+        });
+        // }
 
 
     }
@@ -1317,23 +1326,23 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
                     // it cannot load some tiff compression
 
                     // Limit sharpen to the search space area to increase the speed
-                    
-                        // Clip the size just to make sure
-                        BufferedImage img = paintedImg.getSubimage(
-                                searchRect.x, searchRect.y,
-                                searchRect.width, searchRect.height);
 
-                        ImagePlus imagePlus = new ImagePlus("", img);
+                    // Clip the size just to make sure
+                    BufferedImage img = paintedImg.getSubimage(
+                            searchRect.x, searchRect.y,
+                            searchRect.width, searchRect.height);
 
-                        ImageUtils.unsharpMask(imagePlus.getProcessor(),
-                                this.colorSelectionPanel1.getSigma(),
-                                this.colorSelectionPanel1.getSharpeningFactor());
+                    ImagePlus imagePlus = new ImagePlus("", img);
+
+                    ImageUtils.unsharpMask(imagePlus.getProcessor(),
+                            this.colorSelectionPanel1.getSigma(),
+                            this.colorSelectionPanel1.getSharpeningFactor());
 
 
-                        paintedImg.getGraphics().drawImage(
-                                ImageUtils.toBufferedImage(imagePlus.getImage()),
-                                searchRect.x, searchRect.y, null);
-                    
+                    paintedImg.getGraphics().drawImage(
+                            ImageUtils.toBufferedImage(imagePlus.getImage()),
+                            searchRect.x, searchRect.y, null);
+
                 }
                 // user should be able to scroll through sequence with threshold on,
                 // so check to see what kind of threshold is set in the thresh panel
@@ -1385,8 +1394,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             if (this.colorSelectionPanel1.isCRColorHeighlighted()) {
                 logic.ImageUtils.grayToRGB(pixels);
 
-                int limit = (this.colorSelectionPanel1.getCRGrayValue() +
-                        this.colorSelectionPanel1.getBackgroundGrayValue()) / 2;
+                int limit = (this.colorSelectionPanel1.getCRGrayValue()
+                        + this.colorSelectionPanel1.getBackgroundGrayValue()) / 2;
 
                 int[] highPix = ImageUtils.threshold(pixels, limit, 255,
                         ImageUtils.createARGB(125, 255, 0, 0));
@@ -1401,8 +1410,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             if (this.colorSelectionPanel1.isPupilColorHeighlighted()) {
                 logic.ImageUtils.grayToRGB(pixels);
 
-                int limit = (this.colorSelectionPanel1.getPupilGrayValue() +
-                        this.colorSelectionPanel1.getBackgroundGrayValue()) / 2;
+                int limit = (this.colorSelectionPanel1.getPupilGrayValue()
+                        + this.colorSelectionPanel1.getBackgroundGrayValue()) / 2;
 
                 int[] highPix = ImageUtils.threshold(pixels, 0, limit,
                         ImageUtils.createARGB(125, 0, 255, 0));
@@ -1557,8 +1566,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
                     double newDistance = pupil.distance(info.point);
 
-                    if (this.frameNum == info.frameNum ||
-                            newDistance < distance) {
+                    if (this.frameNum == info.frameNum
+                            || newDistance < distance) {
                         // Take a new closer one
                         distance = newDistance;
                         currentConfig = info;
@@ -1653,11 +1662,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     /** This method set current eye directory and force the program to load the frames */
-    public void setEyeDirectory(String eyePath){
+    public void setEyeDirectory(String eyePath) {
         this.eyeDirTextField.setText(eyePath);
         initProject();
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private gui.ColorSelectionPanel colorSelectionPanel1;
