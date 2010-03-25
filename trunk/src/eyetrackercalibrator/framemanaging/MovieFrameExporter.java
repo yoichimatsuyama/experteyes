@@ -196,6 +196,7 @@ public class MovieFrameExporter {
         // loop for all frames
         int eyeStartFrame = this.frameSynchronizor.getEyeFrame(start);
         for (int i = start; i <= end && alive; i++) {
+           
             // Create file name
             String fileName = numberFormat.format(i - start + 1) + ".tiff";
 
@@ -487,6 +488,8 @@ public class MovieFrameExporter {
                     // Compute scaled eye gaze
                     eyeGaze = computeEyeGaze(scaleFactor, eyeFrameNum, info);
                     this.gazeList.add(eyeGaze);
+                } else {
+                    this.gazeList.add(null);
                 }
             }
             this.gazeAverageRangeNextFrame = firstFrame + range;
@@ -499,6 +502,8 @@ public class MovieFrameExporter {
                 eyeGaze = computeEyeGaze(scaleFactor,
                         this.gazeAverageRangeNextFrame, info);
                 this.gazeList.addLast(eyeGaze);
+            } else {
+                this.gazeList.addLast(null);
             }
 
             // Pop the old one from the list if there is any
@@ -514,14 +519,23 @@ public class MovieFrameExporter {
             // Find medien of x and y seperately when one exists
             double[] x = new double[pointArray.length];
             double[] y = new double[pointArray.length];
+            int totalMissing = 0;
             for (int i = 0; i < pointArray.length; i++) {
-                x[i] = pointArray[i].x;
-                y[i] = pointArray[i].y;
+                if (pointArray[i] != null) {
+                    x[i] = pointArray[i].x;
+                    y[i] = pointArray[i].y;
+                } else {
+                    x[i] = -1;
+                    y[i] = -1;
+                    totalMissing++;
+                }
             }
             Arrays.sort(x);
             Arrays.sort(y);
-            int halfPoint = Math.max(pointArray.length / 2 - 1, 0);
-            if (pointArray.length > 1 && pointArray.length % 2 != 0) {
+            int dataLength = pointArray.length - totalMissing;
+
+            int halfPoint = Math.max(dataLength / 2 - 1, 0) + totalMissing;
+            if (dataLength > 1 && dataLength % 2 != 0) {
                 eyeGaze = new Point2D.Double(
                         (x[halfPoint] + x[halfPoint + 1]) / 2,
                         (y[halfPoint] + y[halfPoint + 1]) / 2);
@@ -761,7 +775,7 @@ public class MovieFrameExporter {
         }
     }
 
-    private void drawReverseMarks(Graphics2D g, Color color, Point[] points, int spaceWidth, int spaceHeight){
+    private void drawReverseMarks(Graphics2D g, Color color, Point[] points, int spaceWidth, int spaceHeight) {
         g.setColor(color);
         if (points != null) {
             for (int i = 0; i < points.length; i++) {
@@ -788,7 +802,6 @@ public class MovieFrameExporter {
             }
         }
     }
-
     static final int TOPLEFT = 0;
     static final int BOTTOMLEFT = 1;
     static final int BOTTOMRIGHT = 2;
