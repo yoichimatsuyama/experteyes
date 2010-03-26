@@ -177,7 +177,7 @@ public class ThresholdPanel extends javax.swing.JPanel {
 
         crThreshLabel.setText("CR Threshold");
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/ThresholdPanel"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/ThresholdPanel"); // NOI18N
         jLabel1.setText(bundle.getString("Instruction Label")); // NOI18N
         jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -223,9 +223,9 @@ public class ThresholdPanel extends javax.swing.JPanel {
                                 .add(pupilThreshButton)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(crThreshButton))
-                            .add(crThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pupilThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)))
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
+                            .add(crThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pupilThreshSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -252,7 +252,7 @@ public class ThresholdPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(loadEstimatedPupilLocationButton)
                     .add(estimatePupilLocationButton))
-                .add(213, 213, 213))
+                .add(222, 222, 222))
         );
     }// </editor-fold>//GEN-END:initComponents
     private void crThreshSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_crThreshSliderStateChanged

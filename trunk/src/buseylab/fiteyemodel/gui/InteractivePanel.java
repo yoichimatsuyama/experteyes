@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package buseylab.fiteyemodel.gui;
 
 import java.awt.Color;
@@ -29,7 +28,7 @@ import buseylab.fiteyemodel.logic.RotatedEllipse2D;
  * Also, it maintains a list of 4 drawing shapes -- 2 ellipses and 2 squares
  * that represent the cr/pupil and background/searchspace
  */
-public class InteractivePanel  extends javax.swing.JLabel {
+public class InteractivePanel extends javax.swing.JLabel {
 
     final static int COLOR_SAMPLING_SIZE = 2;
     RotatedEllipse2D cr, pupil;
@@ -44,6 +43,7 @@ public class InteractivePanel  extends javax.swing.JLabel {
     private Point mousePos;
     private ColorCaptureListener colorCaptureListener;
     private ChangeListener searchAreaChangeListener = null;
+    private Color searchRecColor = Color.green;
 
     @Override
     public void paint(Graphics g) {
@@ -95,6 +95,7 @@ public class InteractivePanel  extends javax.swing.JLabel {
                     (int) pupil.getMaxX(), (int) pupil.getCenterY());
             g2d.setTransform(oldTransform);
         }
+        g2d.setColor(searchRecColor);
         g2d.draw(searchRect);
         g2d.setColor(Color.YELLOW);
     }
@@ -110,6 +111,10 @@ public class InteractivePanel  extends javax.swing.JLabel {
 
     public Rectangle getSearchRect() {
         return searchRect;
+    }
+
+    public void setSearchRecColor(Color searchRecColor) {
+        this.searchRecColor = searchRecColor;
     }
 
     public BufferedImage getImage() {
@@ -153,25 +158,28 @@ public class InteractivePanel  extends javax.swing.JLabel {
         repaint();
     }
 
-  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+
             @Override
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 handleMouseDragged(evt);
             }
         });
         addMouseListener(new java.awt.event.MouseAdapter() {
+
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 handleMousePressed(evt);
             }
+
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 handleMouseReleased(evt);
             }
+
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 handleMouseClicked(evt);
@@ -179,7 +187,7 @@ public class InteractivePanel  extends javax.swing.JLabel {
         });
 
     }
-    
+
     private void handleMouseDragged(java.awt.event.MouseEvent evt) {
         // move the selected shape; note that search rect has the lowest priority, since it is the biggest
         if (shapeToMove != null) {
