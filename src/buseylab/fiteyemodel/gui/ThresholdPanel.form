@@ -49,11 +49,11 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="crThreshButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="crThreshSlider" pref="266" max="32767" attributes="0"/>
-                          <Component id="pupilThreshSlider" alignment="1" pref="266" max="32767" attributes="0"/>
+                          <Component id="crThreshSlider" pref="347" max="32767" attributes="0"/>
+                          <Component id="pupilThreshSlider" alignment="1" pref="347" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="jLabel1" alignment="0" pref="368" max="32767" attributes="0"/>
+                  <Component id="jLabel1" alignment="0" pref="449" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -88,7 +88,7 @@
                   <Component id="loadEstimatedPupilLocationButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="estimatePupilLocationButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="213" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="222" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -154,7 +154,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="resources/ThresholdPanel.properties" key="Instruction Label" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="buseylab/fiteyemodel/resources/ThresholdPanel.properties" key="Instruction Label" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">

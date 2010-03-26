@@ -104,7 +104,7 @@ public class ColorSelectionPanel extends javax.swing.JPanel
 
         autoTestModelCheckBox.setText("Automatically Test Model");
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/ColorSelectionPanel"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/ColorSelectionPanel"); // NOI18N
         detectPupilAngleCheckBox.setText(bundle.getString("Detect Pupil Angle")); // NOI18N
 
         crIsCircleCheckBox.setText(bundle.getString("CR is circle")); // NOI18N

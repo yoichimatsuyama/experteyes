@@ -71,7 +71,7 @@ public class SearchSpacePanel extends javax.swing.JPanel {
     
     public void enableComputeMinMaxAvg(){
         this.isComputeMinMaxAverage = false;
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("busey/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Compute Min, Max, Avg Button Text"));
     }
 
@@ -147,7 +147,7 @@ public class SearchSpacePanel extends javax.swing.JPanel {
             }
         });
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/MinMaxAvgProcessor"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor"); // NOI18N
         computeMinMaxAvgButton.setText(bundle.getString("Compute Min, Max, Avg Button Text")); // NOI18N
         computeMinMaxAvgButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -168,8 +168,8 @@ public class SearchSpacePanel extends javax.swing.JPanel {
                             .add(org.jdesktop.layout.GroupLayout.LEADING, widthLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
-                            .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)))
+                            .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                            .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)))
                     .add(layout.createSequentialGroup()
                         .add(toolsLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -264,7 +264,7 @@ private void computeMinMaxAvgButtonActionPerformed(java.awt.event.ActionEvent ev
         parent.stopMinMaxAverageImageComputation();
     }else{
         this.isComputeMinMaxAverage = true;
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("busey/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Stop Compute Min Max Avg Button Lable"));
         parent.startMinMaxAverageImageComputation();
     }
