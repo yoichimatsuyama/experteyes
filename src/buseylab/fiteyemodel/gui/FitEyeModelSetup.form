@@ -269,7 +269,7 @@
             <Component class="javax.swing.JCheckBox" name="showVoronoiCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="resources/FitEyeModelSetup.properties" key="Show config bound check box text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="buseylab/fiteyemodel/resources/FitEyeModelSetup.properties" key="Show config bound check box text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <AccessibilityProperties>
@@ -322,7 +322,7 @@
                 <Component class="javax.swing.JButton" name="runEyeModelFittingButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="resources/FitEyeModelSetup.properties" key="Run Eye Model Fitting button text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="buseylab/fiteyemodel/resources/FitEyeModelSetup.properties" key="Run Eye Model Fitting button text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
