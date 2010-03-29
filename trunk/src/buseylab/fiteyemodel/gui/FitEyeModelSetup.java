@@ -108,9 +108,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     DelaunayTriangulation delaunayTriangulation = null;
     boolean isEyeFittingRunning = false;
     private boolean isSelectingColor = false;
-
     private Color searchBoxColor = Color.GREEN;
     private Color gradientBoxColor = Color.red;
+    private boolean gradientChangeMode = false;
+    private Rectangle gradientBox = new Rectangle();
+    private Rectangle savedSearchBox = null;
 
     /** Creates new form FitEyeModelSetup */
     public FitEyeModelSetup() {
@@ -251,7 +253,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         grayLevelInfo.frameNum = currentFrame;
         grayLevelInfo.point = estimatePupilFromThreshold(currentFrame);
         // Need to use set method here to make sure that the value saved will not change
-        grayLevelInfo.setSearchArea(interactivePanel.searchRect);
+        grayLevelInfo.setSearchArea(interactivePanel.getSearchRect());
         if (grayLevelInfo.point != null) {
             // Search if already have the info in the list
             int index = this.configListModel.indexOf(grayLevelInfo);
@@ -386,7 +388,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             this.fitEyeModelRunner = new FitEyeModelRunner(
                     new FittingListener() {
 
-                @Override
+                        @Override
                         public void setFit(RotatedEllipse2D crFit, RotatedEllipse2D pupilFit) {
                             interactivePanel.setCR(crFit);
                             interactivePanel.setPupil(pupilFit);
@@ -419,6 +421,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
         if (runner != null) {
             runner.setParameters(eyeFiles[frameNum], createParameters());
         }
+    }
+
+    private void triggerGradientAreaChange() {
+        // Save gradient box
+        this.gradientBox = this.interactivePanel.getSearchRect();
+
+        // 
     }
 
     /**
@@ -502,8 +511,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
         jTabbedPane1.addTab("Search Space", searchSpacePanel1);
-
-        gradientPanel1.setOpaque(false);
         jTabbedPane1.addTab("Gradient", gradientPanel1);
         jTabbedPane1.addTab("Thresholds", thresholdPanel1);
         jTabbedPane1.addTab("Eye Model", colorSelectionPanel1);
@@ -538,7 +545,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             }
         });
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/FitEyeModelSetup"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/FitEyeModelSetup"); // NOI18N
         showVoronoiCheckBox.setText(bundle.getString("Show config bound check box text")); // NOI18N
         showVoronoiCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -593,7 +600,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, Short.MAX_VALUE)
+                        .add(showVoronoiCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -884,15 +891,55 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
             setFrame(getFrame());
         }
 
-        if(this.jTabbedPane1.getSelectedComponent().equals(this.gradientPanel1)){
+        if (this.jTabbedPane1.getSelectedComponent().equals(this.gradientPanel1)) {
+            this.gradientChangeMode = true;
+
             // Make sure that we are not sharpening here
             setFrame(getFrame());
 
+            // Save search box
+            this.savedSearchBox = this.interactivePanel.getSearchRect();
+
             // Set the color of the search box
             this.interactivePanel.setSearchRecColor(this.gradientBoxColor);
-        }else{
-            // Set the color of the search box
-            this.interactivePanel.setSearchRecColor(this.searchBoxColor);
+
+            // Set the gradient box
+            this.interactivePanel.setSearchRect(this.gradientBox);
+
+            // Change listener to box change
+            this.interactivePanel.setSearchAreaChangeListener(new ChangeListener() {
+
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    triggerGradientAreaChange();
+                }
+            });
+        } else {
+            // Only do this if we are previously in the gradient change mode
+            if (this.gradientChangeMode) {
+                this.gradientChangeMode = false;
+
+                // Set the color of the search box
+                this.interactivePanel.setSearchRecColor(this.gradientBoxColor);
+
+                // Set the color of the search box
+                this.interactivePanel.setSearchRecColor(this.searchBoxColor);
+
+                // Use normal listener
+                this.interactivePanel.setSearchAreaChangeListener(new ChangeListener() {
+
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        triggerAutoFitEyeModelRecompute();
+                    }
+                });
+
+                // Restore last known search box
+                this.interactivePanel.setSearchRect(this.savedSearchBox);
+
+                // Trigger reloading of search space
+                changeFrame();
+            }
         }
 
     }//GEN-LAST:event_jTabbedPane1StateChanged
@@ -1353,7 +1400,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
                 // Get proper search space
                 Rectangle searchRect = ImageUtils.clipRectangle(paintedImg,
-                        this.interactivePanel.searchRect);
+                        this.interactivePanel.getSearchRect());
 
                 if (this.colorSelectionPanel1.getSigma() > 0 && this.isSelectingColor) {
                     // Avoid avoid loading image from image plus directly since

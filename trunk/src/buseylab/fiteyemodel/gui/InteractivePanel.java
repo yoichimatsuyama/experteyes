@@ -32,8 +32,8 @@ public class InteractivePanel extends javax.swing.JLabel {
 
     final static int COLOR_SAMPLING_SIZE = 2;
     RotatedEllipse2D cr, pupil;
-    //Rectangle backgroundRect;
-    Rectangle searchRect;
+    /* Please do not access this diretly */
+    protected Rectangle searchRect;
     Shape shapeToMove;
     int BG_RECT_SIZE = 25;
     // the image to paint initialized to prevent null point execption
@@ -110,7 +110,7 @@ public class InteractivePanel extends javax.swing.JLabel {
     }
 
     public Rectangle getSearchRect() {
-        return searchRect;
+        return new Rectangle(searchRect);
     }
 
     public void setSearchRecColor(Color searchRecColor) {
@@ -137,7 +137,7 @@ public class InteractivePanel extends javax.swing.JLabel {
      * shape/img setters
      */
     public void setSearchRect(Rectangle r) {
-        searchRect = r;
+        searchRect.setBounds(r);
         if (this.searchAreaChangeListener != null) {
             this.searchAreaChangeListener.stateChanged(new ChangeEvent(this));
         }
