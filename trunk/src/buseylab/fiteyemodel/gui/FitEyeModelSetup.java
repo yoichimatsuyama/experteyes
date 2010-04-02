@@ -26,6 +26,8 @@
  */
 package buseylab.fiteyemodel.gui;
 
+import buseylab.fiteyemodel.gui.GradientPanel.Corner;
+import buseylab.fiteyemodel.logic.AdditionComposite;
 import edu.cornell.chew.delaunay.DelaunayTriangulation;
 import edu.cornell.chew.delaunay.Pnt;
 import edu.cornell.chew.delaunay.Simplex;
@@ -73,6 +75,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import buseylab.fiteyemodel.logic.FitEyeModel;
 import buseylab.fiteyemodel.logic.FittingListener;
+import buseylab.fiteyemodel.logic.GradientCorrection;
 import buseylab.fiteyemodel.logic.ImageUtils;
 import buseylab.fiteyemodel.logic.NotHiddenPictureFilter;
 import buseylab.fiteyemodel.logic.PointToFrameByEstimatedPupilLocation;
@@ -84,12 +87,13 @@ import buseylab.fiteyemodel.util.ParameterList;
 import buseylab.fiteyemodel.util.ParameterList.Entry;
 import buseylab.fiteyemodel.util.Parameters;
 import buseylab.fiteyemodel.util.TerminationListener;
+import java.awt.Point;
 
 /**
  * @todo add tool tip to the slide bar
  * @author  dwyatte, ruj
  */
-public class FitEyeModelSetup extends javax.swing.JFrame {
+public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelSystemInterface {
 
     public static int ESTIMATE_PUPIL_SAMPLING_RATE = 10;
     boolean notifyDiscardConfiguration = true;
@@ -111,8 +115,9 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     private Color searchBoxColor = Color.GREEN;
     private Color gradientBoxColor = Color.red;
     private boolean gradientChangeMode = false;
-    private Rectangle gradientBox = new Rectangle();
+    private Rectangle gradientBox = new Rectangle(100,150,1,1);
     private Rectangle savedSearchBox = null;
+    private GradientCorrection gradientCorrection = new GradientCorrection();
 
     /** Creates new form FitEyeModelSetup */
     public FitEyeModelSetup() {
@@ -234,9 +239,101 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                triggerAutoFitEyeModelRecompute();
+                handleSearchAreaMove();
+
             }
         });
+
+        this.gradientPanel1.setListener(new GradientPanel.GradientPanelListener() {
+
+            @Override
+            public void enableGradientCorrection(boolean enable) {
+                handleEnableGradientCorrection(enable);
+            }
+
+            @Override
+            public void gradientBoxSizeChange(int height, int width) {
+                handleGradientBoxSizeChange(height, width);
+            }
+
+            @Override
+            public void darkestCornerChange(Corner corner) {
+                setGradientStartEndPoints(corner);
+                // Reload image
+                changeFrame();
+            }
+
+            @Override
+            public void brightnessIncreaseChange(int brightnessIncrease) {
+                // Create equation for gradient
+                gradientCorrection.setLightAdding(brightnessIncrease);
+                // Reload image
+                changeFrame();
+            }
+        });
+    }
+
+    private void handleSearchAreaMove() {
+        if (this.gradientChangeMode) {
+            this.gradientBox.setLocation(this.interactivePanel.getSearchRect().getLocation());
+            setGradientStartEndPoints(this.gradientPanel1.getDarkestCorner());
+            this.gradientCorrection.updateGradientMask();
+        }
+        triggerAutoFitEyeModelRecompute();
+    }
+
+    private void setGradientStartEndPoints(Corner corner) {
+        // Default to top left
+        switch (corner) {
+            case BOTTOMLEFT:
+                this.gradientCorrection.setStart(
+                        new Point((int) this.gradientBox.getMinX(), (int) this.gradientBox.getMaxY()));
+                this.gradientCorrection.setEnd(
+                        new Point((int) this.gradientBox.getMaxX(), (int) this.gradientBox.getMinY()));
+                break;
+            case BOTTOMRIGHT:
+                this.gradientCorrection.setStart(
+                        new Point((int) this.gradientBox.getMaxX(), (int) this.gradientBox.getMaxY()));
+                this.gradientCorrection.setEnd(
+                        new Point((int) this.gradientBox.getMinX(), (int) this.gradientBox.getMinY()));
+                break;
+            case TOPRIGHT:
+                this.gradientCorrection.setStart(
+                        new Point((int) this.gradientBox.getMaxX(), (int) this.gradientBox.getMinY()));
+                this.gradientCorrection.setEnd(
+                        new Point((int) this.gradientBox.getMinX(), (int) this.gradientBox.getMaxY()));
+                break;
+            default:
+                this.gradientCorrection.setStart(
+                        new Point((int) this.gradientBox.getMinX(), (int) this.gradientBox.getMinY()));
+                this.gradientCorrection.setEnd(
+                        new Point((int) this.gradientBox.getMaxX(), (int) this.gradientBox.getMaxY()));
+        }
+    }
+
+    private void handleEnableGradientCorrection(boolean enable) {
+        if (enable) {
+            interactivePanel.setGradientCorrection(gradientCorrection);
+        } else {
+            interactivePanel.setGradientCorrection(null);
+        }
+        changeFrame();
+    }
+
+    private void handleGradientBoxSizeChange(int height, int width) {
+        // Update gradient size
+        this.gradientBox.setSize(width, height);
+
+        this.gradientCorrection.setHeight(height);
+        this.gradientCorrection.setWidth(width);
+
+        this.gradientCorrection.updateGradientMask();
+
+        // Only update display when we are in the gradient correction panel (mode)
+        if (this.gradientChangeMode) {
+            this.interactivePanel.setSearchRect(this.gradientBox);
+        }
+        changeFrame();
     }
 
     private void addConfig(int currentFrame, String frameFileName) throws HeadlessException {
@@ -1259,6 +1356,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     /** This method start min max avg image computation */
+    @Override
     public void startMinMaxAverageImageComputation() {
         // Get starting dir from the text box
         try {
@@ -1277,6 +1375,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     /** This method stop min max avg image computation */
+    @Override
     public void stopMinMaxAverageImageComputation() {
         imgProc.kill();
     }
@@ -1366,21 +1465,25 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     // subcomponenets need to know what to paint to
+    @Override
     public InteractivePanel getInteractivePanel() {
         return interactivePanel;
     }
 
     // searchSpacePanel needs to use the ImageProcessor to get min/max/avg images
+    @Override
     public ThreadedImageProcessor getImageProcessor() {
         return imgProc;
     }
 
+    @Override
     public int getFrame() {
         return frameNum;
     }
 
     // this should get called whenever the frame changes from the frame slider
     // gets called from slider statechanged as well as from other classes
+    @Override
     public void setFrame(int newFrameNumber) {
         // Sanity check and cap
         if (eyeFiles != null) {
@@ -1744,6 +1847,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame {
     }
 
     /** This method set current eye directory and force the program to load the frames */
+    @Override
     public void setEyeDirectory(String eyePath) {
         this.eyeDirTextField.setText(eyePath);
         initProject();

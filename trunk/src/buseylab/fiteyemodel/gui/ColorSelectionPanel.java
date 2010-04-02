@@ -568,6 +568,7 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
         return this.backgroundGrayLevelSlider.getValue();
     }
 
+    @Override
     public void setColor(int grayValue) {
         if (this.pupilDropperToggleButton.isSelected()) {
             setPupilGrayValue(grayValue);

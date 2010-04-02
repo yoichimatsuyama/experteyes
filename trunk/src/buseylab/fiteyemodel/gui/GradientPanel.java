@@ -8,7 +8,6 @@
  *
  * Created on Mar 26, 2010, 3:27:09 PM
  */
-
 package buseylab.fiteyemodel.gui;
 
 /**
@@ -17,9 +16,99 @@ package buseylab.fiteyemodel.gui;
  */
 public class GradientPanel extends javax.swing.JPanel {
 
+    private void handleBoxSizeChange() {
+        if (this.listener != null) {
+            this.listener.gradientBoxSizeChange(this.heightSlider.getValue(), this.widthSlider.getValue());
+        }
+    }
+
+    private void handleDarkestCornerChange() {
+        if (this.listener != null) {
+            this.listener.darkestCornerChange(getDarkestCorner());
+        }
+    }
+
+    public enum Corner {
+
+        TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT
+    }
+
+    public interface GradientPanelListener {
+
+        public void enableGradientCorrection(boolean enable);
+
+        public void gradientBoxSizeChange(int height, int width);
+
+        public void darkestCornerChange(Corner corner);
+
+        public void brightnessIncreaseChange(int brightnessIncrease);
+    }
+    GradientPanelListener listener = null;
+
+    public void setListener(GradientPanelListener listener) {
+        this.listener = listener;
+    }
+
     /** Creates new form GradientPanel */
     public GradientPanel() {
         initComponents();
+    }
+
+    public void enableGradientCorrection(boolean enable) {
+        this.enableCheckBox.setSelected(enable);
+    }
+
+    public boolean isGradientCorrectionEnable() {
+        return this.enableCheckBox.isSelected();
+    }
+
+    public void setGradientBoxSize(int height, int width) {
+        this.heightSlider.setValue(height);
+        this.widthSlider.setValue(width);
+    }
+
+    public int getGradientBoxHeight() {
+        return this.heightSlider.getValue();
+    }
+
+    public int getGradientBoxWidth() {
+        return this.widthSlider.getValue();
+    }
+
+    public void setDarkestCorner(Corner corner) {
+        switch (corner) {
+            case BOTTOMLEFT:
+                this.bottomLeftRadioButton.setSelected(true);
+                break;
+            case BOTTOMRIGHT:
+                this.bottomRightRadioButton.setSelected(true);
+                break;
+            case TOPRIGHT:
+                this.topRightRadioButton.setSelected(true);
+                break;
+            default:
+                this.topLeftRadioButton.setSelected(true);
+        }
+    }
+
+    public Corner getDarkestCorner() {
+        Corner corner = Corner.TOPLEFT;
+        if (this.topRightRadioButton.isSelected()) {
+            corner = Corner.TOPRIGHT;
+        } else if (this.bottomLeftRadioButton.isSelected()) {
+            corner = Corner.BOTTOMLEFT;
+        } else if (this.bottomRightRadioButton.isSelected()) {
+            corner = Corner.BOTTOMRIGHT;
+        }
+        return corner;
+    }
+
+    public void setBrightnessIncrease(int v) {
+        this.brightnessIncreaseSlider.setValue(v);
+    }
+
+    public int getBrightnessIncrease() {
+        return this.brightnessIncreaseSlider.getValue();
     }
 
     /** This method is called from within the constructor to
@@ -34,18 +123,20 @@ public class GradientPanel extends javax.swing.JPanel {
         cornerButtonGroup = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         enableCheckBox = new javax.swing.JCheckBox();
+        jPanel4 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         widthLabel = new javax.swing.JLabel();
         heightLabel = new javax.swing.JLabel();
         heightSlider = new javax.swing.JSlider();
         widthSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
-        brightnessIncreaseSlider = new javax.swing.JSlider();
+        showGradientCheckBox = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         bottomRightRadioButton = new javax.swing.JRadioButton();
         topLeftRadioButton = new javax.swing.JRadioButton();
         bottomLeftRadioButton = new javax.swing.JRadioButton();
         topRightRadioButton = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
+        brightnessIncreaseSlider = new javax.swing.JSlider();
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -62,6 +153,15 @@ public class GradientPanel extends javax.swing.JPanel {
         setOpaque(false);
 
         enableCheckBox.setText("Enable Gradient Correction");
+        enableCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel4.setEnabled(false);
+        jPanel4.setOpaque(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setOpaque(false);
@@ -71,6 +171,7 @@ public class GradientPanel extends javax.swing.JPanel {
         heightLabel.setText("Height"); // NOI18N
 
         heightSlider.setMaximum(512);
+        heightSlider.setEnabled(false);
         heightSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 heightSliderStateChanged(evt);
@@ -78,6 +179,7 @@ public class GradientPanel extends javax.swing.JPanel {
         });
 
         widthSlider.setMaximum(512);
+        widthSlider.setEnabled(false);
         widthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 widthSliderStateChanged(evt);
@@ -94,8 +196,8 @@ public class GradientPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, widthLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
-                    .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)))
+                    .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                    .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -109,14 +211,22 @@ public class GradientPanel extends javax.swing.JPanel {
                     .add(heightSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
-        jLabel1.setText("Brightness Increase");
+        showGradientCheckBox.setText("Show gradient only");
+        showGradientCheckBox.setEnabled(false);
+        showGradientCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showGradientCheckBoxActionPerformed(evt);
+            }
+        });
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Darkest Corner:"));
+        jPanel3.setEnabled(false);
         jPanel3.setOpaque(false);
 
         cornerButtonGroup.add(bottomRightRadioButton);
         bottomRightRadioButton.setText("Bottom Right");
+        bottomRightRadioButton.setEnabled(false);
         bottomRightRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bottomRightRadioButtonActionPerformed(evt);
@@ -124,7 +234,9 @@ public class GradientPanel extends javax.swing.JPanel {
         });
 
         cornerButtonGroup.add(topLeftRadioButton);
+        topLeftRadioButton.setSelected(true);
         topLeftRadioButton.setText("Top Left");
+        topLeftRadioButton.setEnabled(false);
         topLeftRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 topLeftRadioButtonActionPerformed(evt);
@@ -133,6 +245,7 @@ public class GradientPanel extends javax.swing.JPanel {
 
         cornerButtonGroup.add(bottomLeftRadioButton);
         bottomLeftRadioButton.setText("Bottom Left");
+        bottomLeftRadioButton.setEnabled(false);
         bottomLeftRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bottomLeftRadioButtonActionPerformed(evt);
@@ -141,6 +254,7 @@ public class GradientPanel extends javax.swing.JPanel {
 
         cornerButtonGroup.add(topRightRadioButton);
         topRightRadioButton.setText("Top Right");
+        topRightRadioButton.setEnabled(false);
         topRightRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 topRightRadioButtonActionPerformed(evt);
@@ -172,6 +286,52 @@ public class GradientPanel extends javax.swing.JPanel {
                     .add(bottomRightRadioButton)))
         );
 
+        jLabel1.setText("Brightness Increase");
+
+        brightnessIncreaseSlider.setMaximum(255);
+        brightnessIncreaseSlider.setEnabled(false);
+        brightnessIncreaseSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                brightnessIncreaseSliderStateChanged(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(showGradientCheckBox))
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(27, 27, 27)
+                        .add(showGradientCheckBox)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -179,62 +339,73 @@ public class GradientPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(enableCheckBox)
-                    .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(enableCheckBox))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(enableCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void widthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_widthSliderStateChanged
-//        // set the rect to it's old location with new width/height
-//        Rectangle oldSearchRect = parent.getInteractivePanel().getSearchRect();
-//        Rectangle newSearchRect = new Rectangle((int) oldSearchRect.getX(), (int) oldSearchRect.getY(), widthSlider.getValue(), heightSlider.getValue());
-//        parent.getInteractivePanel().setSearchRect(newSearchRect);
+        handleBoxSizeChange();
 }//GEN-LAST:event_widthSliderStateChanged
 
     private void heightSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_heightSliderStateChanged
-        // set the rect to it's old location with new width/height
-//        Rectangle oldSearchRect = parent.getInteractivePanel().getSearchRect();
-//        Rectangle newSearchRect = new Rectangle((int) oldSearchRect.getX(), (int) oldSearchRect.getY(), widthSlider.getValue(), heightSlider.getValue());
-//        parent.getInteractivePanel().setSearchRect(newSearchRect);
+        handleBoxSizeChange();
 }//GEN-LAST:event_heightSliderStateChanged
 
     private void topLeftRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topLeftRadioButtonActionPerformed
-        // TODO add your handling code here:
+        handleDarkestCornerChange();
     }//GEN-LAST:event_topLeftRadioButtonActionPerformed
 
     private void topRightRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topRightRadioButtonActionPerformed
-        // TODO add your handling code here:
+        handleDarkestCornerChange();
     }//GEN-LAST:event_topRightRadioButtonActionPerformed
 
     private void bottomLeftRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bottomLeftRadioButtonActionPerformed
-        // TODO add your handling code here:
+        handleDarkestCornerChange();
     }//GEN-LAST:event_bottomLeftRadioButtonActionPerformed
 
     private void bottomRightRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bottomRightRadioButtonActionPerformed
-        // TODO add your handling code here:
+        handleDarkestCornerChange();
     }//GEN-LAST:event_bottomRightRadioButtonActionPerformed
 
+    private void brightnessIncreaseSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_brightnessIncreaseSliderStateChanged
+        if (this.listener != null) {
+            this.listener.brightnessIncreaseChange(this.brightnessIncreaseSlider.getValue());
+        }
+    }//GEN-LAST:event_brightnessIncreaseSliderStateChanged
+
+    private void enableCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableCheckBoxActionPerformed
+        boolean enable = this.enableCheckBox.isSelected();
+
+        if (this.listener != null) {
+            this.listener.enableGradientCorrection(enable);
+        }
+
+        // Enable components according to the state of the chack box
+        this.bottomLeftRadioButton.setEnabled(enable);
+        this.bottomRightRadioButton.setEnabled(enable);
+        this.topLeftRadioButton.setEnabled(enable);
+        this.topRightRadioButton.setEnabled(enable);
+        this.showGradientCheckBox.setEnabled(enable);
+        this.brightnessIncreaseSlider.setEnabled(enable);
+        this.widthSlider.setEnabled(enable);
+        this.heightSlider.setEnabled(enable);
+
+    }//GEN-LAST:event_enableCheckBoxActionPerformed
+
+    private void showGradientCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGradientCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_showGradientCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton bottomLeftRadioButton;
@@ -248,10 +419,11 @@ public class GradientPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JCheckBox showGradientCheckBox;
     private javax.swing.JRadioButton topLeftRadioButton;
     private javax.swing.JRadioButton topRightRadioButton;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JSlider widthSlider;
     // End of variables declaration//GEN-END:variables
-
 }

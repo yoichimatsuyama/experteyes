@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  */
 public class SearchSpacePanel extends javax.swing.JPanel {
 
-    FitEyeModelSetup parent;
+    FitEyeModelSystemInterface parent;
     BufferedImage oldImg = null;
     private boolean isComputeMinMaxAverage = false;
 
@@ -53,7 +53,7 @@ public class SearchSpacePanel extends javax.swing.JPanel {
         setDefaultButton();
     }
 
-    public void setParent(FitEyeModelSetup parent) {
+    public void setParent(FitEyeModelSystemInterface parent) {
         this.parent = parent;
     }
 
