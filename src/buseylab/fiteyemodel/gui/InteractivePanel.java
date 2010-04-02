@@ -4,6 +4,7 @@
  */
 package buseylab.fiteyemodel.gui;
 
+import buseylab.fiteyemodel.logic.GradientCorrection;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -44,13 +45,26 @@ public class InteractivePanel extends javax.swing.JLabel {
     private ColorCaptureListener colorCaptureListener;
     private ChangeListener searchAreaChangeListener = null;
     private Color searchRecColor = Color.green;
+    private GradientCorrection gradientCorrection = null;
+
+    public GradientCorrection getGradientCorrection() {
+        return gradientCorrection;
+    }
+
+    public void setGradientCorrection(GradientCorrection gradientCorrection) {
+        this.gradientCorrection = gradientCorrection;
+    }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
 
-//        // draw the image
-//        g.drawImage(img, 0, 0, null);
+        if (this.gradientCorrection != null) {
+            this.gradientCorrection.setWidth(this.getWidth());
+            this.gradientCorrection.setHeight(this.getHeight());
+            this.gradientCorrection.updateGradientMask();
+            this.gradientCorrection.correctGradient(g);
+        }
 
         // draw the highlight
         for (Iterator<BufferedImage> it = highlightImgList.iterator(); it.hasNext();) {

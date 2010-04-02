@@ -130,6 +130,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
      * evaluation function if isCircle is true the cost only care for 7 elements
      * in parames instead of all 8
      */
+    @Override
     public double cost(double[] params) throws CostException {
         // save params
         this.params = params;
@@ -365,6 +366,7 @@ public class FitEyeModel implements Runnable {
         this.terminationListener = listener;
     }
 
+    @Override
     public void run() {
         BufferedImage eyeImg;
         String eyeFilename;

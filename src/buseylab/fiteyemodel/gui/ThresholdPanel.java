@@ -41,7 +41,7 @@ import javax.swing.event.ChangeListener;
 public class ThresholdPanel extends javax.swing.JPanel {
 
     private boolean dirty = false;
-    FitEyeModelSetup parent;
+    FitEyeModelSystemInterface parent;
     // starting values
     private int crThresh = 128;
     private int pupilThresh = 128;
@@ -79,7 +79,7 @@ public class ThresholdPanel extends javax.swing.JPanel {
         setNoThreshold();
     }
 
-    public void setParent(FitEyeModelSetup parent) {
+    public void setParent(FitEyeModelSystemInterface parent) {
         this.parent = parent;
     }
 
