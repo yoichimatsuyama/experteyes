@@ -40,7 +40,7 @@ public class GradientCorrection {
     }
 
     public void setHeight(int height) {
-        this.height = height;
+        this.height = Math.max(1, height);
     }
 
     public int getLightAdding() {
@@ -49,7 +49,7 @@ public class GradientCorrection {
 
     /** Accept 0-255 level */
     public void setLightAdding(int lightAdding) {
-        this.lightAdding = Math.min(255,Math.max(0,lightAdding));
+        this.lightAdding = Math.min(255, Math.max(0, lightAdding));
     }
 
     public Point getStart() {
@@ -65,16 +65,24 @@ public class GradientCorrection {
     }
 
     public void setWidth(int width) {
-        this.width = width;
+        this.width = Math.max(1, width);
+    }
+
+    public boolean isOnlyShowGradient() {
+        return onlyShowGradient;
+    }
+
+    public void setOnlyShowGradient(boolean onlyShowGradient) {
+        this.onlyShowGradient = onlyShowGradient;
     }
     // Set parameters here
     int lightAdding = 0;
     // Gradient mask
     BufferedImage gradientMask = null;
-    
-    int width, height;
+    int width = 1, height = 1;
     Point start = new Point(0, 0);
     Point end = new Point(1, 1);
+    boolean onlyShowGradient = false;
 
     /** Make sure you call this once you change a parameter to update your gradient mask or you will be sorry */
     public void updateGradientMask() {
@@ -86,31 +94,21 @@ public class GradientCorrection {
 
         g2d.setPaint(gradientPaint);
         g2d.fill(new Rectangle(0, 0, this.width, this.height));
+        g2d.dispose();
     }
 
     // This method draw Image with corrected gradient on the given graphic
     public void correctGradient(Graphics g) {
         if (this.gradientMask != null) {
-//            BufferedImage destination = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
-//            Graphics2D g2d = destination.createGraphics();
-//
-//            g2d.setComposite(AlphaComposite.Clear);
-//
-//            g2d.drawImage(source, 0, 0, null);
-//
-//            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, lightAdding));
-//            g2d.drawImage(gradientMask, 0, 0, null);
-//
-//            g2d.dispose();
-//
-//            g2d = (Graphics2D) g;
-//            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-//            g2d.drawImage(destination, 0, 0, null);
-            
-//            g.drawImage(source, 0, 0, null);
-//            g.drawImage(gradientMask, 0, 0, null);
 
             Graphics2D g2d = (Graphics2D) g;
+
+            if (this.onlyShowGradient) {
+                // Fill image with some gray
+                int graylevel = 60;
+                g2d.setColor(new Color(graylevel, graylevel, graylevel,255));
+                g2d.fill(new Rectangle(0, 0, gradientMask.getWidth(), gradientMask.getHeight()));
+            }
 
             // Save old composite
             Composite oldComposite = g2d.getComposite();
@@ -120,10 +118,9 @@ public class GradientCorrection {
 
             // Draw our gradient mask
             g2d.drawImage(gradientMask, 0, 0, null);
-            
+
             // Restore old composite
             g2d.setComposite(oldComposite);
-            g2d.dispose();
         }
     }
 }
