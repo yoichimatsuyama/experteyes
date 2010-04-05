@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 /*
  * GraphTabPanel.java
  *
@@ -34,6 +34,7 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.framemanaging.CornerDistanceXYDataSet;
 import eyetrackercalibrator.framemanaging.CornerSimilarityXYDataSet;
 import eyetrackercalibrator.framemanaging.CorniaReflectXYDataSet;
 import eyetrackercalibrator.framemanaging.FrameManager;
@@ -48,6 +49,7 @@ import org.jfree.data.xy.DefaultXYDataset;
 public class FrameInfoGraphTabPanel extends GraphTabPanel {
 
     private CornerSimilarityXYDataSet cornerSimilarityXYDataSet = null;
+    private CornerDistanceXYDataSet cornerDistanceXYDataSet = null;
     private PupilXYDataset pupilXYDataset = null;
     private CorniaReflectXYDataSet corniaXYDataset = null;
     // Edit tab order and label here
@@ -55,10 +57,12 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
     private final static int INDEX_PUPIL_GRAPH_PANEL = 0;
     private final static int INDEX_REFLECTION_GRAPH_PANEL = 1;
     private final static int INDEX_CORNER_SIM_GRAPH_PANEL = 2;
+    private final static int INDEX_CORNER_DIST_GRAPH_PANEL = 3;
     private final static String[] graphName = {
         "Pupil Loction",
         "Cornia Reflection",
-        "Corner Similarity"
+        "Corner Similarity",
+        "Corner Distance"
     };
     private int eyeOffset = 0;
     private int screenOffset = 0;
@@ -78,6 +82,7 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         this.graphPanel[INDEX_PUPIL_GRAPH_PANEL] = createChartPanel(null, 500, 525);
         this.graphPanel[INDEX_REFLECTION_GRAPH_PANEL] = createChartPanel(null, 500, 525);
         this.graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL] = createChartPanel(null, 500, 1);
+        this.graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL] = createChartPanel(null, 500, 55);
     }
 
     /**
@@ -110,10 +115,14 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
                     cornerSimilarityXYDataSet,
                     graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL]);
 
+            this.cornerDistanceXYDataSet = new CornerDistanceXYDataSet(screenFrameManager, 500);
+            this.cornerDistanceXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
+            setDataSet(cornerDistanceXYDataSet, graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL]);
         } else {
             // Otherwise clear out all data
             DefaultXYDataset emptyDataSet = new DefaultXYDataset();
             setDataSet(emptyDataSet, graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL]);
+            setDataSet(emptyDataSet, graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL]);
         }
     }
 
@@ -122,7 +131,9 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         if (this.cornerSimilarityXYDataSet != null) {
             this.cornerSimilarityXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
         }
-
+        if (this.cornerDistanceXYDataSet != null) {
+            this.cornerDistanceXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
+        }
         if (this.corniaXYDataset != null) {
             this.corniaXYDataset.setFrameSynchronizor(this.frameSynchronizor);
         }
