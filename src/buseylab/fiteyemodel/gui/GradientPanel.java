@@ -42,6 +42,8 @@ public class GradientPanel extends javax.swing.JPanel {
         public void darkestCornerChange(Corner corner);
 
         public void brightnessIncreaseChange(int brightnessIncrease);
+
+        public void onlyShowGradient(boolean enable);
     }
     GradientPanelListener listener = null;
 
@@ -153,9 +155,9 @@ public class GradientPanel extends javax.swing.JPanel {
         setOpaque(false);
 
         enableCheckBox.setText("Enable Gradient Correction");
-        enableCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                enableCheckBoxActionPerformed(evt);
+        enableCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                enableCheckBoxStateChanged(evt);
             }
         });
 
@@ -213,9 +215,9 @@ public class GradientPanel extends javax.swing.JPanel {
 
         showGradientCheckBox.setText("Show gradient only");
         showGradientCheckBox.setEnabled(false);
-        showGradientCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showGradientCheckBoxActionPerformed(evt);
+        showGradientCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                showGradientCheckBoxStateChanged(evt);
             }
         });
 
@@ -384,7 +386,13 @@ public class GradientPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_brightnessIncreaseSliderStateChanged
 
-    private void enableCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableCheckBoxActionPerformed
+    private void showGradientCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_showGradientCheckBoxStateChanged
+        if(this.listener != null){
+            this.listener.onlyShowGradient(this.showGradientCheckBox.isSelected());
+        }
+    }//GEN-LAST:event_showGradientCheckBoxStateChanged
+
+    private void enableCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_enableCheckBoxStateChanged
         boolean enable = this.enableCheckBox.isSelected();
 
         if (this.listener != null) {
@@ -400,12 +408,7 @@ public class GradientPanel extends javax.swing.JPanel {
         this.brightnessIncreaseSlider.setEnabled(enable);
         this.widthSlider.setEnabled(enable);
         this.heightSlider.setEnabled(enable);
-
-    }//GEN-LAST:event_enableCheckBoxActionPerformed
-
-    private void showGradientCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGradientCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_showGradientCheckBoxActionPerformed
+    }//GEN-LAST:event_enableCheckBoxStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton bottomLeftRadioButton;

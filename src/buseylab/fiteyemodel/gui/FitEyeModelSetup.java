@@ -115,7 +115,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     private Color searchBoxColor = Color.GREEN;
     private Color gradientBoxColor = Color.red;
     private boolean gradientChangeMode = false;
-    private Rectangle gradientBox = new Rectangle(100,150,1,1);
+    private Rectangle gradientBox = new Rectangle(100, 150, 1, 1);
     private Rectangle savedSearchBox = null;
     private GradientCorrection gradientCorrection = new GradientCorrection();
 
@@ -270,6 +270,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 // Reload image
                 changeFrame();
             }
+
+            @Override
+            public void onlyShowGradient(boolean enable) {
+                gradientCorrection.setOnlyShowGradient(enable);
+                // Reload image
+                changeFrame();
+            }
         });
     }
 
@@ -317,6 +324,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         } else {
             interactivePanel.setGradientCorrection(null);
         }
+        this.gradientChangeMode = enable;
         changeFrame();
     }
 
@@ -1008,7 +1016,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    triggerGradientAreaChange();
+                    handleSearchAreaMove();
                 }
             });
         } else {
@@ -1027,7 +1035,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
                     @Override
                     public void stateChanged(ChangeEvent e) {
-                        triggerAutoFitEyeModelRecompute();
+                        handleSearchAreaMove();
                     }
                 });
 
