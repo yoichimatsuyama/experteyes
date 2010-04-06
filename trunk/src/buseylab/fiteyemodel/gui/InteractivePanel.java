@@ -263,9 +263,9 @@ public class InteractivePanel extends javax.swing.JLabel {
         if (this.img != null) {
 
             int topBound = Math.max(0, center.y - COLOR_SAMPLING_SIZE);
-            int bottomBound = Math.min(img.getHeight(), center.y + COLOR_SAMPLING_SIZE);
+            int bottomBound = Math.min(img.getHeight()-1, center.y + COLOR_SAMPLING_SIZE);
             int leftBound = Math.max(0, center.x - COLOR_SAMPLING_SIZE);
-            int rightBound = Math.min(img.getWidth(), center.x + COLOR_SAMPLING_SIZE);
+            int rightBound = Math.min(img.getWidth()-1, center.x + COLOR_SAMPLING_SIZE);
 
             int totalPix = 0;
             int sumPix = 0;
@@ -275,8 +275,13 @@ public class InteractivePanel extends javax.swing.JLabel {
                     totalPix++;
                 }
             }
-            return sumPix / totalPix;
-        }else{
+
+            if (totalPix > 0) {
+                return sumPix / totalPix;
+            }else{
+                return 0;
+            }
+        } else {
             return 0;
         }
     }
