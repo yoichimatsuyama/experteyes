@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
@@ -45,26 +46,19 @@ public class InteractivePanel extends javax.swing.JLabel {
     private ColorCaptureListener colorCaptureListener;
     private ChangeListener searchAreaChangeListener = null;
     private Color searchRecColor = Color.green;
-    private GradientCorrection gradientCorrection = null;
+    private boolean showGrayLevelToolTip = false;
 
-    public GradientCorrection getGradientCorrection() {
-        return gradientCorrection;
+    public boolean isShowGrayLevelToolTip() {
+        return showGrayLevelToolTip;
     }
 
-    public void setGradientCorrection(GradientCorrection gradientCorrection) {
-        this.gradientCorrection = gradientCorrection;
+    public void setShowGrayLevelToolTip(boolean showGrayLevelToolTip) {
+        this.showGrayLevelToolTip = showGrayLevelToolTip;
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-
-        if (this.gradientCorrection != null) {
-            this.gradientCorrection.setWidth(this.getWidth());
-            this.gradientCorrection.setHeight(this.getHeight());
-            this.gradientCorrection.updateGradientMask();
-            this.gradientCorrection.correctGradient(g);
-        }
 
         // draw the highlight
         for (Iterator<BufferedImage> it = highlightImgList.iterator(); it.hasNext();) {
@@ -178,6 +172,11 @@ public class InteractivePanel extends javax.swing.JLabel {
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
 
             @Override
+            public void mouseMoved(MouseEvent e) {
+                handleMouseMoved(e);
+            }
+
+            @Override
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 handleMouseDragged(evt);
             }
@@ -200,6 +199,14 @@ public class InteractivePanel extends javax.swing.JLabel {
             }
         });
 
+    }
+
+    private void handleMouseMoved(MouseEvent e) {
+        if (this.showGrayLevelToolTip) {
+            Point center = e.getPoint();
+
+            setToolTipText(String.valueOf(captureColor(center)));
+        }
     }
 
     private void handleMouseDragged(java.awt.event.MouseEvent evt) {
@@ -240,6 +247,21 @@ public class InteractivePanel extends javax.swing.JLabel {
             // Capture gray color
             Point center = evt.getPoint();
 
+            this.colorCaptureListener.setColor(captureColor(center));
+        }
+    }
+
+    public void setColorCaptureListener(ColorCaptureListener listener) {
+        this.colorCaptureListener = listener;
+    }
+
+    public void setSearchAreaChangeListener(ChangeListener listener) {
+        this.searchAreaChangeListener = listener;
+    }
+
+    protected int captureColor(Point center) {
+        if (this.img != null) {
+
             int topBound = Math.max(0, center.y - COLOR_SAMPLING_SIZE);
             int bottomBound = Math.min(img.getHeight(), center.y + COLOR_SAMPLING_SIZE);
             int leftBound = Math.max(0, center.x - COLOR_SAMPLING_SIZE);
@@ -253,16 +275,9 @@ public class InteractivePanel extends javax.swing.JLabel {
                     totalPix++;
                 }
             }
-
-            this.colorCaptureListener.setColor(sumPix / totalPix);
+            return sumPix / totalPix;
+        }else{
+            return 0;
         }
-    }
-
-    public void setColorCaptureListener(ColorCaptureListener listener) {
-        this.colorCaptureListener = listener;
-    }
-
-    public void setSearchAreaChangeListener(ChangeListener listener) {
-        this.searchAreaChangeListener = listener;
     }
 }

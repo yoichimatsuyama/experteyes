@@ -27,7 +27,6 @@
 package buseylab.fiteyemodel.gui;
 
 import buseylab.fiteyemodel.gui.GradientPanel.Corner;
-import buseylab.fiteyemodel.logic.AdditionComposite;
 import edu.cornell.chew.delaunay.DelaunayTriangulation;
 import edu.cornell.chew.delaunay.Pnt;
 import edu.cornell.chew.delaunay.Simplex;
@@ -114,6 +113,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     private boolean isSelectingColor = false;
     private Color searchBoxColor = Color.GREEN;
     private Color gradientBoxColor = Color.red;
+    private boolean gradientChangePanelActivate = false;
     private boolean gradientChangeMode = false;
     private Rectangle gradientBox = new Rectangle(100, 150, 1, 1);
     private Rectangle savedSearchBox = null;
@@ -281,7 +281,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     }
 
     private void handleSearchAreaMove() {
-        if (this.gradientChangeMode) {
+        if (this.gradientChangePanelActivate) {
             this.gradientBox.setLocation(this.interactivePanel.getSearchRect().getLocation());
             setGradientStartEndPoints(this.gradientPanel1.getDarkestCorner());
             this.gradientCorrection.updateGradientMask();
@@ -319,11 +319,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     }
 
     private void handleEnableGradientCorrection(boolean enable) {
-        if (enable) {
-            interactivePanel.setGradientCorrection(gradientCorrection);
-        } else {
-            interactivePanel.setGradientCorrection(null);
-        }
         this.gradientChangeMode = enable;
         changeFrame();
     }
@@ -338,7 +333,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         this.gradientCorrection.updateGradientMask();
 
         // Only update display when we are in the gradient correction panel (mode)
-        if (this.gradientChangeMode) {
+        if (this.gradientChangePanelActivate) {
             this.interactivePanel.setSearchRect(this.gradientBox);
         }
         changeFrame();
@@ -997,7 +992,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         }
 
         if (this.jTabbedPane1.getSelectedComponent().equals(this.gradientPanel1)) {
-            this.gradientChangeMode = true;
+            this.gradientChangePanelActivate = true;
 
             // Make sure that we are not sharpening here
             setFrame(getFrame());
@@ -1019,10 +1014,18 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     handleSearchAreaMove();
                 }
             });
+
+            // Set cursor to a default
+            this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+            // Set tool tip to show gray level
+            this.interactivePanel.setShowGrayLevelToolTip(true);
         } else {
+            this.interactivePanel.setShowGrayLevelToolTip(false);
+
             // Only do this if we are previously in the gradient change mode
-            if (this.gradientChangeMode) {
-                this.gradientChangeMode = false;
+            if (this.gradientChangePanelActivate) {
+                this.gradientChangePanelActivate = false;
 
                 // Set the color of the search box
                 this.interactivePanel.setSearchRecColor(this.gradientBoxColor);
@@ -1488,6 +1491,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     public int getFrame() {
         return frameNum;
     }
+    BufferedImage drawingBuffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
     // this should get called whenever the frame changes from the frame slider
     // gets called from slider statechanged as well as from other classes
@@ -1504,13 +1508,36 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             frameTextField.setText(new Integer(newFrameNumber).toString());
 
             try {
-                BufferedImage paintedImg = null;
+                BufferedImage paintImg = null;
 
                 // Load image
-                paintedImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
+                paintImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
+
+                //this.drawingBuffer = paintImg;
+
+                if (this.drawingBuffer.getWidth() != paintImg.getWidth()
+                        || this.drawingBuffer.getHeight() != paintImg.getHeight()) {
+                    // We need to change the size of buffer
+                    this.drawingBuffer = new BufferedImage(
+                            paintImg.getWidth(), paintImg.getHeight(),
+                            BufferedImage.TYPE_INT_ARGB);
+                }
+
+                Graphics2D g2d = drawingBuffer.createGraphics();
+                g2d.drawImage(paintImg, 0, 0, null);
+
+                if (this.gradientChangeMode) {
+
+                    this.gradientCorrection.setWidth(drawingBuffer.getWidth());
+                    this.gradientCorrection.setHeight(drawingBuffer.getHeight());
+                    this.gradientCorrection.updateGradientMask();
+
+                    this.gradientCorrection.correctGradient(g2d);
+                }
+                g2d.dispose();
 
                 // Get proper search space
-                Rectangle searchRect = ImageUtils.clipRectangle(paintedImg,
+                Rectangle searchRect = ImageUtils.clipRectangle(drawingBuffer,
                         this.interactivePanel.getSearchRect());
 
                 if (this.colorSelectionPanel1.getSigma() > 0 && this.isSelectingColor) {
@@ -1520,7 +1547,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     // Limit sharpen to the search space area to increase the speed
 
                     // Clip the size just to make sure
-                    BufferedImage img = paintedImg.getSubimage(
+                    BufferedImage img = drawingBuffer.getSubimage(
                             searchRect.x, searchRect.y,
                             searchRect.width, searchRect.height);
 
@@ -1531,7 +1558,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                             this.colorSelectionPanel1.getSharpeningFactor());
 
 
-                    paintedImg.getGraphics().drawImage(
+                    drawingBuffer.getGraphics().drawImage(
                             ImageUtils.toBufferedImage(imagePlus.getImage()),
                             searchRect.x, searchRect.y, null);
 
@@ -1540,29 +1567,29 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 // so check to see what kind of threshold is set in the thresh panel
                 switch (thresholdPanel1.getThresholdType()) {
                     case NO_THRESH_TYPE:
-                        interactivePanel.setImage(paintedImg);
+                        interactivePanel.setImage(drawingBuffer);
                         setHighlight();
                         break;
                     case CR_THRESH_TYPE:
                         // find the cr
-                        RotatedEllipse2D foundCR = FitEyeModel.findCR(paintedImg,
+                        RotatedEllipse2D foundCR = FitEyeModel.findCR(drawingBuffer,
                                 searchRect,
                                 this.thresholdPanel1.getCRThresh());
 
                         // draw into the image
-                        paintFoundEllisp(foundCR, paintedImg,
+                        paintFoundEllisp(foundCR, drawingBuffer,
                                 this.thresholdPanel1.getCRThresh());
 
                         break;
                     case PUPIL_THRESH_TYPE:
 
-                        RotatedEllipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
+                        RotatedEllipse2D foundPupil = FitEyeModel.findPupil(drawingBuffer,
                                 searchRect,
                                 this.thresholdPanel1.getPupilThresh(),
                                 false);
 
                         // draw into the image
-                        paintFoundEllisp(foundPupil, paintedImg,
+                        paintFoundEllisp(foundPupil, drawingBuffer,
                                 this.thresholdPanel1.getPupilThresh());
                         break;
                 }
