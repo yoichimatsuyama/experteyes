@@ -285,6 +285,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             this.gradientBox.setLocation(this.interactivePanel.getSearchRect().getLocation());
             setGradientStartEndPoints(this.gradientPanel1.getDarkestCorner());
             this.gradientCorrection.updateGradientMask();
+            changeFrame();
         }
         triggerAutoFitEyeModelRecompute();
     }
@@ -1164,11 +1165,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         if (grayLevelInfo != null) {
             // Set current parameters to the selected one
             frameSlider.setValue(grayLevelInfo.frameNum);
-//            colorSelectionPanel1.setBackgroundGrayValue(grayLevelInfo.background);
-//            colorSelectionPanel1.setCRGrayValue(grayLevelInfo.cr);
-//            colorSelectionPanel1.setPupilGrayValue(grayLevelInfo.pupil);
-//            colorSelectionPanel1.setDetectPupilAngle(grayLevelInfo.isDetectingPupilAngle);
-//            colorSelectionPanel1.setDirty(false);
+
         }
     }//GEN-LAST:event_configListMouseClicked
 
