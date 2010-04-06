@@ -146,22 +146,22 @@ public class CornerDistanceXYDataSet extends SyncXYDataSet {
             if (currentBottomLeft == null || bottomLeft == null) {
                 buffer[ScreenViewFrameInfo.BOTTOMLEFT][arrayPos] = missingValueValue;
             } else {
-                buffer[ScreenViewFrameInfo.BOTTOMLEFT][arrayPos] = currentBottomLeft.distance(bottomLeft);
+                buffer[ScreenViewFrameInfo.BOTTOMLEFT][arrayPos] = Math.min(currentBottomLeft.distance(bottomLeft),missingValueValue);
             }
             if (currentBottomRight == null || bottomRight == null) {
                 buffer[ScreenViewFrameInfo.BOTTOMRIGHT][arrayPos] = missingValueValue;
             } else {
-                buffer[ScreenViewFrameInfo.BOTTOMRIGHT][arrayPos] = currentBottomRight.distance(bottomRight);
+                buffer[ScreenViewFrameInfo.BOTTOMRIGHT][arrayPos] = Math.min(currentBottomRight.distance(bottomRight),missingValueValue);
             }
             if (currentTopLeft == null || topLeft == null) {
                 buffer[ScreenViewFrameInfo.TOPLEFT][arrayPos] = missingValueValue;
             } else {
-                buffer[ScreenViewFrameInfo.TOPLEFT][arrayPos] = currentTopLeft.distance(topLeft);
+                buffer[ScreenViewFrameInfo.TOPLEFT][arrayPos] = Math.min(currentTopLeft.distance(topLeft),missingValueValue);
             }
             if (currentTopRight == null || topRight == null) {
                 buffer[ScreenViewFrameInfo.TOPRIGHT][arrayPos] = missingValueValue;
             } else {
-                buffer[ScreenViewFrameInfo.TOPRIGHT][arrayPos] = currentTopRight.distance(topRight);
+                buffer[ScreenViewFrameInfo.TOPRIGHT][arrayPos] = Math.min(currentTopRight.distance(topRight),missingValueValue);
             }
 
 
