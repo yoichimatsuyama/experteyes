@@ -98,10 +98,10 @@ public class GradientCorrection {
     }
 
     // This method draw Image with corrected gradient on the given graphic
-    public void correctGradient(Graphics g) {
+    public void correctGradient(Graphics2D g2d) {
         if (this.gradientMask != null) {
 
-            Graphics2D g2d = (Graphics2D) g;
+            //Graphics2D g2d = (Graphics2D) g;
 
             if (this.onlyShowGradient) {
                 // Fill image with some gray
