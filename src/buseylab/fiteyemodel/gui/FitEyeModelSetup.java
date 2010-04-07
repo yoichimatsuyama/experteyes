@@ -908,7 +908,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             if (configListModel.isEmpty()) {
                 Parameters parameters = createParameters();
-                parameterList.add(estimatePupilFromThreshold(this.frameNum),
+                parameterList.addParameters(estimatePupilFromThreshold(this.frameNum),
                         this.eyeFiles[this.frameNum].getName(), parameters);
             } else {
                 // If there is configuration then loop through each
@@ -926,12 +926,20 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     parameters.detectPupilAngle = info.isDetectingPupilAngle;
                     parameters.isCRCircle = info.isCRCircle;
 
-                    parameterList.add(info.point, info.frameFileName, parameters);
+                    parameterList.addParameters(info.point, info.frameFileName, parameters);
                 }
 
             }
             // Add comment parameter list
             parameterList.setComment(this.commentTextPane.getText());
+
+            // Add gradient info
+            parameterList.setGradientCorrectionInfo(this.gradientChangeMode,
+                    this.gradientPanel1.getDarkestCorner(),
+                    this.gradientBox.x, this.gradientBox.y,
+                    this.gradientBox.width, this.gradientBox.height,
+                    this.gradientCorrection.getLightAdding());
+
             try {
                 // Save parameter list
                 parameterList.save(saveFile);
@@ -1072,6 +1080,17 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             // Get comment
             this.commentTextPane.setText(parameterList.getComment());
+
+            // Set up gradient correction
+            this.gradientPanel1.setBrightnessIncrease(parameterList.getGradientBrightnessAddValue());
+            this.gradientPanel1.setDarkestCorner(parameterList.getGradientStartCorner());
+            this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
+            if(this.gradientChangePanelActivate){
+                this.interactivePanel.setSearchRect(this.gradientBox);
+            }
+            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
+            this.gradientPanel1.enableGradientCorrection(parameterList.isGradientCorrecting());
+            this.gradientChangeMode = parameterList.isGradientCorrecting();
 
             // Set up initial parameters
             Parameters parameters = parameterList.getFirstParameters();
