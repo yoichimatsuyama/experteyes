@@ -168,7 +168,7 @@ public class ThreadedImageProcessor implements Runnable {
     }
 
     public void load(File directory) {
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
 
         File inputFile = new File(directory, bundle.getString("minImageFile"));
         if (inputFile.exists()) {
@@ -185,7 +185,7 @@ public class ThreadedImageProcessor implements Runnable {
     }
 
     public void save(File directory) throws IOException {
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
 
         File outputfile = new File(directory, bundle.getString("minImageFile"));
         ImageIO.write(minImg, "jpg", outputfile);
