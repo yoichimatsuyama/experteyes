@@ -150,7 +150,7 @@ public class ParameterList {
                 String.valueOf(this.gradientStartCorner));
         gradientCorrectionElement.setAttribute(GRADIENT_CORRECTING_V_ATTRIBUTE,
                 String.valueOf(this.gradientBrightnessAddValue));
-
+        root.addContent(gradientCorrectionElement);
 
         for (Iterator<ParameterList.Entry> it = parametersList.iterator(); it.hasNext();) {
             ParameterList.Entry info = it.next();

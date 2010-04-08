@@ -330,6 +330,8 @@ public class ImportMovieJFrame extends javax.swing.JFrame {
                         Desktop.getDesktop().open(outputDir);
                     } catch (IOException ex) {
                         Logger.getLogger(ImportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }catch(Exception ex){
+                        // Ignore every other exception.. This should take care of Missing Desktop in 1.5
                     }
                 }
             });

@@ -240,7 +240,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             @Override
             public void stateChanged(ChangeEvent e) {
                 handleSearchAreaMove();
-
             }
         });
 
@@ -535,7 +534,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
      * Create parameters by reading from all panels values.
      */
     private Parameters createParameters() {
-        Rectangle searchRect = new Rectangle(interactivePanel.getSearchRect());
+        Rectangle searchRect;
+        if (this.gradientChangePanelActivate) {
+            searchRect = new Rectangle(this.savedSearchBox);
+        } else {
+            searchRect = new Rectangle(this.interactivePanel.getSearchRect());
+        }
 
         Parameters parameters = new Parameters(
                 thresholdPanel1.getCRThresh(), thresholdPanel1.getPupilThresh(),
@@ -1012,17 +1016,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             // Set the color of the search box
             this.interactivePanel.setSearchRecColor(this.gradientBoxColor);
 
-            // Set the gradient box
+            /* Set the gradient box             */
             this.interactivePanel.setSearchRect(this.gradientBox);
-
-            // Change listener to box change
-            this.interactivePanel.setSearchAreaChangeListener(new ChangeListener() {
-
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    handleSearchAreaMove();
-                }
-            });
 
             // Set cursor to a default
             this.interactivePanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1042,16 +1037,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 // Set the color of the search box
                 this.interactivePanel.setSearchRecColor(this.searchBoxColor);
 
-                // Use normal listener
-                this.interactivePanel.setSearchAreaChangeListener(new ChangeListener() {
-
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        handleSearchAreaMove();
-                    }
-                });
-
-                // Restore last known search box
+                /* Restore last known search box   */
                 this.interactivePanel.setSearchRect(this.savedSearchBox);
 
                 // Trigger reloading of search space
@@ -1085,7 +1071,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             this.gradientPanel1.setBrightnessIncrease(parameterList.getGradientBrightnessAddValue());
             this.gradientPanel1.setDarkestCorner(parameterList.getGradientStartCorner());
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
-            if(this.gradientChangePanelActivate){
+            if (this.gradientChangePanelActivate) {
                 this.interactivePanel.setSearchRect(this.gradientBox);
             }
             this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
