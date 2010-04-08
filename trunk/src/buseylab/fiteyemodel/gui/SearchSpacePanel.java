@@ -75,6 +75,11 @@ public class SearchSpacePanel extends javax.swing.JPanel {
         computeMinMaxAvgButton.setText(bundle.getString("Compute Min, Max, Avg Button Text"));
     }
 
+    public void setMaximumHeightWidth(int width, int height){
+        this.widthSlider.setMaximum(width);
+        this.heightSlider.setMaximum(height);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

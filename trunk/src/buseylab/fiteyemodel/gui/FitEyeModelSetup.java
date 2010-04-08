@@ -239,6 +239,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             @Override
             public void stateChanged(ChangeEvent e) {
+
                 handleSearchAreaMove();
             }
         });
@@ -1007,7 +1008,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         if (this.jTabbedPane1.getSelectedComponent().equals(this.gradientPanel1)) {
             this.gradientChangePanelActivate = true;
 
-            // Make sure that we are not sharpening here
+
             setFrame(getFrame());
 
             // Save search box
@@ -1070,11 +1071,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             // Set up gradient correction
             this.gradientPanel1.setBrightnessIncrease(parameterList.getGradientBrightnessAddValue());
             this.gradientPanel1.setDarkestCorner(parameterList.getGradientStartCorner());
+            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
             if (this.gradientChangePanelActivate) {
                 this.interactivePanel.setSearchRect(this.gradientBox);
             }
-            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
             this.gradientPanel1.enableGradientCorrection(parameterList.isGradientCorrecting());
             this.gradientChangeMode = parameterList.isGradientCorrecting();
 
@@ -1307,21 +1308,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     }//GEN-LAST:event_frameSliderMouseWheelMoved
 
     private void initProject() {
-//        JFileChooser chooser = new JFileChooser();
-//        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//
-//        // Get starting dir from the text box
-//        if (this.eyeDirTextField.getText().length() > 0) {
-//            chooser.setCurrentDirectory(new File(this.eyeDirTextField.getText()));
-//        }
-//
-//        // Clear current frame by pupil location lookup
-//        this.pointToFrameByEstimatedPupilLocation.clear();
-
-        //int returnVal = chooser.showOpenDialog(null);
-        //if (returnVal == JFileChooser.APPROVE_OPTION) {
         // list the eye files and set the text field to reflect their directory
-        eyeDir = new File(this.eyeDirTextField.getText());//chooser.getSelectedFile();
+        eyeDir = new File(this.eyeDirTextField.getText());
         eyeDirTextField.setText(eyeDir.getAbsolutePath());
 
         if (!eyeDir.exists()) {
@@ -1346,6 +1334,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         // Set correct total images
         this.frameSlider.setMaximum(eyeFiles.length - 1);
 
+        // Try getting the first image so that we can set the maximum of slider
+        BufferedImage image = ImageUtils.loadRGBImage(eyeFiles[0]);
+        if (image != null) {
+            this.searchSpacePanel1.setMaximumHeightWidth(image.getWidth(), image.getHeight());
+        } else {
+            this.searchSpacePanel1.setMaximumHeightWidth(512, 512);
+        }
+
         imgProc = new ThreadedImageProcessor(new ThreadedImageProcessorListener() {
 
             @Override
@@ -1363,9 +1359,6 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 repaint();
             }
         });
-        // }
-
-
     }
 
     /** This method start min max avg image computation */
@@ -1806,8 +1799,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 this.colorSelectionPanel1.setSigma(currentConfig.unsharpRadious);
                 this.colorSelectionPanel1.setSharpeningFactor(currentConfig.unsharpFactor);
 
-                // Set search space
-                this.interactivePanel.setSearchRect(currentConfig.getSearchArea());
+                // Set search space if not in gradient selection mode
+                if (!this.gradientChangePanelActivate) {
+                    this.interactivePanel.setSearchRect(currentConfig.getSearchArea());
+                }
+                this.savedSearchBox = currentConfig.getSearchArea();
+                
                 this.searchSpacePanel1.setArea(
                         currentConfig.getSearchArea().width,
                         currentConfig.getSearchArea().height);

@@ -208,11 +208,15 @@ public class ParameterList {
 
         // Get gradient if any
         Element gradientCorrectionElement = root.getChild(GRADIENT_CORRECTING_ELEMENT);
+
+        // Set default values
         boolean gradientCorrecting = false;
         Rectangle gradientBoxGuide = new Rectangle(0, 0, 1, 1);
         int gradientBrightnessAddValue = 0;
         GradientPanel.Corner gradientStartCorner = GradientPanel.Corner.TOPLEFT;
+
         if (gradientCorrectionElement != null) {
+            // Load values from file when applicable
             gradientCorrecting = Boolean.parseBoolean(
                     gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_ENABLE_ATTRIBUTE));
             gradientBoxGuide.x = Integer.parseInt(
@@ -228,6 +232,10 @@ public class ParameterList {
             gradientBrightnessAddValue = Integer.parseInt(
                     gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_V_ATTRIBUTE));
         }
+        // Save to parameter list
+        parameterMap.setGradientCorrectionInfo(gradientCorrecting, gradientStartCorner,
+                gradientBoxGuide.x, gradientBoxGuide.y,
+                gradientBoxGuide.width, gradientBoxGuide.height, gradientBrightnessAddValue);
 
         // Iterate through each parameter set
         for (Iterator<Element> iter = root.getChildren(PARAMETER_ELEMENT).iterator();
