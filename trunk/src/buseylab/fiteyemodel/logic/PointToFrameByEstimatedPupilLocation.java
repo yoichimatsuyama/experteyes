@@ -24,12 +24,10 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package buseylab.fiteyemodel.logic;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
@@ -129,12 +127,13 @@ public class PointToFrameByEstimatedPupilLocation {
      * @param frames input frames to be processed
      * @param pupilThreshold pupil threshold to be used across all frames
      * @param searchRect Area to search for pupil
+     * @param gradientCorrection  null if no gradient correction is needed.
      * @param frameSampling Sampling rate.  1 mean compute all fram n mean compute
      * every n frames. The frame will be looked at when 
      * frames array position % frameSampling = 0
      */
     public void loadFrames(File[] frames, int pupilThreshold,
-            Rectangle searchRect, int frameSampling){
+            Rectangle searchRect, GradientCorrection gradientCorrection, int frameSampling){
         
         double[] size = new double[frames.length];
         Point2D.Double[] pupil = new Double[frames.length];
@@ -147,6 +146,17 @@ public class PointToFrameByEstimatedPupilLocation {
         for (int i = 0; i < frames.length; i++) {
             if (i % frameSampling == 0) {
                 BufferedImage paintedImg = ImageUtils.loadRGBImage(frames[i]);
+
+                // Correct gradient if the corrector is provided
+                if(gradientCorrection != null){
+                    gradientCorrection.setWidth(paintedImg.getWidth());
+                    gradientCorrection.setHeight(paintedImg.getHeight());
+                    gradientCorrection.updateGradientMask();
+
+                    Graphics2D gd = paintedImg.createGraphics();
+                    gradientCorrection.correctGradient(gd);
+                    gd.dispose();
+                }
 
                 // Get pupil estimate
                 Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
