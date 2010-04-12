@@ -51,6 +51,10 @@ public class GradientPanel extends javax.swing.JPanel {
         this.listener = listener;
     }
 
+    public GradientPanelListener getListener() {
+        return listener;
+    }
+
     /** Creates new form GradientPanel */
     public GradientPanel() {
         initComponents();
