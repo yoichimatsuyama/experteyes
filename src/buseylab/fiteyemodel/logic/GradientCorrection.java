@@ -18,6 +18,18 @@ import java.awt.image.BufferedImage;
  */
 public class GradientCorrection {
 
+    @Override
+    public GradientCorrection clone(){
+        GradientCorrection gc = new GradientCorrection();
+        gc.start.setLocation(this.start);
+        gc.end.setLocation(this.end);
+        gc.width = this.width;
+        gc.height = this.height;
+        gc.lightAdding = this.lightAdding;
+        gc.updateGradientMask();
+        return gc;
+    }
+
     public Point getEnd() {
         return end;
     }

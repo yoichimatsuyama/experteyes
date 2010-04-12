@@ -216,6 +216,7 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
     /* ignore the simplex points and instead look at the difference between 
      * current sse and lastsse to check for convergence
      */
+    @Override
     public boolean converged(PointCostPair[] simplex) {
         if (this.isAlive) {
             diff = Math.abs(lastSSE - SSE);
@@ -261,44 +262,12 @@ public class FitEyeModel implements Runnable {
     private TerminationListener terminationListener = null;
 
     /**
-     * Create fit eye model with default output dir "Gaze" at current running dir.
-     */
-    public FitEyeModel(File imageFile, Parameters parameters) {
-        // set the filename and wait for run()
-        this.imageFile = imageFile;
-        this.parameters = parameters;
-        this.outputFile = createOutputFile(imageFile, new File(GAZE_ROOT));
-    }
-
-    /**
-     * Create fit eye model with default output dir "Gaze" at current running dir.
-     */
-    public FitEyeModel(File imageFile, ParameterList parameterList) {
-        // set the filename and wait for run()
-        this.imageFile = imageFile;
-        this.parameterList = parameterList;
-        this.parameters = parameterList.getFirstParameters();
-        this.outputFile = createOutputFile(imageFile, new File(GAZE_ROOT));
-    }
-
-    /**
      * @output Output file. Null to supress output
      */
     public FitEyeModel(File imageFile, File output, Parameters parameters) {
         // set the filename and wait for run()
         this.imageFile = imageFile;
         this.parameters = parameters;
-        this.outputFile = output;
-    }
-
-    /**
-     * @output Output file. Null to supress output
-     */
-    public FitEyeModel(File imageFile, File output, ParameterList parameterList) {
-        // set the filename and wait for run()
-        this.imageFile = imageFile;
-        this.parameterList = parameterList;
-        this.parameters = parameterList.getFirstParameters();
         this.outputFile = output;
     }
 

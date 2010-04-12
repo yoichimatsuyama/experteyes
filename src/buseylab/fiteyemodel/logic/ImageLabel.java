@@ -232,7 +232,7 @@ public class ImageLabel extends Thread {
         int condensed[] = new int[nextlabel]; // cant be more than nextlabel labels
 
         count = 0;
-        for (int i = 0; i < nextlabel; i++) {
+        for (int i = 0; i < nextlabel && i < labels.length; i++) {
             if (i == labels[i]) {
                 condensed[i] = count++;
             }

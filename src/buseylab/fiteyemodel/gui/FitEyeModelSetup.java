@@ -119,11 +119,17 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     private Rectangle gradientBox = new Rectangle(100, 150, 1, 1);
     private Rectangle savedSearchBox = null;
     private GradientCorrection gradientCorrection = new GradientCorrection();
+    int lastFrameNum = -1;
+    BufferedImage bufferedOriginalImage = null;
 
     /** Creates new form FitEyeModelSetup */
     public FitEyeModelSetup() {
 
         initComponents();
+
+        // Clear out buffered information
+        this.lastFrameNum = -1;
+        this.bufferedOriginalImage = null;
 
         // Create transparent empty buffer for voronoi
         this.voronoiBufferedImage = new BufferedImage(
@@ -436,13 +442,23 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 }
             });
 
+            final GradientCorrection gc;
+
+            if (this.gradientChangeMode) {
+                gc = this.gradientCorrection.clone();
+            } else {
+                gc = null;
+            }
+
             Thread t = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
                     pointToFrameByEstimatedPupilLocation.loadFrames(eyeFiles,
                             thresholdPanel1.getPupilThresh(),
-                            interactivePanel.getSearchRect(), ESTIMATE_PUPIL_SAMPLING_RATE);
+                            interactivePanel.getSearchRect(),
+                            gc,
+                            ESTIMATE_PUPIL_SAMPLING_RATE);
                     try {
                         pointToFrameByEstimatedPupilLocation.save(saveFile);
                     } catch (FileNotFoundException ex) {
@@ -1068,7 +1084,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             // Get comment
             this.commentTextPane.setText(parameterList.getComment());
-            
+
             // Stop panel from responsing to value changes
             GradientPanelListener listener = this.gradientPanel1.getListener();
             this.gradientPanel1.setListener(null);
@@ -1079,14 +1095,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
 
-            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width,this.gradientBox.height);
+            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
             this.gradientPanel1.setDarkestCorner(parameterList.getGradientStartCorner());
 
             // This has to be done ONLY after the gradient box is peoperly
             setGradientStartEndPoints(parameterList.getGradientStartCorner());
 
             this.gradientPanel1.enableGradientCorrection(parameterList.isGradientCorrecting());
-            
+
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
             if (this.gradientChangePanelActivate) {
                 this.interactivePanel.setSearchRect(this.gradientBox);
@@ -1386,7 +1402,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         // Get starting dir from the text box
         try {
             // start processing images
-            imgProc.initialize(eyeFiles);
+            if (this.gradientChangeMode) {
+                imgProc.initialize(eyeFiles, this.gradientCorrection);
+            } else {
+                imgProc.initialize(eyeFiles, null);
+            }
+
             Thread imgProcThread = new Thread(imgProc);
             imgProcThread.start();
 
@@ -1524,10 +1545,18 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             try {
                 BufferedImage paintImg = null;
 
-                // Load image
-                paintImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
+                // Check if we need to load image from file
+                if (this.lastFrameNum == this.frameNum && this.bufferedOriginalImage != null) {
+                    // Use the previously loaded image
+                    paintImg = this.bufferedOriginalImage;
+                } else {
+                    // Load image
+                    paintImg = ImageUtils.loadRGBImage(eyeFiles[newFrameNumber]);
 
-                //this.drawingBuffer = paintImg;
+                    // Change buffered data
+                    this.lastFrameNum = this.frameNum;
+                    this.bufferedOriginalImage = paintImg;
+                }
 
                 if (this.drawingBuffer.getWidth() != paintImg.getWidth()
                         || this.drawingBuffer.getHeight() != paintImg.getHeight()) {
@@ -1728,6 +1757,16 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
         BufferedImage paintedImg = ImageUtils.loadRGBImage(eyeFiles[frameNum]);
 
+        if (this.gradientChangeMode) {
+            Graphics2D g2d = paintedImg.createGraphics();
+            this.gradientCorrection.setWidth(paintedImg.getWidth());
+            this.gradientCorrection.setHeight(paintedImg.getHeight());
+            this.gradientCorrection.updateGradientMask();
+
+            this.gradientCorrection.correctGradient(g2d);
+            g2d.dispose();
+        }
+
         if (paintedImg != null) {
 
             Rectangle searchArea = null;
@@ -1823,7 +1862,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     this.interactivePanel.setSearchRect(currentConfig.getSearchArea());
                 }
                 this.savedSearchBox = currentConfig.getSearchArea();
-                
+
                 this.searchSpacePanel1.setArea(
                         currentConfig.getSearchArea().width,
                         currentConfig.getSearchArea().height);
