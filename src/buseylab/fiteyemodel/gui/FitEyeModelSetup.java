@@ -27,6 +27,7 @@
 package buseylab.fiteyemodel.gui;
 
 import buseylab.fiteyemodel.gui.GradientPanel.Corner;
+import buseylab.fiteyemodel.gui.GradientPanel.GradientPanelListener;
 import edu.cornell.chew.delaunay.DelaunayTriangulation;
 import edu.cornell.chew.delaunay.Pnt;
 import edu.cornell.chew.delaunay.Simplex;
@@ -1067,16 +1068,34 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
             // Get comment
             this.commentTextPane.setText(parameterList.getComment());
+            
+            // Stop panel from responsing to value changes
+            GradientPanelListener listener = this.gradientPanel1.getListener();
+            this.gradientPanel1.setListener(null);
 
             // Set up gradient correction
             this.gradientPanel1.setBrightnessIncrease(parameterList.getGradientBrightnessAddValue());
+            this.gradientCorrection.setLightAdding(parameterList.getGradientBrightnessAddValue());
+
+            this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
+
+            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width,this.gradientBox.height);
             this.gradientPanel1.setDarkestCorner(parameterList.getGradientStartCorner());
-            this.gradientPanel1.setGradientBoxSize(this.gradientBox.width, this.gradientBox.height);
+
+            // This has to be done ONLY after the gradient box is peoperly
+            setGradientStartEndPoints(parameterList.getGradientStartCorner());
+
+            this.gradientPanel1.enableGradientCorrection(parameterList.isGradientCorrecting());
+            
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
             if (this.gradientChangePanelActivate) {
                 this.interactivePanel.setSearchRect(this.gradientBox);
             }
-            this.gradientPanel1.enableGradientCorrection(parameterList.isGradientCorrecting());
+
+            // Restore panel interaction
+            this.gradientPanel1.setListener(listener);
+
+            // Set the state
             this.gradientChangeMode = parameterList.isGradientCorrecting();
 
             // Set up initial parameters

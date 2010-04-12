@@ -30,14 +30,12 @@ public class GradientCorrection {
         return gradientMask;
     }
 
-    public void setGradientMask(BufferedImage gradientMask) {
-        this.gradientMask = gradientMask;
-    }
-
+    /** Get height of gradient mask */
     public int getHeight() {
         return height;
     }
 
+    /** Set height of gradient mask (not the gradient guiding box) */
     public void setHeight(int height) {
         this.height = Math.max(1, height);
     }
@@ -59,10 +57,12 @@ public class GradientCorrection {
         this.start.setLocation(start);
     }
 
+    /** Set width of gradient mask (not the gradient guiding box) */
     public int getWidth() {
         return width;
     }
 
+    /** Set width of gradient mask (not the gradient guiding box) */
     public void setWidth(int width) {
         this.width = Math.max(1, width);
     }
