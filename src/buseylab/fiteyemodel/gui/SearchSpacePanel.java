@@ -71,7 +71,7 @@ public class SearchSpacePanel extends javax.swing.JPanel {
     
     public void enableComputeMinMaxAvg(){
         this.isComputeMinMaxAverage = false;
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("busey/fiteyemodel/resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Compute Min, Max, Avg Button Text"));
     }
 
@@ -269,7 +269,7 @@ private void computeMinMaxAvgButtonActionPerformed(java.awt.event.ActionEvent ev
         parent.stopMinMaxAverageImageComputation();
     }else{
         this.isComputeMinMaxAverage = true;
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("busey/fiteyemodel/resources/MinMaxAvgProcessor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Stop Compute Min Max Avg Button Lable"));
         parent.startMinMaxAverageImageComputation();
     }
