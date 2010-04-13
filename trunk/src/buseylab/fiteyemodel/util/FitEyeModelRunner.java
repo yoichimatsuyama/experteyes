@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.concurrent.Semaphore;
 import buseylab.fiteyemodel.logic.FitEyeModel;
 import buseylab.fiteyemodel.logic.FittingListener;
+import buseylab.fiteyemodel.logic.GradientCorrection;
 
 /**
  *
@@ -78,13 +79,19 @@ public class FitEyeModelRunner extends Thread {
         return model;
     }
 
-    synchronized public void setParameters(File imageFile, Parameters parameters) {
+    /**
+     * Set parameters before running.
+     * @param gradientCorrection null if the is no need for gradient correcting.
+     * If not null, the object is cloned inside the method.
+     */
+    synchronized public void setParameters(File imageFile, Parameters parameters, 
+            GradientCorrection gradientCorrection) {
         // Kill old fit eye model
         if (this.fitEyeModel != null) {
             this.fitEyeModel.kill();
         }
         // Create new fit eye model
-        this.fitEyeModel = new FitEyeModel(imageFile, null, parameters);
+        this.fitEyeModel = new FitEyeModel(imageFile, null, parameters, gradientCorrection);
         this.fitEyeModel.setFittingListener(this.listener);
         // Signal semaphore
         this.sem.release();
