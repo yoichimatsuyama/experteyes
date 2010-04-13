@@ -44,6 +44,7 @@ import org.spaceroots.mantissa.optimization.NelderMead;
 import org.spaceroots.mantissa.optimization.PointCostPair;
 import buseylab.fiteyemodel.util.ParameterList;
 import buseylab.fiteyemodel.util.Parameters;
+import org.apache.sanselan.formats.png.GammaCorrection;
 
 /**
  * 
@@ -251,6 +252,7 @@ public class FitEyeModel implements Runnable {
     final static String GAZE_ROOT = "Gaze";    // filenames
     File imageFile;
     File outputFile;
+    private GradientCorrection gradientCorrection;
 //    /** Flag for determining whether we consider CR as a circle and not an elisp*/
 //    public boolean isCRCircle = true;
 
@@ -263,9 +265,17 @@ public class FitEyeModel implements Runnable {
 
     /**
      * @output Output file. Null to supress output
+     *
      */
-    public FitEyeModel(File imageFile, File output, Parameters parameters) {
+    public FitEyeModel(File imageFile, File output, Parameters parameters,
+            GradientCorrection gradientCorrection) {
         // set the filename and wait for run()
+        if (gradientCorrection != null) {
+            this.gradientCorrection = gradientCorrection.clone();
+        } else {
+            this.gradientCorrection = null;
+        }
+
         this.imageFile = imageFile;
         this.parameters = parameters;
         this.outputFile = output;
@@ -276,8 +286,15 @@ public class FitEyeModel implements Runnable {
      * placed it in the specified output directory
      * @outputDir output directory.  Null to supress output
      */
-    public FitEyeModel(File imageFile, String outputDir, ParameterList parameterList) {
+    public FitEyeModel(File imageFile, String outputDir, ParameterList parameterList,
+            GradientCorrection gradientCorrection) {
         // set the filename and wait for run()
+        // set the filename and wait for run()
+        if (gradientCorrection != null) {
+            this.gradientCorrection = gradientCorrection.clone();
+        } else {
+            this.gradientCorrection = null;
+        }
         this.imageFile = imageFile;
         this.parameterList = parameterList;
         this.parameters = parameterList.getFirstParameters();
@@ -358,6 +375,17 @@ public class FitEyeModel implements Runnable {
 
             // get eye image
             eyeImg = ImageUtils.loadRGBImage(imageFile);
+
+            // Correct gradient if the corrector is provided
+            if (this.gradientCorrection != null) {
+                this.gradientCorrection.setWidth(eyeImg.getWidth());
+                this.gradientCorrection.setHeight(eyeImg.getHeight());
+                this.gradientCorrection.updateGradientMask();
+
+                Graphics2D gd = eyeImg.createGraphics();
+                this.gradientCorrection.correctGradient(gd);
+                gd.dispose();
+            }
 
             RotatedEllipse2D pupil = null;
 

@@ -515,7 +515,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     });
             // Start one if pass sanity check
             if (eyeFiles != null && eyeFiles.length > frameNum) {
-                this.fitEyeModelRunner.setParameters(eyeFiles[frameNum], createParameters());
+                GradientCorrection gc = null;
+
+                if (this.gradientChangeMode) {
+                    gc = this.gradientCorrection;
+                }
+
+                this.fitEyeModelRunner.setParameters(eyeFiles[frameNum],
+                        createParameters(), gc);
                 // Start the runner
                 this.fitEyeModelRunner.start();
             }
@@ -537,7 +544,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     private void triggerAutoFitEyeModelRecompute() {
         FitEyeModelRunner runner = this.fitEyeModelRunner;
         if (runner != null) {
-            runner.setParameters(eyeFiles[frameNum], createParameters());
+            GradientCorrection gc = null;
+
+            if (this.gradientChangeMode) {
+                gc = this.gradientCorrection;
+            }
+
+            runner.setParameters(eyeFiles[frameNum], createParameters(), gc);
         }
     }
 
@@ -1454,8 +1467,15 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         for (int i = 0; i < numCPUs && this.isEyeFittingRunning; i++) {
             FitEyeModel fem = null;
 
+            GradientCorrection gc = null;
+
+            if (this.gradientChangeMode) {
+                gc = this.gradientCorrection;
+            }
+
             fem = new FitEyeModel(
-                    this.eyeFiles[curEyeFile], outputDir.getAbsolutePath(), parameters);
+                    this.eyeFiles[curEyeFile], outputDir.getAbsolutePath(),
+                    parameters, gc);
             fem.setTerminationListener(terminationListener);
 
             Thread threads = new Thread(fem, "Eye fitting " + curEyeFile);
@@ -1480,8 +1500,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             }
 
             if (toRun) {
+                GradientCorrection gc = null;
+
+                if (this.gradientChangeMode) {
+                    gc = this.gradientCorrection;
+                }
                 fem = new FitEyeModel(
-                        this.eyeFiles[curEyeFile], outputDir.getAbsolutePath(), parameters);
+                        this.eyeFiles[curEyeFile], outputDir.getAbsolutePath(),
+                        parameters, gc);
                 fem.setTerminationListener(terminationListener);
 
                 Thread threads = new Thread(fem, "Eye fitting " + curEyeFile);
