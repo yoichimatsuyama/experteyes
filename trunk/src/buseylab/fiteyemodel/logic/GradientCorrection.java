@@ -13,13 +13,14 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 /**
- *
+ * This class correct illumination using gradient.  Make sure that the image
+ * is in RGB format
  * @author ruj
  */
 public class GradientCorrection {
 
     @Override
-    public GradientCorrection clone(){
+    public GradientCorrection clone() {
         GradientCorrection gc = new GradientCorrection();
         gc.start.setLocation(this.start);
         gc.end.setLocation(this.end);
@@ -97,18 +98,23 @@ public class GradientCorrection {
 
     /** Make sure you call this once you change a parameter to update your gradient mask or you will be sorry */
     public void updateGradientMask() {
-        this.gradientMask = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
+        //this.gradientMask = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
+        this.gradientMask = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g2d = (Graphics2D) this.gradientMask.getGraphics();
 
-        GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightAdding, lightAdding, lightAdding, 255), this.end, new Color(0, 0, 0, 255));
+        //GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightAdding, lightAdding, lightAdding, 255), this.end, new Color(0, 0, 0, 255));
+        GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightAdding, lightAdding, lightAdding), this.end, new Color(0, 0, 0));
+
 
         g2d.setPaint(gradientPaint);
         g2d.fill(new Rectangle(0, 0, this.width, this.height));
         g2d.dispose();
     }
 
-    // This method draw Image with corrected gradient on the given graphic
+    /* This method draw Image with corrected gradient on the given graphic
+     * Make sure that g2d is from RGB image
+     */
     public void correctGradient(Graphics2D g2d) {
         if (this.gradientMask != null) {
 
@@ -117,7 +123,7 @@ public class GradientCorrection {
             if (this.onlyShowGradient) {
                 // Fill image with some gray
                 int graylevel = 60;
-                g2d.setColor(new Color(graylevel, graylevel, graylevel,255));
+                g2d.setColor(new Color(graylevel, graylevel, graylevel, 255));
                 g2d.fill(new Rectangle(0, 0, gradientMask.getWidth(), gradientMask.getHeight()));
             }
 

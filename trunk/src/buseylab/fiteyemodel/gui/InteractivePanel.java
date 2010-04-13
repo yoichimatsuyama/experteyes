@@ -116,6 +116,7 @@ public class InteractivePanel extends javax.swing.JLabel {
         this.searchRect = new Rectangle(125, 25, 100, 100);
     }
 
+    /* Get a clone of current search rec showing on the panel */
     public Rectangle getSearchRect() {
         return new Rectangle(searchRect);
     }

@@ -347,6 +347,14 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         changeFrame();
     }
 
+    private Rectangle getProperSearchRec(){
+        if(this.savedSearchBox != null && this.gradientChangePanelActivate){
+            return new Rectangle(this.savedSearchBox);
+        }else{
+            return this.interactivePanel.getSearchRect();
+        }
+    }
+
     private void addConfig(int currentFrame, String frameFileName) throws HeadlessException {
         // Construct the config
         ConfigutationInfo grayLevelInfo = new ConfigutationInfo();
@@ -361,7 +369,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         grayLevelInfo.frameNum = currentFrame;
         grayLevelInfo.point = estimatePupilFromThreshold(currentFrame);
         // Need to use set method here to make sure that the value saved will not change
-        grayLevelInfo.setSearchArea(interactivePanel.getSearchRect());
+
+        grayLevelInfo.setSearchArea(getProperSearchRec());
         if (grayLevelInfo.point != null) {
             // Search if already have the info in the list
             int index = this.configListModel.indexOf(grayLevelInfo);
@@ -443,7 +452,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             });
 
             final GradientCorrection gc;
-
+            
             if (this.gradientChangeMode) {
                 gc = this.gradientCorrection.clone();
             } else {
@@ -456,7 +465,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 public void run() {
                     pointToFrameByEstimatedPupilLocation.loadFrames(eyeFiles,
                             thresholdPanel1.getPupilThresh(),
-                            interactivePanel.getSearchRect(),
+                            getProperSearchRec(),
                             gc,
                             ESTIMATE_PUPIL_SAMPLING_RATE);
                     try {
@@ -554,30 +563,18 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         }
     }
 
-    private void triggerGradientAreaChange() {
-        // Save gradient box
-        this.gradientBox = this.interactivePanel.getSearchRect();
-
-        // 
-    }
-
     /**
      * Create parameters by reading from all panels values.
      */
     private Parameters createParameters() {
         Rectangle searchRect;
-        if (this.gradientChangePanelActivate) {
-            searchRect = new Rectangle(this.savedSearchBox);
-        } else {
-            searchRect = new Rectangle(this.interactivePanel.getSearchRect());
-        }
 
         Parameters parameters = new Parameters(
                 thresholdPanel1.getCRThresh(), thresholdPanel1.getPupilThresh(),
                 this.colorSelectionPanel1.getCRGrayValue(),
                 this.colorSelectionPanel1.getPupilGrayValue(),
                 this.colorSelectionPanel1.getBackgroundGrayValue(),
-                searchRect,
+                getProperSearchRec(),
                 this.colorSelectionPanel1.getSigma(),
                 this.colorSelectionPanel1.getSharpeningFactor(),
                 this.colorSelectionPanel1.isDetectingPupilAngle(),
@@ -1552,7 +1549,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     public int getFrame() {
         return frameNum;
     }
-    BufferedImage drawingBuffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage drawingBuffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 
     // this should get called whenever the frame changes from the frame slider
     // gets called from slider statechanged as well as from other classes
@@ -1589,7 +1586,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     // We need to change the size of buffer
                     this.drawingBuffer = new BufferedImage(
                             paintImg.getWidth(), paintImg.getHeight(),
-                            BufferedImage.TYPE_INT_ARGB);
+                            BufferedImage.TYPE_INT_RGB);
                 }
 
                 Graphics2D g2d = drawingBuffer.createGraphics();
@@ -1607,7 +1604,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
                 // Get proper search space
                 Rectangle searchRect = ImageUtils.clipRectangle(drawingBuffer,
-                        this.interactivePanel.getSearchRect());
+                        getProperSearchRec());
 
                 if (this.colorSelectionPanel1.getSigma() > 0 && this.isSelectingColor) {
                     // Avoid avoid loading image from image plus directly since
@@ -1803,7 +1800,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                         (ConfigutationInfo) this.configListModel.firstElement();
                 searchArea = info.getSearchArea();
             } else {
-                searchArea = this.interactivePanel.getSearchRect();
+                searchArea = getProperSearchRec();
             }
             // Get pupil estimate
             Ellipse2D foundPupil = FitEyeModel.findPupil(paintedImg,
