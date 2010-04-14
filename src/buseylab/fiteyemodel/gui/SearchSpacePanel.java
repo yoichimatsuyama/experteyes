@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package buseylab.fiteyemodel.gui;
 
 import java.awt.Rectangle;
@@ -68,14 +68,14 @@ public class SearchSpacePanel extends javax.swing.JPanel {
         this.widthSlider.setValue(width);
         this.heightSlider.setValue(height);
     }
-    
-    public void enableComputeMinMaxAvg(){
+
+    public void enableComputeMinMaxAvg() {
         this.isComputeMinMaxAverage = false;
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Compute Min, Max, Avg Button Text"));
     }
 
-    public void setMaximumHeightWidth(int width, int height){
+    public void setMaximumHeightWidth(int width, int height) {
         this.widthSlider.setMaximum(width);
         this.heightSlider.setMaximum(height);
     }
@@ -212,42 +212,23 @@ public class SearchSpacePanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void avgButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avgButtonActionPerformed
-        // save the old image
-        if (oldImg == null) {
-            oldImg = parent.getInteractivePanel().getImage();
-        }
-        BufferedImage newImg = parent.getImageProcessor().getAvgImg();
-        parent.getInteractivePanel().setImage(newImg);
+
+        parent.setImage(parent.getImageProcessor().getAvgImg());
 
     }//GEN-LAST:event_avgButtonActionPerformed
 
     private void maxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxButtonActionPerformed
-        // save the old image
-        if (oldImg == null) {
-            oldImg = parent.getInteractivePanel().getImage();
-        }
-        BufferedImage newImg = parent.getImageProcessor().getMaxImg();
-        parent.getInteractivePanel().setImage(newImg);
-
+        parent.setImage(parent.getImageProcessor().getMaxImg());
     }//GEN-LAST:event_maxButtonActionPerformed
 
     private void minButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minButtonActionPerformed
-        // save the old image
-        if (oldImg == null) {
-            oldImg = parent.getInteractivePanel().getImage();
-        }
-        BufferedImage newImg = parent.getImageProcessor().getMinImg();
-        parent.getInteractivePanel().setImage(newImg);
+        parent.setImage(parent.getImageProcessor().getMinImg());
     }//GEN-LAST:event_minButtonActionPerformed
 
     private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
-        if (oldImg != null) {
-            // set back to the old img
-            parent.getInteractivePanel().setImage(oldImg);
-            oldImg = null;
-        } else {
-            oldImg = null;
-        }
+
+        parent.setImage(null);
+
     }//GEN-LAST:event_defaultButtonActionPerformed
 
     private void widthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_widthSliderStateChanged
@@ -267,14 +248,13 @@ public class SearchSpacePanel extends javax.swing.JPanel {
 private void computeMinMaxAvgButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeMinMaxAvgButtonActionPerformed
     if (this.isComputeMinMaxAverage) {
         parent.stopMinMaxAverageImageComputation();
-    }else{
+    } else {
         this.isComputeMinMaxAverage = true;
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/MinMaxAvgProcessor");
         computeMinMaxAvgButton.setText(bundle.getString("Stop Compute Min Max Avg Button Lable"));
         parent.startMinMaxAverageImageComputation();
     }
 }//GEN-LAST:event_computeMinMaxAvgButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton avgButton;
     private javax.swing.ButtonGroup buttonGroup1;

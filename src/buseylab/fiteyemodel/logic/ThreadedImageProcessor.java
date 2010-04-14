@@ -62,7 +62,6 @@ public class ThreadedImageProcessor implements Runnable {
     BufferedImage img, maxImg, minImg, avgImg;
     private boolean alive;
     private ThreadedImageProcessorListener listener;
-    private GradientCorrection gradientCorrection = null;
 
     // support for progress bar
     public ThreadedImageProcessor(ThreadedImageProcessorListener listener) {
@@ -71,14 +70,11 @@ public class ThreadedImageProcessor implements Runnable {
     }
 
     /**
-     * @param gradientCorrection null if not wish to make any gradient correct.
-     * If passed in the copy of gradientCorrection is made.  So any changes to
-     * original gradientCorrection won't effect what this object is using.
+    
      */
-    public void initialize(File[] imgFiles, GradientCorrection gradientCorrection) {
+    public void initialize(File[] imgFiles) {
         // set up fields
         this.imgFiles = imgFiles;
-        this.gradientCorrection = gradientCorrection;
     }
 
     /** Initialize has to be called before running or nothing will happen */
@@ -98,18 +94,7 @@ public class ThreadedImageProcessor implements Runnable {
             BufferedImage oldAvgImg = avgImg;
 
             // get the initial img and pixels
-             img = ImageUtils.loadRGBImage(imgFiles[0]);
-
-            // Correct gradient if the corrector is provided
-            if (this.gradientCorrection != null) {
-                this.gradientCorrection.setWidth(img.getWidth());
-                this.gradientCorrection.setHeight(img.getHeight());
-                this.gradientCorrection.updateGradientMask();
-
-                Graphics2D gd = img.createGraphics();
-                this.gradientCorrection.correctGradient(gd);
-                gd.dispose();
-            }
+            img = ImageUtils.loadRGBImage(imgFiles[0]);
 
             minImg = new BufferedImage(img.getWidth(), img.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
