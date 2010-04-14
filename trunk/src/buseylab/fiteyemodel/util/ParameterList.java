@@ -32,7 +32,6 @@ package buseylab.fiteyemodel.util;
 
 import buseylab.fiteyemodel.gui.GradientPanel;
 import buseylab.fiteyemodel.gui.GradientPanel.Corner;
-import buseylab.fiteyemodel.logic.GradientCorrection;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -58,6 +57,15 @@ public class ParameterList {
     private boolean gradientCorrecting = false;
     private Rectangle gradientBoxGuide = new Rectangle();
     private int gradientBrightnessAddValue = 0;
+    private int gradientBackgroundLevelValue = 0;
+
+    public int getGradientBackgroundLevelValue() {
+        return gradientBackgroundLevelValue;
+    }
+
+    public void setGradientBackgroundLevelValue(int gradientBackgroundLevelValue) {
+        this.gradientBackgroundLevelValue = gradientBackgroundLevelValue;
+    }
     private GradientPanel.Corner gradientStartCorner = GradientPanel.Corner.TOPLEFT;
 
     public String getComment() {
@@ -108,11 +116,13 @@ public class ParameterList {
     }
 
     public void setGradientCorrectionInfo(boolean enable, GradientPanel.Corner corner,
-            int x, int y, int width, int height, int brightnessAddValue) {
+            int x, int y, int width, int height, int brightnessAddValue,
+            int gradientBackgroundLevel) {
         this.gradientCorrecting = enable;
         this.gradientBrightnessAddValue = brightnessAddValue;
         this.gradientBoxGuide.setBounds(x, y, width, height);
         this.gradientStartCorner = corner;
+        this.gradientBackgroundLevelValue = gradientBackgroundLevel;
     }
     public static String GRADIENT_CORRECTING_ELEMENT = "gradient_correcting";
     public static String GRADIENT_CORRECTING_ENABLE_ATTRIBUTE = "enable";
@@ -121,6 +131,7 @@ public class ParameterList {
     public static String GRADIENT_CORRECTING_W_ATTRIBUTE = "w";
     public static String GRADIENT_CORRECTING_H_ATTRIBUTE = "h";
     public static String GRADIENT_CORRECTING_V_ATTRIBUTE = "v";
+    public static String GRADIENT_CORRECTING_BACKGROUND_ATTRIBUTE = "background";
     public static String GRADIENT_CORRECTING_CORNER_ATTRIBUTE = "corner";
     public static String X_ATTRIBUTE = "x";
     public static String Y_ATTRIBUTE = "y";
@@ -150,6 +161,8 @@ public class ParameterList {
                 String.valueOf(this.gradientStartCorner));
         gradientCorrectionElement.setAttribute(GRADIENT_CORRECTING_V_ATTRIBUTE,
                 String.valueOf(this.gradientBrightnessAddValue));
+        gradientCorrectionElement.setAttribute(GRADIENT_CORRECTING_BACKGROUND_ATTRIBUTE,
+                String.valueOf(this.gradientBackgroundLevelValue));
         root.addContent(gradientCorrectionElement);
 
         for (Iterator<ParameterList.Entry> it = parametersList.iterator(); it.hasNext();) {
@@ -211,31 +224,36 @@ public class ParameterList {
 
         // Set default values
         boolean gradientCorrecting = false;
-        Rectangle gradientBoxGuide = new Rectangle(0, 0, 1, 1);
+        Rectangle gradientBoxGuide = new Rectangle(10, 10, 10, 10);
         int gradientBrightnessAddValue = 0;
+        int gradientBackgroundLevel = 0;
         GradientPanel.Corner gradientStartCorner = GradientPanel.Corner.TOPLEFT;
 
         if (gradientCorrectionElement != null) {
             // Load values from file when applicable
-            gradientCorrecting = Boolean.parseBoolean(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_ENABLE_ATTRIBUTE));
-            gradientBoxGuide.x = Integer.parseInt(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_X_ATTRIBUTE));
-            gradientBoxGuide.y = Integer.parseInt(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_Y_ATTRIBUTE));
-            gradientBoxGuide.width = Integer.parseInt(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_W_ATTRIBUTE));
-            gradientBoxGuide.height = Integer.parseInt(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_H_ATTRIBUTE));
-            gradientStartCorner = GradientPanel.Corner.valueOf(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_CORNER_ATTRIBUTE));
-            gradientBrightnessAddValue = Integer.parseInt(
-                    gradientCorrectionElement.getAttributeValue(GRADIENT_CORRECTING_V_ATTRIBUTE));
+            gradientCorrecting = getBooleanValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_ENABLE_ATTRIBUTE, gradientCorrecting);
+            gradientBoxGuide.x = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_X_ATTRIBUTE, gradientBoxGuide.x);
+            gradientBoxGuide.y = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_Y_ATTRIBUTE, gradientBoxGuide.y);
+            gradientBoxGuide.width = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_W_ATTRIBUTE, gradientBoxGuide.width);
+            gradientBoxGuide.height = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_H_ATTRIBUTE, gradientBoxGuide.height);
+            gradientStartCorner = getCornerValueFromAttribute(gradientCorrectionElement, 
+                    GRADIENT_CORRECTING_CORNER_ATTRIBUTE, gradientStartCorner);
+            gradientBrightnessAddValue = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_V_ATTRIBUTE,gradientBrightnessAddValue);
+            gradientBackgroundLevel = getIntegerValueFromAttribute(gradientCorrectionElement,
+                    GRADIENT_CORRECTING_BACKGROUND_ATTRIBUTE,gradientBackgroundLevel);
+
         }
         // Save to parameter list
         parameterMap.setGradientCorrectionInfo(gradientCorrecting, gradientStartCorner,
                 gradientBoxGuide.x, gradientBoxGuide.y,
-                gradientBoxGuide.width, gradientBoxGuide.height, gradientBrightnessAddValue);
+                gradientBoxGuide.width, gradientBoxGuide.height, gradientBrightnessAddValue,
+                gradientBackgroundLevel);
 
         // Iterate through each parameter set
         for (Iterator<Element> iter = root.getChildren(PARAMETER_ELEMENT).iterator();
@@ -274,5 +292,32 @@ public class ParameterList {
             entry.parameters.searchArea.setRect(rectangle);
         }
 
+    }
+
+    public static boolean getBooleanValueFromAttribute(Element e, String attribName, boolean defaultV) {
+        String txt = e.getAttributeValue(attribName);
+        if (txt != null) {
+            return Boolean.valueOf(txt);
+        } else {
+            return defaultV;
+        }
+    }
+
+    public static int getIntegerValueFromAttribute(Element e, String attribName, int defaultV) {
+        String txt = e.getAttributeValue(attribName);
+        if (txt != null) {
+            return Integer.valueOf(txt);
+        } else {
+            return defaultV;
+        }
+    }
+
+    public static Corner getCornerValueFromAttribute(Element e, String attribName, Corner defaultV) {
+        String txt = e.getAttributeValue(attribName);
+        if (txt != null) {
+            return GradientPanel.Corner.valueOf(txt);
+        } else {
+            return defaultV;
+        }
     }
 }

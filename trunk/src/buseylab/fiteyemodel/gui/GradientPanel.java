@@ -44,7 +44,10 @@ public class GradientPanel extends javax.swing.JPanel {
         public void brightnessIncreaseChange(int brightnessIncrease);
 
         public void onlyShowGradient(boolean enable);
+
+        public void backgroundLevelIncreaseChange(int value);
     }
+    
     GradientPanelListener listener = null;
 
     public void setListener(GradientPanelListener listener) {
@@ -117,6 +120,14 @@ public class GradientPanel extends javax.swing.JPanel {
         return this.brightnessIncreaseSlider.getValue();
     }
 
+    public void setBackGroundLevel(int v) {
+        this.backgroundLevelSlider.setValue(v);
+    }
+
+    public int getBackGroundLevel() {
+        return this.backgroundLevelSlider.getValue();
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -143,6 +154,8 @@ public class GradientPanel extends javax.swing.JPanel {
         topRightRadioButton = new javax.swing.JRadioButton();
         jLabel1 = new javax.swing.JLabel();
         brightnessIncreaseSlider = new javax.swing.JSlider();
+        jLabel2 = new javax.swing.JLabel();
+        backgroundLevelSlider = new javax.swing.JSlider();
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -202,8 +215,8 @@ public class GradientPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, widthLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
-                    .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)))
+                    .add(heightSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+                    .add(widthSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -295,10 +308,22 @@ public class GradientPanel extends javax.swing.JPanel {
         jLabel1.setText("Brightness Increase");
 
         brightnessIncreaseSlider.setMaximum(255);
+        brightnessIncreaseSlider.setValue(0);
         brightnessIncreaseSlider.setEnabled(false);
         brightnessIncreaseSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 brightnessIncreaseSliderStateChanged(evt);
+            }
+        });
+
+        jLabel2.setText("Background Level");
+
+        backgroundLevelSlider.setMaximum(255);
+        backgroundLevelSlider.setValue(0);
+        backgroundLevelSlider.setEnabled(false);
+        backgroundLevelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                backgroundLevelSliderStateChanged(evt);
             }
         });
 
@@ -313,11 +338,16 @@ public class GradientPanel extends javax.swing.JPanel {
                     .add(jPanel4Layout.createSequentialGroup()
                         .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(showGradientCheckBox))
+                        .add(showGradientCheckBox)
+                        .addContainerGap())
                     .add(jPanel4Layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))))
+                        .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE))
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 121, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(backgroundLevelSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -327,15 +357,19 @@ public class GradientPanel extends javax.swing.JPanel {
                 .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel4Layout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jPanel4Layout.createSequentialGroup()
-                        .add(27, 27, 27)
+                        .add(30, 30, 30)
                         .add(showGradientCheckBox)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(brightnessIncreaseSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(backgroundLevelSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -343,19 +377,19 @@ public class GradientPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(enableCheckBox))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(enableCheckBox)
+                    .add(layout.createSequentialGroup()
+                        .add(8, 8, 8)
+                        .add(jPanel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(enableCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 258, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -410,11 +444,19 @@ public class GradientPanel extends javax.swing.JPanel {
         this.topRightRadioButton.setEnabled(enable);
         this.showGradientCheckBox.setEnabled(enable);
         this.brightnessIncreaseSlider.setEnabled(enable);
+        this.backgroundLevelSlider.setEnabled(enable);
         this.widthSlider.setEnabled(enable);
         this.heightSlider.setEnabled(enable);
     }//GEN-LAST:event_enableCheckBoxStateChanged
 
+    private void backgroundLevelSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_backgroundLevelSliderStateChanged
+         if (this.listener != null) {
+            this.listener.backgroundLevelIncreaseChange(this.backgroundLevelSlider.getValue());
+        }
+    }//GEN-LAST:event_backgroundLevelSliderStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSlider backgroundLevelSlider;
     private javax.swing.JRadioButton bottomLeftRadioButton;
     private javax.swing.JRadioButton bottomRightRadioButton;
     private javax.swing.JSlider brightnessIncreaseSlider;
@@ -423,6 +465,7 @@ public class GradientPanel extends javax.swing.JPanel {
     private javax.swing.JLabel heightLabel;
     private javax.swing.JSlider heightSlider;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
