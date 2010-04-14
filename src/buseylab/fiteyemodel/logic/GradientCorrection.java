@@ -89,6 +89,15 @@ public class GradientCorrection {
     }
     // Set parameters here
     int lightAdding = 0;
+    int backgroundLevel = 0;
+
+    public int getBackgroundLevel() {
+        return backgroundLevel;
+    }
+
+    public void setBackgroundLevel(int backgroundLevel) {
+        this.backgroundLevel = backgroundLevel;
+    }
     // Gradient mask
     BufferedImage gradientMask = null;
     int width = 1, height = 1;
@@ -104,9 +113,8 @@ public class GradientCorrection {
         Graphics2D g2d = (Graphics2D) this.gradientMask.getGraphics();
 
         //GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightAdding, lightAdding, lightAdding, 255), this.end, new Color(0, 0, 0, 255));
-        GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightAdding, lightAdding, lightAdding), this.end, new Color(0, 0, 0));
-
-
+        int lightLevel = Math.min(255, this.lightAdding + this.backgroundLevel);
+        GradientPaint gradientPaint = new GradientPaint(this.start, new Color(lightLevel, lightLevel, lightLevel), this.end, new Color(this.backgroundLevel, this.backgroundLevel, this.backgroundLevel));
         g2d.setPaint(gradientPaint);
         g2d.fill(new Rectangle(0, 0, this.width, this.height));
         g2d.dispose();

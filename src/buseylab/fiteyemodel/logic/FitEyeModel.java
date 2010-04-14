@@ -44,7 +44,6 @@ import org.spaceroots.mantissa.optimization.NelderMead;
 import org.spaceroots.mantissa.optimization.PointCostPair;
 import buseylab.fiteyemodel.util.ParameterList;
 import buseylab.fiteyemodel.util.Parameters;
-import org.apache.sanselan.formats.png.GammaCorrection;
 
 /**
  * 

@@ -284,6 +284,12 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 // Reload image
                 changeFrame();
             }
+
+            @Override
+            public void backgroundLevelIncreaseChange(int value) {
+                gradientCorrection.setBackgroundLevel(value);
+                changeFrame();
+            }
         });
     }
 
@@ -970,7 +976,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     this.gradientPanel1.getDarkestCorner(),
                     this.gradientBox.x, this.gradientBox.y,
                     this.gradientBox.width, this.gradientBox.height,
-                    this.gradientCorrection.getLightAdding());
+                    this.gradientCorrection.getLightAdding(),
+                    this.gradientCorrection.getBackgroundLevel());
 
             try {
                 // Save parameter list
@@ -1053,7 +1060,11 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             // Set tool tip to show gray level
             this.interactivePanel.setShowGrayLevelToolTip(true);
         } else {
-            this.interactivePanel.setShowGrayLevelToolTip(false);
+            if (this.jTabbedPane1.getSelectedComponent().equals(this.searchSpacePanel1)) {
+                this.interactivePanel.setShowGrayLevelToolTip(true);
+            } else {
+                this.interactivePanel.setShowGrayLevelToolTip(false);
+            }
 
             // Only do this if we are previously in the gradient change mode
             if (this.gradientChangePanelActivate) {
@@ -1102,6 +1113,9 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             // Set up gradient correction
             this.gradientPanel1.setBrightnessIncrease(parameterList.getGradientBrightnessAddValue());
             this.gradientCorrection.setLightAdding(parameterList.getGradientBrightnessAddValue());
+
+            this.gradientPanel1.setBackGroundLevel(parameterList.getGradientBackgroundLevelValue());
+            this.gradientCorrection.setBackgroundLevel(parameterList.getGradientBackgroundLevelValue());
 
             this.gradientBox.setBounds(parameterList.getGradientBoxGuide());
 
@@ -2012,7 +2026,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             }
 
             this.interactivePanel.setImage(buffer);
-        }else{
+        } else {
             changeFrame();
         }
     }

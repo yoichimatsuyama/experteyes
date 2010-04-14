@@ -53,6 +53,9 @@ public class InteractivePanel extends javax.swing.JLabel {
 
     public void setShowGrayLevelToolTip(boolean showGrayLevelToolTip) {
         this.showGrayLevelToolTip = showGrayLevelToolTip;
+        if(!showGrayLevelToolTip){
+            setToolTipText(null);
+        }
     }
 
     @Override
