@@ -6,6 +6,7 @@
 package buseylab.fiteyemodel.gui;
 
 import buseylab.fiteyemodel.logic.ThreadedImageProcessor;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -36,4 +37,10 @@ public interface FitEyeModelSystemInterface {
      */
     void stopMinMaxAverageImageComputation();
 
+    /* This method force image to be show.  If null, then normal image showing
+     * operation of the system should be used
+     */
+    void setImage(BufferedImage img);
+
+    void setSearchSpaceSize(int width, int height);
 }

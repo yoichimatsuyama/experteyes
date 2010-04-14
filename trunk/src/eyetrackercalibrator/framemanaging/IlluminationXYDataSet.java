@@ -91,7 +91,7 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
         
         // Get info
         Double info = 
-                informationDatabase.getInfo(item + offset);
+                informationDatabase.getInfo(this.frameSynchronizor.getEyeFrame(item));
         if(info != null){
             if(series == 0){
                     result = info;

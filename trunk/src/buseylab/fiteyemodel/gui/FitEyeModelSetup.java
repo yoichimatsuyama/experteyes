@@ -347,10 +347,10 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
         changeFrame();
     }
 
-    private Rectangle getProperSearchRec(){
-        if(this.savedSearchBox != null && this.gradientChangePanelActivate){
+    private Rectangle getProperSearchRec() {
+        if (this.savedSearchBox != null && this.gradientChangePanelActivate) {
             return new Rectangle(this.savedSearchBox);
-        }else{
+        } else {
             return this.interactivePanel.getSearchRect();
         }
     }
@@ -452,7 +452,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             });
 
             final GradientCorrection gc;
-            
+
             if (this.gradientChangeMode) {
                 gc = this.gradientCorrection.clone();
             } else {
@@ -1247,7 +1247,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         final java.util.ResourceBundle bundle =
-                                java.util.ResourceBundle.getBundle("resources/FitEyeModelSetup");
+                                java.util.ResourceBundle.getBundle("buseylab/fiteyemodel/resources/FitEyeModelSetup");
 
                         // Set the flag that eye fitting is running
                         isEyeFittingRunning =
@@ -1411,13 +1411,8 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     public void startMinMaxAverageImageComputation() {
         // Get starting dir from the text box
         try {
-            // start processing images
-            if (this.gradientChangeMode) {
-                imgProc.initialize(eyeFiles, this.gradientCorrection);
-            } else {
-                imgProc.initialize(eyeFiles, null);
-            }
 
+            imgProc.initialize(eyeFiles);
             Thread imgProcThread = new Thread(imgProc);
             imgProcThread.start();
 
@@ -1998,4 +1993,32 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
     private javax.swing.JCheckBox showVoronoiCheckBox;
     private buseylab.fiteyemodel.gui.ThresholdPanel thresholdPanel1;
     // End of variables declaration//GEN-END:variables
+
+    /** This method is not optimized for being called multiple times  */
+    @Override
+    public void setImage(BufferedImage img) {
+        if (img != null) {
+            BufferedImage buffer = img;
+
+            if (this.gradientChangeMode) {
+                // Fix gradient before putting image
+                buffer = new BufferedImage(buffer.getWidth(), buffer.getHeight(),
+                        BufferedImage.TYPE_INT_RGB);
+
+                Graphics2D gd = buffer.createGraphics();
+                gd.drawImage(img, 0, 0, null);
+                this.gradientCorrection.correctGradient(gd);
+                gd.dispose();
+            }
+
+            this.interactivePanel.setImage(buffer);
+        }else{
+            changeFrame();
+        }
+    }
+
+    @Override
+    public void setSearchSpaceSize(int width, int height) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
