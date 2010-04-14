@@ -108,6 +108,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         // Add listener to mouse click on graph
         graphTabPanel.addChartProgressListener(new ChartProgressListener() {
 
+            @Override
             public void chartProgress(ChartProgressEvent chartProgressEvent) {
                 if (chartProgressEvent.getType() == ChartProgressEvent.DRAWING_FINISHED) {
                     JFreeChart chart = chartProgressEvent.getChart();
@@ -126,6 +127,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
                 FrameScrollingJPanel.CURRENT_FRAME_CHANGE,
                 new PropertyChangeListener() {
 
+                    @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         frameChangeHandler(evt);
                     }
@@ -188,8 +190,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
 
     public void setInformationDatabase(InformationDatabase informationDatabase) {
         this.informationDatabase = informationDatabase;
-        graphTabPanel.setDataSet(informationDatabase,
-                timer.getScreenFrameManager().getTotalFrames());
+        graphTabPanel.setDataSet(informationDatabase);
     }
 
     /**
@@ -736,8 +737,8 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     private void estimateTrialButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_estimateTrialButtonActionPerformed
         if (trialSet.isEmpty()) {
             JOptionPane.showMessageDialog(null,
-                    "<html>You need to load the trial info / enter trial info <br>" +
-                    "and compute illumination before estimation</html>");
+                    "<html>You need to load the trial info / enter trial info <br>"
+                    + "and compute illumination before estimation</html>");
         } else {
             // Get all trial info and sort it
             Object[] array = trialSet.toArray();
