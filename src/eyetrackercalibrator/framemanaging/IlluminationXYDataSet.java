@@ -45,8 +45,6 @@ import org.jfree.data.general.DatasetGroup;
  */
 public class IlluminationXYDataSet extends SyncXYDataSet{
     InformationDatabase informationDatabase = null;
-    protected int offset = 0;
-    private int lastItem = 0;
     
     /** Creates a new instance of IlluminationXYDataSet
      * @param infoDatabase 
@@ -55,18 +53,21 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
         this.informationDatabase = infoDatabase;
     }
     
+    @Override
     public DomainOrder getDomainOrder() {
         return DomainOrder.ASCENDING;
     }
     
     /* Return the last item */
+    @Override
     public int getItemCount(int i) {
-        return lastItem;
+        return this.frameSynchronizor.getTotalFrame();
     }
     
     /**
      * This X represent a frame 
      */
+    @Override
     public Number getX(int series, int item) {
         return new Integer(item);
     }
@@ -74,6 +75,7 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
     /**
      * This X represent a frame 
      */
+    @Override
     public double getXValue(int series, int item) {
         return (double) (item);
     }
@@ -82,16 +84,18 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
      * Return (x,y) coor of the pupil depending on series value
      * @param series 0 for X value of pupil 1 for Y value of pupil
      */
+    @Override
     public Number getY(int series, int item) {
         return new Double(getYValue(series,item));
     }
     
+    @Override
     public double getYValue(int series, int item) {
         double result = 0d;
         
         // Get info
         Double info = 
-                informationDatabase.getInfo(this.frameSynchronizor.getEyeFrame(item));
+                informationDatabase.getInfo(this.frameSynchronizor.getSceneFrame(item));
         if(info != null){
             if(series == 0){
                     result = info;
@@ -100,10 +104,12 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
         return result;
     }
     
+    @Override
     public int getSeriesCount() {
         return 1;
     }
     
+    @Override
     public Comparable getSeriesKey(int series) {
         if(series == 0){
             return "Illumination";
@@ -112,6 +118,7 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
         }
     }
     
+    @Override
     public int indexOf(Comparable seriesKey) {
         if(seriesKey.equals(getSeriesKey(0))){
             return 0;
@@ -120,24 +127,20 @@ public class IlluminationXYDataSet extends SyncXYDataSet{
         }
     }
     
+    @Override
     public void addChangeListener(DatasetChangeListener datasetChangeListener) {
     }
     
+    @Override
     public void removeChangeListener(DatasetChangeListener datasetChangeListener) {
     }
     
+    @Override
     public DatasetGroup getGroup() {
         return new DatasetGroup("Illumination data group");
     }
     
+    @Override
     public void setGroup(DatasetGroup datasetGroup) {
-    }
-    
-    public int getLastItem() {
-        return lastItem;
-    }
-
-    public void setLastItem(int lastItem) {
-        this.lastItem = lastItem + 1;
     }
 }
