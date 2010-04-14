@@ -738,8 +738,20 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     // Set interval marking
                     IntervalMarker marker = intervalMarkerManager.getNewIntervalMarker();
                     info.setIntervalMarker(marker);
-                    marker.setStartValue(Math.min(startEyeFrame, startScreenFrame));
-                    marker.setEndValue(Math.min(stopEyeFrame, stopScreenFrame));
+                    FrameSynchronizor synchronizor = this.timer.getFrameSynchronizor();
+                    int frame = -1;
+                    if(startEyeFrame >= 0){
+                        frame = synchronizor.eyeFrameToSyncFrame(startEyeFrame);
+                    }else{
+                        frame = synchronizor.sceneFrameToSyncFrame(startScreenFrame);
+                    }
+                    marker.setStartValue(frame);
+                    if(stopEyeFrame >= 0){
+                        frame = synchronizor.eyeFrameToSyncFrame(stopEyeFrame);
+                    }else{
+                        frame = synchronizor.sceneFrameToSyncFrame(stopScreenFrame);
+                    }
+                    marker.setEndValue(frame);;
                 }
             }
 
