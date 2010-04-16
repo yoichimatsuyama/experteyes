@@ -27,6 +27,7 @@ public class GradientCorrection {
         gc.width = this.width;
         gc.height = this.height;
         gc.lightAdding = this.lightAdding;
+        gc.backgroundLevel = this.backgroundLevel;
         gc.updateGradientMask();
         return gc;
     }
