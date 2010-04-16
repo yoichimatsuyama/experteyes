@@ -163,13 +163,20 @@ class ImgDiffErr implements CostFunction, ConvergenceChecker {
 
         eyeModelGraphics2D.setColor(new Color(crGray, crGray, crGray));
 
-        if (this.isCRCircle) {
-            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5] + params[4] - params[6]);
-        } else {
-            cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
+        if (crGray > 0) {
+            if (this.isCRCircle) {
+                cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5] + params[4] - params[6]);
+            } else {
+                cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
+            }
+        }else{
+            cr.setFrame(0, 0, 0, 0);
         }
 
-        eyeModelGraphics2D.fill(cr);
+        // turn this off when cr is empty
+        if (crGray > 0) {
+            eyeModelGraphics2D.fill(cr);
+        }
 
         eyeModelPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(
                 eyeModel, (int) searchRect.getX(), (int) searchRect.getY(),

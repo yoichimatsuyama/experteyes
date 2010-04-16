@@ -196,6 +196,7 @@
             <Component class="javax.swing.JSlider" name="heightSlider">
               <Properties>
                 <Property name="maximum" type="int" value="512"/>
+                <Property name="value" type="int" value="100"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -205,6 +206,7 @@
             <Component class="javax.swing.JSlider" name="widthSlider">
               <Properties>
                 <Property name="maximum" type="int" value="512"/>
+                <Property name="value" type="int" value="100"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
