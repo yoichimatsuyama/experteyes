@@ -190,6 +190,7 @@ public class GradientPanel extends javax.swing.JPanel {
         heightLabel.setText("Height"); // NOI18N
 
         heightSlider.setMaximum(512);
+        heightSlider.setValue(100);
         heightSlider.setEnabled(false);
         heightSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -198,6 +199,7 @@ public class GradientPanel extends javax.swing.JPanel {
         });
 
         widthSlider.setMaximum(512);
+        widthSlider.setValue(100);
         widthSlider.setEnabled(false);
         widthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
