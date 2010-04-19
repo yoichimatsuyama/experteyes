@@ -251,6 +251,13 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
             }
         });
 
+
+        // Set gradient box to match init value of the slider bar
+        this.gradientBox.setBounds(this.interactivePanel.getWidth() / 2 - this.gradientPanel1.getGradientBoxWidth() / 2,
+                this.interactivePanel.getHeight() / 2 - this.gradientPanel1.getGradientBoxHeight() / 2,
+                this.gradientPanel1.getGradientBoxWidth(),
+                this.gradientPanel1.getGradientBoxHeight());
+        
         this.gradientPanel1.setListener(new GradientPanel.GradientPanelListener() {
 
             @Override
