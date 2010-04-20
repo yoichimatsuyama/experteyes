@@ -37,6 +37,7 @@ import eyetrackercalibrator.framemanaging.MovieFrameExporter;
 import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.util.FFMPEGHandler;
+import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -50,6 +51,7 @@ import javax.swing.JOptionPane;
 public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
     private static double CORNER_FRAME_SCALE = 0.3;
+    protected static final int TOTAL_TEST_FRAMES = 10;
     MovieFrameExporter movieFrameExporter = null;
     int start;
     int totalProcess;
@@ -77,7 +79,61 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                 CORNER_FRAME_SCALE, eyeGazeComputing, frameSynchronizor,
                 eyeFrameManager, screenFrameManager, null,
                 Integer.parseInt(this.frameRateTextField.getText()), this);
+    }
 
+    protected boolean startMovieExporting(int to, int from) throws HeadlessException {
+        File exportDirectory = new File(this.exportLocationTextField.getText());
+        // Set up start and end
+        this.start = Math.min(to, from);
+        this.totalProcess = Math.abs(to - from) + 1;
+        this.progressBar.setMaximum(this.totalProcess);
+        // Get number of average frame with sanity check
+        String avgStr = this.gazeAverageTextField.getText();
+        int averageFrames = 1;
+        if (avgStr != null) {
+            int v = 1;
+            try {
+                v = Integer.parseInt(avgStr);
+            } catch (NumberFormatException numberFormatException) {
+            }
+            averageFrames = Math.max(1, v);
+            this.gazeAverageTextField.setText(String.valueOf(averageFrames));
+            repaint();
+        }
+        if (!(eyeOnlyCheckBox.isSelected() || screenOnlyCheckBox.isSelected() || 
+                eyeInCornerCheckBox.isSelected() || screenInCornerCheckBox.isSelected() ||
+                sideBySideCheckBox.isSelected())) {
+            // None is selected so warn the user and do nothing
+            // Show warning dialog
+            JOptionPane.showMessageDialog(this, "Please select at least one export type.",
+                    "No Export Type Is Selected", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        boolean createMovieFile = true;
+        boolean deleteMoviePictureFile = true;
+        if (movieAndFramesRadioButton.isSelected()) {
+            deleteMoviePictureFile = false;
+        } else if (framesOnlyRadioButton.isSelected()) {
+            deleteMoviePictureFile = false;
+            createMovieFile = false;
+        }
+        // Check if ffmpeg is needed
+        if (this.movieOnlyRadioButton.isSelected() ||
+                this.movieAndFramesRadioButton.isSelected()) {
+            File ffmpegFile = FFMPEGHandler.getFFMPEGExecutable(this);
+            if (ffmpegFile == null) {
+                return true;
+            }
+            this.movieFrameExporter.setFfmpegExecutable(ffmpegFile);
+        }
+        this.startButton.setEnabled(false);
+        this.testButton.setEnabled(false);
+        this.movieFrameExporter.exportThread(exportDirectory, from, to,
+                this.drawCornerCheckBox.isSelected(), this.eyeOnlyCheckBox.isSelected(),
+                this.screenOnlyCheckBox.isSelected(), this.sideBySideCheckBox.isSelected(),
+                this.eyeInCornerCheckBox.isSelected(), this.screenInCornerCheckBox.isSelected(),
+                createMovieFile, deleteMoviePictureFile, averageFrames);
+        return false;
     }
 
     /** 
@@ -102,16 +158,10 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         screenInCornerCheckBox = new javax.swing.JCheckBox();
         eyeInCornerCheckBox = new javax.swing.JCheckBox();
         progressBar = new javax.swing.JProgressBar();
-        okButton = new javax.swing.JButton();
-        cancelButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         fromTextField = new javax.swing.JTextField();
         toTextField = new javax.swing.JTextField();
-        drawCornerCheckBox = new javax.swing.JCheckBox();
-        jLabel4 = new javax.swing.JLabel();
-        gazeAverageTextField = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         frameRateTextField = new javax.swing.JTextField();
@@ -119,6 +169,20 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         movieOnlyRadioButton = new javax.swing.JRadioButton();
         movieAndFramesRadioButton = new javax.swing.JRadioButton();
         framesOnlyRadioButton = new javax.swing.JRadioButton();
+        jPanel3 = new javax.swing.JPanel();
+        testButton = new javax.swing.JButton();
+        startButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        drawCornerCheckBox = new javax.swing.JCheckBox();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        gazeAverageTextField = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Exporting Movie Frames");
@@ -175,20 +239,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        okButton.setText("OK");
-        okButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okButtonActionPerformed(evt);
-            }
-        });
-
-        cancelButton.setText("Cancel");
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
-            }
-        });
-
         jLabel2.setText("From:");
 
         jLabel3.setText("To:");
@@ -198,20 +248,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         toTextField.setText("1");
         toTextField.setInputVerifier(textFieldPosIntInputVerifier);
-
-        drawCornerCheckBox.setText("Draw screen corners in scenes");
-
-        jLabel4.setText("Moving median gaze point across");
-
-        gazeAverageTextField.setText("3");
-        gazeAverageTextField.setInputVerifier(textFieldPosIntInputVerifier);
-        gazeAverageTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gazeAverageTextFieldActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("frames");
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Output Options"));
 
@@ -239,6 +275,104 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         framesOnlyRadioButton.setText("Frame files only");
         jPanel2.add(framesOnlyRadioButton);
 
+        testButton.setText("Test");
+        testButton.setToolTipText("Try exporting the first 10 frames.");
+        testButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                testButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(testButton);
+
+        startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(startButton);
+
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+        jPanel3.add(cancelButton);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        drawCornerCheckBox.setText("Draw screen corners in scenes");
+        jPanel5.add(drawCornerCheckBox);
+
+        jLabel4.setText("Moving median gaze point across");
+
+        gazeAverageTextField.setText("3");
+        gazeAverageTextField.setInputVerifier(textFieldPosIntInputVerifier);
+        gazeAverageTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gazeAverageTextFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("frames");
+
+        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel4Layout.createSequentialGroup()
+                .add(jLabel4)
+                .add(6, 6, 6)
+                .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel5))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(jLabel4)
+                .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jLabel5))
+        );
+
+        jPanel5.add(jPanel4);
+
+        jTextField1.setText("100");
+        jTextField1.setInputVerifier(textFieldPosFloatInputVerifier1);
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("Image in the corner");
+
+        jLabel9.setText("%shrink");
+
+        org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createSequentialGroup()
+                .add(9, 9, 9)
+                .add(jLabel8)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 38, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel9)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(jLabel8)
+                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jLabel9))
+        );
+
+        jPanel5.add(jPanel6);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -249,81 +383,55 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+                        .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(browseButton)
-                        .addContainerGap())
+                        .add(browseButton))
                     .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(okButton)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(cancelButton)
-                                .add(5, 5, 5))
-                            .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE))
-                        .add(22, 22, 22))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(layout.createSequentialGroup()
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel2)
-                                    .add(jLabel3)))
-                            .add(layout.createSequentialGroup()
-                                .add(drawCornerCheckBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(jLabel4)
-                                .add(1, 1, 1)))
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel5))
-                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
-                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE))
-                        .addContainerGap())
-                    .add(layout.createSequentialGroup()
-                        .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                            .add(jLabel2)
+                            .add(jLabel3))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(20, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(browseButton))
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(9, 9, 9)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 88, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(layout.createSequentialGroup()
-                        .add(25, 25, 25)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(jLabel2)
                             .add(fromTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(17, 17, 17)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(jLabel3)
-                            .add(toTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(layout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 88, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(toTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(drawCornerCheckBox)
-                    .add(jLabel4)
-                    .add(gazeAverageTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel5))
+                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 75, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(okButton)
-                    .add(cancelButton))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(14, 14, 14))
         );
 
         pack();
@@ -336,87 +444,22 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
 
         // Check if it has focus
-        if (!this.okButton.isFocusOwner()) {
+        if (!this.startButton.isFocusOwner()) {
             return;
         }
-
-        boolean error = false;
 
         // Get to and from
         int from = 0, to = 0;
         // There is no need to catch error here coz we do input validation at the textfield
         from = Integer.parseInt(this.fromTextField.getText());
         to = Integer.parseInt(this.toTextField.getText());
-
-        File exportDirectory = new File(this.exportLocationTextField.getText());
-
-        // Set up start and end
-        this.start = Math.min(to, from);
-        this.totalProcess = Math.abs(to - from) + 1;
-        this.progressBar.setMaximum(this.totalProcess);
-
-        // Get number of average frame with sanity check
-        String avgStr = this.gazeAverageTextField.getText();
-        int averageFrames = 1;
-        if (avgStr != null) {
-            int v = 1;
-            try {
-                v = Integer.parseInt(avgStr);
-            } catch (NumberFormatException numberFormatException) {
-            }
-            averageFrames = Math.max(1, v);
-            this.gazeAverageTextField.setText(String.valueOf(averageFrames));
-            repaint();
-        }
-
-        // Check output type
-        if (!(eyeOnlyCheckBox.isSelected()
-                || screenOnlyCheckBox.isSelected()
-                || eyeInCornerCheckBox.isSelected()
-                || screenInCornerCheckBox.isSelected()
-                || sideBySideCheckBox.isSelected())) {
-            // None is selected so warn the user and do nothing
-            // Show warning dialog
-            JOptionPane.showMessageDialog(this,
-                    "Please select at least one export type.",
-                    "No Export Type Is Selected",
-                    JOptionPane.ERROR_MESSAGE);
+        if (startMovieExporting(to, from)) {
             return;
         }
-        boolean createMovieFile = true;
-        boolean deleteMoviePictureFile = true;
-        if (movieAndFramesRadioButton.isSelected()) {
-            deleteMoviePictureFile = false;
-        } else if (framesOnlyRadioButton.isSelected()) {
-            deleteMoviePictureFile = false;
-            createMovieFile = false;
-        }
-
-        // Check if ffmpeg is needed
-        if (this.movieOnlyRadioButton.isSelected()
-                || this.movieAndFramesRadioButton.isSelected()) {
-            File ffmpegFile = FFMPEGHandler.getFFMPEGExecutable(this);
-            if (ffmpegFile == null) {
-                return;
-            }
-            // Set ffmpeg file for exporter
-            this.movieFrameExporter.setFfmpegExecutable(ffmpegFile);
-        }
-
-        this.okButton.setVisible(false);
-
-        this.movieFrameExporter.exportThread(exportDirectory, from, to,
-                this.drawCornerCheckBox.isSelected(),
-                this.eyeOnlyCheckBox.isSelected(),
-                this.screenOnlyCheckBox.isSelected(),
-                this.sideBySideCheckBox.isSelected(),
-                this.eyeInCornerCheckBox.isSelected(),
-                this.screenInCornerCheckBox.isSelected(),
-                createMovieFile, deleteMoviePictureFile, averageFrames);
-    }//GEN-LAST:event_okButtonActionPerformed
+    }//GEN-LAST:event_startButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         // Set text box with directory that user chose.
@@ -453,6 +496,27 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         // Reset output
         gazeAverageTextField.setText(String.valueOf(value));
 }//GEN-LAST:event_gazeAverageTextFieldActionPerformed
+
+    private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_testButtonActionPerformed
+        // Check if it has focus
+        if (!this.testButton.isFocusOwner()) {
+            return;
+        }
+
+        // Get to and from and cap from to the either the last frame possible or the (n-1)th after the first frame
+        int from = 0, to = 0;
+        // There is no need to catch error here coz we do input validation at the textfield
+        from = Integer.parseInt(this.fromTextField.getText());
+        to = Math.min(Integer.parseInt(this.toTextField.getText()), from + TOTAL_TEST_FRAMES - 1);
+        if (startMovieExporting(to, from)) {
+            return;
+        }
+    }//GEN-LAST:event_testButtonActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JButton cancelButton;
@@ -471,16 +535,24 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JRadioButton movieAndFramesRadioButton;
     private javax.swing.JRadioButton movieOnlyRadioButton;
-    private javax.swing.JButton okButton;
     private javax.swing.ButtonGroup outputButtonGroup;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JCheckBox screenInCornerCheckBox;
     private javax.swing.JCheckBox screenOnlyCheckBox;
     private javax.swing.JCheckBox sideBySideCheckBox;
+    private javax.swing.JButton startButton;
+    private javax.swing.JButton testButton;
     private eyetrackercalibrator.gui.util.TextFieldPosFloatInputVerifier textFieldPosFloatInputVerifier1;
     private javax.swing.JTextField toTextField;
     // End of variables declaration//GEN-END:variables
@@ -495,6 +567,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             if (completed >= this.totalProcess && evt.getPropertyName().startsWith("Completed")) {
                 this.progressBar.setString(evt.getPropertyName());
                 this.cancelButton.setText("Close");
+                this.startButton.setEnabled(true);
+                this.testButton.setEnabled(true);
             } else {
                 this.progressBar.setString(evt.getPropertyName() + " " + completed + " of " + this.totalProcess);
             }
