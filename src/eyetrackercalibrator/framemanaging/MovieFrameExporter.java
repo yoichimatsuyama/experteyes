@@ -40,6 +40,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -77,9 +78,8 @@ public class MovieFrameExporter {
     int pointMarkLength = 2;
     int cornerMarkLength = 10;
     PropertyChangeListener listener;
-    int width;
-    int height;
-    double smallImageScale;
+    double cornerImageScale;
+    double mainImageScale;
     EyeGazeComputing eyeGazeComputing;
     FrameManager eyeFrameManager;
     ScreenFrameManager screenFrameManager;
@@ -88,6 +88,7 @@ public class MovieFrameExporter {
     private ReentrantLock processLock = new ReentrantLock();
     Process process = null;
     private float frameRate;
+    private boolean useFullSizeScene;
 
     /**
      * 
@@ -102,13 +103,10 @@ public class MovieFrameExporter {
      * @param screenFrameManager
      * @param listener
      */
-    public MovieFrameExporter(int width, int height, double smallImageScale,
+    public MovieFrameExporter(
             EyeGazeComputing eyeGazeComputing, FrameSynchronizor frameSynchronizor,
             FrameManager eyeFrameManager, ScreenFrameManager screenFrameManager,
             File ffmpegExecutable, float frameRate, PropertyChangeListener listener) {
-        this.width = width;
-        this.height = height;
-        this.smallImageScale = smallImageScale;
         this.eyeGazeComputing = eyeGazeComputing;
         this.eyeFrameManager = eyeFrameManager;
         this.screenFrameManager = screenFrameManager;
@@ -131,32 +129,40 @@ public class MovieFrameExporter {
      * None blocking version of export.  The thread spawned can be stopped through
      * cancel method call.
      */
-    public void exportThread(final File exportDirectory, final int start, final int end,
+    public void exportThread(final File exportDirectory, final String fullSceneDir,
+            final double cornerImageScale, final double mainImageScale,
+            final int start, final int end,
             final boolean withCorners, final boolean eyeOnly, final boolean screenOnly,
             final boolean sideBySide, final boolean eyeInCorner, final boolean screenInCorner,
             final boolean createMovieFile, final boolean deleteMoviePictureFile,
             final int averageFrames) {
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
-                export(exportDirectory, start, end, withCorners, eyeOnly,
+                export(exportDirectory, fullSceneDir,
+                        cornerImageScale, mainImageScale,
+                        start, end, withCorners, eyeOnly,
                         screenOnly, sideBySide, eyeInCorner, screenInCorner,
-                        createMovieFile, deleteMoviePictureFile,
-                        averageFrames);
+                        createMovieFile, deleteMoviePictureFile, averageFrames);
             }
         });
         t.start();
     }
 
-    public void export(File exportDirectory, int start, int end,
+    public void export(File exportDirectory, String fullSceneDir,
+            double cornerImageScale, double mainImageScale,
+            int start, int end,
             boolean withCorners, boolean eyeOnly, boolean screenOnly,
             boolean sideBySide, boolean eyeInCorner, boolean screenInCorner,
             boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
         this.alive = true;
-        Point2D.Double eyeVector = new Point2D.Double();
         Point gazePoint = new Point();
         double scaleFactor = screenFrameManager.getScreenInfoScalefactor();
+
+        Point eyeDefaultSize = new Point(1, 1);
+        Point sceneDefaultSize = new Point(1, 1);
 
         File eyeOnlyDir = null;
         File screenOnlyDir = null;
@@ -172,7 +178,7 @@ public class MovieFrameExporter {
         numberFormat.setMaximumIntegerDigits(digit);
 
         //Example
-        //String sb = (nf.format((long) 12)) // Prepare all directories accordingly 
+        //String sb = (nf.format((long) 12)) // Prepare all directories accordingly
 
         if (!exportDirectory.exists()) {
             exportDirectory.mkdirs();
@@ -193,16 +199,47 @@ public class MovieFrameExporter {
             screenInCornerDir = createSubDir("ScreenInCorner", exportDirectory);
         }
 
+        /* Try to determine eye and scene default size by grapping from the first
+         * image that we can find
+         */
+        // Do eye if we need eye
+        if (sideBySide || eyeInCorner || eyeOnly) {
+            for (int i = start; i <= end; i++) {
+                // Get eye frame
+                BufferedImage image = eyeFrameManager.getFrame(
+                        this.frameSynchronizor.getEyeFrame(i));
+                if (image != null) {
+                    eyeDefaultSize.x = image.getWidth();
+                    eyeDefaultSize.y = image.getHeight();
+                    // Terminate loop
+                    i = end;
+                }
+            }
+        }
+        // Do scene if we need scene
+        if (sideBySide || eyeInCorner || eyeOnly) {
+            for (int i = start; i <= end; i++) {
+                // Get eye frame
+                BufferedImage image = screenFrameManager.getFrame(
+                        this.frameSynchronizor.getSceneFrame(i));
+                if (image != null) {
+                    sceneDefaultSize.x = image.getWidth();
+                    sceneDefaultSize.y = image.getHeight();
+                    // Terminate loop
+                    i = end;
+                }
+            }
+        }
+
         // loop for all frames
-        int eyeStartFrame = this.frameSynchronizor.getEyeFrame(start);
         for (int i = start; i <= end && alive; i++) {
-           
+
             // Create file name
             String fileName = numberFormat.format(i - start + 1) + ".tiff";
 
             // Get eye frame
             BufferedImage eyeImage = renderEyeImage(
-                    this.frameSynchronizor.getEyeFrame(i), eyeFrameManager);
+                    this.frameSynchronizor.getEyeFrame(i), eyeFrameManager, eyeDefaultSize);
 
             // Get average eye gaze
             Point2D.Double point = getNextAverageEyeGaze(
@@ -216,7 +253,7 @@ public class MovieFrameExporter {
             // Get screen frame
             BufferedImage screenImage = renderScreenImage(
                     this.frameSynchronizor.getSceneFrame(i),
-                    screenFrameManager, withCorners, gazePoint);
+                    screenFrameManager, withCorners, gazePoint, sceneDefaultSize, fullSceneDir);
 
             // Writing out information
             if (eyeOnly) {
@@ -270,7 +307,8 @@ public class MovieFrameExporter {
                     && createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
 
             movieCreatedSuccessfully = movieCreatedSuccessfully
-                    && createMovie(screenInCorner, "Creating screen in the corner movie", SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
+                    && createMovie(screenInCorner, "Creating screen in the corner movie",
+                    SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
 
             this.processLock.lock();
             this.process = null;
@@ -423,12 +461,6 @@ public class MovieFrameExporter {
             }
         }
         return true;
-    }
-
-    private String constructFFMPEGCommand(String name, int totalDigitInFileName) {
-        return this.ffmpegExecutable.getAbsolutePath() + " -sameq -r "
-                + this.frameRate + " -i " + "%0" + totalDigitInFileName + "d.tiff "
-                + "-y " + name.trim() + ".mov";
     }
 
     private LinkedList<String> constructFFMPEGCommandList(String name, int totalDigitInFileName) {
@@ -592,30 +624,19 @@ public class MovieFrameExporter {
      *        (GlobalConstants.ERROR_VALUE,GlobalConstants.ERROR_VALUE) is given when eye vector is unavailable.
      */
     private BufferedImage renderEyeImage(
-            int i, FrameManager eyeFrameManager) {
+            int i, FrameManager eyeFrameManager, Point eyeDefaultSize) {
 
         BufferedImage eyeImage = null;
 
         Graphics2D g = null;
 
         BufferedImage image = eyeFrameManager.getFrame(i);
-        double scale = 1d;
+        double scale = this.mainImageScale;
         if (image != null) {
             // Scale image
-            double widthScale = (double) this.width / (double) image.getWidth();
-            double heightScale = (double) this.height / (double) image.getHeight();
-            Image scaledImage = null;
-            if (widthScale < heightScale) {
-                // We should scale by width
-                scale = widthScale;
-                scaledImage = image.getScaledInstance(
-                        this.width, -1, Image.SCALE_FAST);
-            } else {
-                // We should scale by height
-                scale = heightScale;
-                scaledImage = image.getScaledInstance(
-                        -1, this.height, Image.SCALE_FAST);
-            }
+            int newWidth = (int) (this.mainImageScale * (double) image.getWidth());
+            Image scaledImage = image.getScaledInstance(
+                    newWidth, -1, Image.SCALE_FAST);
 
             // Put picture in
             eyeImage = new BufferedImage(
@@ -626,12 +647,12 @@ public class MovieFrameExporter {
             g.drawImage(scaledImage, 0, 0, null);
         } else {
             eyeImage = new BufferedImage(
-                    this.width, this.height,
+                    eyeDefaultSize.x, eyeDefaultSize.y,
                     BufferedImage.TYPE_INT_RGB);
             g = eyeImage.createGraphics();
             // Fill with black
             g.setColor(Color.BLACK);
-            g.fillRect(0, 0, width, height);
+            g.fillRect(0, 0, eyeDefaultSize.x, eyeDefaultSize.y);
         }
 
         EyeViewFrameInfo info =
@@ -676,31 +697,25 @@ public class MovieFrameExporter {
 
     private BufferedImage renderScreenImage(
             int i, ScreenFrameManager screenFrameManager, boolean withCorners,
-            Point gazePosition) {
+            Point gazePosition, Point sceneDefaultSize, String fullSceneDir) {
 
         BufferedImage screenImage = null;
 
         Graphics2D g = null;
 
-        BufferedImage image = screenFrameManager.getFrame(i);
-        double scale = 1d;
-        if (image != null) {
+        BufferedImage image;
+        if (fullSceneDir != null) {
+            image = screenFrameManager.getFrame(fullSceneDir,i);
+        } else {
+            image = screenFrameManager.getFrame(i);
+        }
 
+        double scale = this.mainImageScale;
+        if (image != null) {
             // Scale image
-            double widthScale = (double) this.width / (double) image.getWidth();
-            double heightScale = (double) this.height / (double) image.getHeight();
-            Image scaledImage = null;
-            if (widthScale < heightScale) {
-                // We should scale by width
-                scale = widthScale;
-                scaledImage = image.getScaledInstance(
-                        this.width, -1, Image.SCALE_FAST);
-            } else {
-                // We should scale by height
-                scale = heightScale;
-                scaledImage = image.getScaledInstance(
-                        -1, this.height, Image.SCALE_FAST);
-            }
+            int newWidth = (int) (this.mainImageScale * (double) image.getWidth());
+            Image scaledImage = image.getScaledInstance(
+                    newWidth, -1, Image.SCALE_FAST);
 
             // Put picture in
             screenImage = new BufferedImage(
@@ -711,12 +726,12 @@ public class MovieFrameExporter {
             g.drawImage(scaledImage, 0, 0, null);
         } else {
             screenImage = new BufferedImage(
-                    this.width, this.height,
+                    sceneDefaultSize.x, sceneDefaultSize.y,
                     BufferedImage.TYPE_INT_RGB);
             g = screenImage.createGraphics();
             // Fill with black
             g.setColor(Color.BLACK);
-            g.fillRect(0, 0, width, height);
+            g.fillRect(0, 0, sceneDefaultSize.x, sceneDefaultSize.y);
         }
 
         Point[] point = new Point[1];
@@ -726,7 +741,8 @@ public class MovieFrameExporter {
             point[0] = new Point((int) (gazePosition.x * scale),
                     (int) (gazePosition.y * scale));
             //drawMarks(g, Color.RED, point);
-            drawReverseMarks(g, Color.yellow, point, this.width, this.height);
+            drawReverseMarks(g, Color.yellow, point, screenImage.getWidth(),
+                    screenImage.getHeight());
         }
 
         if (withCorners) {
@@ -750,7 +766,7 @@ public class MovieFrameExporter {
                 if (info.getBottomRight() != null) {
                     corners[BOTTOMRIGHT].setLocation(info.getBottomRight());
                 }
-                drawCorners(g, Color.GREEN, corners);
+                drawCorners(g, Color.GREEN, corners, scale);
             }
         }
 
@@ -807,59 +823,63 @@ public class MovieFrameExporter {
     static final int BOTTOMRIGHT = 2;
     static final int TOPRIGHT = 3;
 
-    private void drawCorners(Graphics2D g, Color color, Point[] points) {
+    private void drawCorners(Graphics2D g, Color color, Point[] points, double scale) {
         // Set color
         g.setColor(color);
 
         // Paint corners when possible
         if (points[TOPLEFT] != null) {
             g.drawLine(
-                    points[TOPLEFT].x,
-                    points[TOPLEFT].y,
-                    points[TOPLEFT].x,
-                    points[TOPLEFT].y + cornerMarkLength);
+                    scaleing(points[TOPLEFT].x, scale),
+                    scaleing(points[TOPLEFT].y, scale),
+                    scaleing(points[TOPLEFT].x, scale),
+                    scaleing(points[TOPLEFT].y + cornerMarkLength, scale));
             g.drawLine(
-                    points[TOPLEFT].x,
-                    points[TOPLEFT].y,
-                    points[TOPLEFT].x + cornerMarkLength,
-                    points[TOPLEFT].y);
+                    scaleing(points[TOPLEFT].x, scale),
+                    scaleing(points[TOPLEFT].y, scale),
+                    scaleing(points[TOPLEFT].x + cornerMarkLength, scale),
+                    scaleing(points[TOPLEFT].y, scale));
         }
         if (points[TOPRIGHT] != null) {
             g.drawLine(
-                    points[TOPRIGHT].x,
-                    points[TOPRIGHT].y,
-                    points[TOPRIGHT].x,
-                    points[TOPRIGHT].y + cornerMarkLength);
+                    scaleing(points[TOPRIGHT].x, scale),
+                    scaleing(points[TOPRIGHT].y, scale),
+                    scaleing(points[TOPRIGHT].x, scale),
+                    scaleing(points[TOPRIGHT].y + cornerMarkLength, scale));
             g.drawLine(
-                    points[TOPRIGHT].x,
-                    points[TOPRIGHT].y,
-                    points[TOPRIGHT].x - cornerMarkLength,
-                    points[TOPRIGHT].y);
+                    scaleing(points[TOPRIGHT].x, scale),
+                    scaleing(points[TOPRIGHT].y, scale),
+                    scaleing(points[TOPRIGHT].x - cornerMarkLength, scale),
+                    scaleing(points[TOPRIGHT].y, scale));
         }
         if (points[BOTTOMRIGHT] != null) {
             g.drawLine(
-                    points[BOTTOMRIGHT].x,
-                    points[BOTTOMRIGHT].y,
-                    points[BOTTOMRIGHT].x,
-                    points[BOTTOMRIGHT].y - cornerMarkLength);
+                    scaleing(points[BOTTOMRIGHT].x, scale),
+                    scaleing(points[BOTTOMRIGHT].y, scale),
+                    scaleing(points[BOTTOMRIGHT].x, scale),
+                    scaleing(points[BOTTOMRIGHT].y - cornerMarkLength, scale));
             g.drawLine(
-                    points[BOTTOMRIGHT].x,
-                    points[BOTTOMRIGHT].y,
-                    points[BOTTOMRIGHT].x - cornerMarkLength,
-                    points[BOTTOMRIGHT].y);
+                    scaleing(points[BOTTOMRIGHT].x, scale),
+                    scaleing(points[BOTTOMRIGHT].y, scale),
+                    scaleing(points[BOTTOMRIGHT].x - cornerMarkLength, scale),
+                    scaleing(points[BOTTOMRIGHT].y, scale));
         }
         if (points[BOTTOMLEFT] != null) {
             g.drawLine(
-                    points[BOTTOMLEFT].x,
-                    points[BOTTOMLEFT].y,
-                    points[BOTTOMLEFT].x,
-                    points[BOTTOMLEFT].y - cornerMarkLength);
+                    scaleing(points[BOTTOMLEFT].x, scale),
+                    scaleing(points[BOTTOMLEFT].y, scale),
+                    scaleing(points[BOTTOMLEFT].x, scale),
+                    scaleing(points[BOTTOMLEFT].y - cornerMarkLength, scale));
             g.drawLine(
-                    points[BOTTOMLEFT].x,
-                    points[BOTTOMLEFT].y,
-                    points[BOTTOMLEFT].x + cornerMarkLength,
-                    points[BOTTOMLEFT].y);
+                    scaleing(points[BOTTOMLEFT].x, scale),
+                    scaleing(points[BOTTOMLEFT].y, scale),
+                    scaleing(points[BOTTOMLEFT].x + cornerMarkLength, scale),
+                    scaleing(points[BOTTOMLEFT].y, scale));
         }
+    }
+
+    private int scaleing(int v, double scale){
+        return (int)((double)v * scale);
     }
 
     private Point[] makeBoundingBox(double[] cornerPoints, double scale) {
@@ -906,15 +926,15 @@ public class MovieFrameExporter {
         g.drawImage(mainImage, null, 0, 0);
 
         AffineTransform at = AffineTransform.getScaleInstance(
-                this.smallImageScale, this.smallImageScale);
+                this.cornerImageScale, this.cornerImageScale);
         g.drawImage(cornerImage,
                 new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC),
                 0, 0);
 
         // Draw a box around corner image
         g.setColor(Color.WHITE);
-        g.drawRect(0, 0, (int) (cornerImage.getWidth() * this.smallImageScale),
-                (int) (cornerImage.getHeight() * this.smallImageScale));
+        g.drawRect(0, 0, (int) (cornerImage.getWidth() * this.cornerImageScale),
+                (int) (cornerImage.getHeight() * this.cornerImageScale));
 
         return image;
     }

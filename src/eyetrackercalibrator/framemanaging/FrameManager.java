@@ -363,8 +363,10 @@ public class FrameManager {
     }
 
     public BufferedImage getFrame(Integer i) {
-        //long time = System.currentTimeMillis();
+        return getFrame(frameDirectory, i);
+    }
 
+    public BufferedImage getFrame(String frameDir, Integer i) {
         String picData = (String) numberToFrameMap.get(i);
         if (picData != null) {
             RenderedOp op = null;
@@ -380,10 +382,6 @@ public class FrameManager {
                 e.printStackTrace();
                 return null;
             }
-            //long newtime = System.currentTimeMillis();
-            //System.out.println(newtime-time);
-            //time=newtime;
-
         } else {
             return null;
         }
