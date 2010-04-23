@@ -368,7 +368,8 @@ public class Main extends javax.swing.JFrame {
         ExportMovieJFrame exportMovieJFrame = new ExportMovieJFrame(
                 projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
                 this.eyeGazeComputing, this.frameSynchronizor,
-                this.eyeFrameManager, this.screenFrameManager);
+                this.eyeFrameManager, this.screenFrameManager,
+                this.projectSelectPanel.getFullScreenFrameDirectory());
         exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
     }
