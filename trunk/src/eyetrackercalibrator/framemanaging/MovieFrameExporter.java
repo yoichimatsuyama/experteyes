@@ -153,7 +153,7 @@ public class MovieFrameExporter {
     public void export(File exportDirectory, String fullSceneDir,
             double cornerImageScale, double mainImageScale,
             int start, int end,
-            boolean withCorners, boolean eyeOnly, boolean screenOnly,
+            boolean withCorners, boolean eyeOnly, boolean sceneOnly,
             boolean sideBySide, boolean eyeInCorner, boolean screenInCorner,
             boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
@@ -186,7 +186,7 @@ public class MovieFrameExporter {
         if (eyeOnly) {
             eyeOnlyDir = createSubDir("EyeOnly", exportDirectory);
         }
-        if (screenOnly) {
+        if (sceneOnly) {
             screenOnlyDir = createSubDir("ScreenOnly", exportDirectory);
         }
         if (sideBySide) {
@@ -217,11 +217,17 @@ public class MovieFrameExporter {
             }
         }
         // Do scene if we need scene
-        if (sideBySide || eyeInCorner || eyeOnly) {
+        if (sideBySide || eyeInCorner || sceneOnly) {
             for (int i = start; i <= end; i++) {
                 // Get eye frame
-                BufferedImage image = screenFrameManager.getFrame(
-                        this.frameSynchronizor.getSceneFrame(i));
+                BufferedImage image;
+                if (fullSceneDir != null) {
+                    image = screenFrameManager.getFrame(fullSceneDir,
+                            this.frameSynchronizor.getSceneFrame(i));
+                } else {
+                    image = screenFrameManager.getFrame(
+                            this.frameSynchronizor.getSceneFrame(i));
+                }
                 if (image != null) {
                     sceneDefaultSize.x = image.getWidth();
                     sceneDefaultSize.y = image.getHeight();
@@ -239,7 +245,8 @@ public class MovieFrameExporter {
 
             // Get eye frame
             BufferedImage eyeImage = renderEyeImage(
-                    this.frameSynchronizor.getEyeFrame(i), eyeFrameManager, eyeDefaultSize);
+                    this.frameSynchronizor.getEyeFrame(i), eyeFrameManager,
+                    eyeDefaultSize, mainImageScale);
 
             // Get average eye gaze
             Point2D.Double point = getNextAverageEyeGaze(
@@ -253,7 +260,8 @@ public class MovieFrameExporter {
             // Get screen frame
             BufferedImage screenImage = renderScreenImage(
                     this.frameSynchronizor.getSceneFrame(i),
-                    screenFrameManager, withCorners, gazePoint, sceneDefaultSize, fullSceneDir);
+                    screenFrameManager, withCorners, gazePoint, sceneDefaultSize,
+                    mainImageScale, fullSceneDir);
 
             // Writing out information
             if (eyeOnly) {
@@ -262,7 +270,7 @@ public class MovieFrameExporter {
             }
 
             // Writing out information
-            if (screenOnly) {
+            if (sceneOnly) {
                 writeImage(screenImage,
                         new File(screenOnlyDir, fileName));
             }
@@ -298,7 +306,7 @@ public class MovieFrameExporter {
                     && createMovie(eyeOnly, "Creating eye only movie", EYE_ONLY_FILE_NAME, digit, eyeOnlyDir);
 
             movieCreatedSuccessfully = movieCreatedSuccessfully
-                    && createMovie(screenOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
+                    && createMovie(sceneOnly, "Creating screen only movie", SCREEN_ONLY_FILE_NAME, digit, screenOnlyDir);
 
             movieCreatedSuccessfully = movieCreatedSuccessfully
                     && createMovie(sideBySide, "Creating side by side movie", SIDE_BY_SIDE_FILE_NAME, digit, sideBySideDir);
@@ -341,7 +349,7 @@ public class MovieFrameExporter {
             }
 
             // Writing out information
-            if (screenOnly) {
+            if (sceneOnly) {
                 file = new File(screenOnlyDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
@@ -624,17 +632,16 @@ public class MovieFrameExporter {
      *        (GlobalConstants.ERROR_VALUE,GlobalConstants.ERROR_VALUE) is given when eye vector is unavailable.
      */
     private BufferedImage renderEyeImage(
-            int i, FrameManager eyeFrameManager, Point eyeDefaultSize) {
+            int i, FrameManager eyeFrameManager, Point eyeDefaultSize, double scale) {
 
         BufferedImage eyeImage = null;
 
         Graphics2D g = null;
 
         BufferedImage image = eyeFrameManager.getFrame(i);
-        double scale = this.mainImageScale;
         if (image != null) {
             // Scale image
-            int newWidth = (int) (this.mainImageScale * (double) image.getWidth());
+            int newWidth = (int) (scale * (double) image.getWidth());
             Image scaledImage = image.getScaledInstance(
                     newWidth, -1, Image.SCALE_FAST);
 
@@ -697,7 +704,7 @@ public class MovieFrameExporter {
 
     private BufferedImage renderScreenImage(
             int i, ScreenFrameManager screenFrameManager, boolean withCorners,
-            Point gazePosition, Point sceneDefaultSize, String fullSceneDir) {
+            Point gazePosition, Point sceneDefaultSize, double scale, String fullSceneDir) {
 
         BufferedImage screenImage = null;
 
@@ -705,15 +712,15 @@ public class MovieFrameExporter {
 
         BufferedImage image;
         if (fullSceneDir != null) {
-            image = screenFrameManager.getFrame(fullSceneDir,i);
+            image = screenFrameManager.getFrame(fullSceneDir, i);
         } else {
             image = screenFrameManager.getFrame(i);
         }
 
-        double scale = this.mainImageScale;
+
         if (image != null) {
             // Scale image
-            int newWidth = (int) (this.mainImageScale * (double) image.getWidth());
+            int newWidth = (int) (scale * (double) image.getWidth());
             Image scaledImage = image.getScaledInstance(
                     newWidth, -1, Image.SCALE_FAST);
 
@@ -878,8 +885,8 @@ public class MovieFrameExporter {
         }
     }
 
-    private int scaleing(int v, double scale){
-        return (int)((double)v * scale);
+    private int scaleing(int v, double scale) {
+        return (int) ((double) v * scale);
     }
 
     private Point[] makeBoundingBox(double[] cornerPoints, double scale) {
