@@ -78,7 +78,6 @@ public class MovieFrameExporter {
     int pointMarkLength = 2;
     int cornerMarkLength = 10;
     PropertyChangeListener listener;
-    double cornerImageScale;
     double mainImageScale;
     EyeGazeComputing eyeGazeComputing;
     FrameManager eyeFrameManager;
@@ -154,9 +153,16 @@ public class MovieFrameExporter {
             double cornerImageScale, double mainImageScale,
             int start, int end,
             boolean withCorners, boolean eyeOnly, boolean sceneOnly,
-            boolean sideBySide, boolean eyeInCorner, boolean screenInCorner,
+            boolean sideBySide, boolean eyeInCorner, boolean sceneInCorner,
             boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
+
+        // Make sure fullSceneDir is in correct form
+        if (fullSceneDir != null) {
+            File dir = new File(fullSceneDir);
+            fullSceneDir = dir.getAbsolutePath() + File.separator;
+        }
+
         this.alive = true;
         Point gazePoint = new Point();
         double scaleFactor = screenFrameManager.getScreenInfoScalefactor();
@@ -195,7 +201,7 @@ public class MovieFrameExporter {
         if (eyeInCorner) {
             eyeInCornerDir = createSubDir("EyeInCorner", exportDirectory);
         }
-        if (screenInCorner) {
+        if (sceneInCorner) {
             screenInCornerDir = createSubDir("ScreenInCorner", exportDirectory);
         }
 
@@ -211,13 +217,18 @@ public class MovieFrameExporter {
                 if (image != null) {
                     eyeDefaultSize.x = image.getWidth();
                     eyeDefaultSize.y = image.getHeight();
-                    // Terminate loop
-                    i = end;
+                    // Terminate loop if the size is reasonable
+                    if (eyeDefaultSize.x > 0 && eyeDefaultSize.y > 0) {
+                        i = end;
+                    }
                 }
             }
+            // Sanity sheck
+            sceneDefaultSize.x = Math.max(1, sceneDefaultSize.x);
+            sceneDefaultSize.y = Math.max(1, sceneDefaultSize.y);
         }
         // Do scene if we need scene
-        if (sideBySide || eyeInCorner || sceneOnly) {
+        if (sideBySide || eyeInCorner || sceneInCorner || sceneOnly) {
             for (int i = start; i <= end; i++) {
                 // Get eye frame
                 BufferedImage image;
@@ -231,11 +242,17 @@ public class MovieFrameExporter {
                 if (image != null) {
                     sceneDefaultSize.x = image.getWidth();
                     sceneDefaultSize.y = image.getHeight();
-                    // Terminate loop
-                    i = end;
+                    // Terminate loop if the size is reasonable
+                    if (sceneDefaultSize.x > 0 && sceneDefaultSize.y > 0) {
+                        i = end;
+                    }
                 }
             }
+            // Sanity sheck
+            sceneDefaultSize.x = Math.max(1, sceneDefaultSize.x);
+            sceneDefaultSize.y = Math.max(1, sceneDefaultSize.y);
         }
+
 
         // loop for all frames
         for (int i = start; i <= end && alive; i++) {
@@ -281,12 +298,12 @@ public class MovieFrameExporter {
             }
 
             if (eyeInCorner) {
-                writeImage(renderInCornerImage(eyeImage, screenImage),
+                writeImage(renderInCornerImage(eyeImage, screenImage, cornerImageScale),
                         new File(eyeInCornerDir, fileName));
             }
 
-            if (screenInCorner) {
-                writeImage(renderInCornerImage(screenImage, eyeImage),
+            if (sceneInCorner) {
+                writeImage(renderInCornerImage(screenImage, eyeImage, cornerImageScale),
                         new File(screenInCornerDir, fileName));
             }
 
@@ -315,7 +332,7 @@ public class MovieFrameExporter {
                     && createMovie(eyeInCorner, "Creating eye in the corner movie", EYE_IN_CORNER_FILE_NAME, digit, eyeInCornerDir);
 
             movieCreatedSuccessfully = movieCreatedSuccessfully
-                    && createMovie(screenInCorner, "Creating screen in the corner movie",
+                    && createMovie(sceneInCorner, "Creating screen in the corner movie",
                     SCREEN_IN_CORNER_FILE_NAME, digit, screenInCornerDir);
 
             this.processLock.lock();
@@ -394,7 +411,7 @@ public class MovieFrameExporter {
                 }
             }
 
-            if (screenInCorner) {
+            if (sceneInCorner) {
                 file = new File(screenInCornerDir, fileName);
                 if (deleteMoviePictureFile) {
                     file.delete();
@@ -906,7 +923,8 @@ public class MovieFrameExporter {
     }
 
     private BufferedImage renderSideBySideImage(
-            BufferedImage eyeImage, BufferedImage screenImage) {
+            BufferedImage eyeImage, BufferedImage screenImage
+            ){//double largerImageScale) {
         BufferedImage image = new BufferedImage(
                 eyeImage.getWidth() + screenImage.getWidth(),
                 Math.max(eyeImage.getHeight(), screenImage.getHeight()),
@@ -922,7 +940,7 @@ public class MovieFrameExporter {
     }
 
     private BufferedImage renderInCornerImage(
-            BufferedImage cornerImage, BufferedImage mainImage) {
+            BufferedImage cornerImage, BufferedImage mainImage, double cornerImageScale) {
 
         BufferedImage image = new BufferedImage(
                 mainImage.getWidth(), mainImage.getHeight(),
@@ -932,16 +950,28 @@ public class MovieFrameExporter {
 
         g.drawImage(mainImage, null, 0, 0);
 
-        AffineTransform at = AffineTransform.getScaleInstance(
-                this.cornerImageScale, this.cornerImageScale);
-        g.drawImage(cornerImage,
-                new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC),
-                0, 0);
+        Image newCornerImage = null;
+
+        // Scale smaller image to fit into bounding box of scaled big image
+        int newHeight = (int) ((double) cornerImage.getHeight() * (double) mainImage.getWidth()
+                * cornerImageScale / (double) cornerImage.getWidth());
+
+        int mainScaledHeight = (int) ((double) mainImage.getHeight()
+                * cornerImageScale);
+
+        if (newHeight > mainScaledHeight) {
+            // Height is out of bound after scaling so have to scale by height
+            newCornerImage = cornerImage.getScaledInstance(-1,mainScaledHeight, BufferedImage.SCALE_DEFAULT);
+        } else {
+            // Just scale
+            newCornerImage = cornerImage.getScaledInstance(-1,newHeight, BufferedImage.SCALE_DEFAULT);
+        }
+
+        g.drawImage(newCornerImage, 0, 0, null);
 
         // Draw a box around corner image
         g.setColor(Color.WHITE);
-        g.drawRect(0, 0, (int) (cornerImage.getWidth() * this.cornerImageScale),
-                (int) (cornerImage.getHeight() * this.cornerImageScale));
+        g.drawRect(0, 0, newCornerImage.getWidth(null), newCornerImage.getHeight(null));
 
         return image;
     }

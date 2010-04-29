@@ -50,14 +50,14 @@ import javax.swing.JOptionPane;
  */
 public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
-    public static final String[] SCENE_SOURCE_CHOICE = new String[] { "Small Scene", "Full Scene"};
-    
+    public static final String[] SCENE_SOURCE_CHOICE = new String[]{"Small Scene", "Full Scene"};
     private static double CORNER_FRAME_SCALE = 0.3;
     protected static final int TOTAL_TEST_FRAMES = 10;
     MovieFrameExporter movieFrameExporter = null;
     int start;
     int totalProcess;
     private String fullScreenDir;
+    boolean isExporting = false;
 
     /** Creates new form ExportMovieJFrame */
     public ExportMovieJFrame(File currentDir, int exportWidth, int exportHeight,
@@ -80,7 +80,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
         this.fullScreenDir = fullScreenDir;
 
-         // Set up exporter
+        // Set up exporter
         this.movieFrameExporter = new MovieFrameExporter(
                 eyeGazeComputing, frameSynchronizor,
                 eyeFrameManager, screenFrameManager, null,
@@ -93,6 +93,10 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         this.start = Math.min(to, from);
         this.totalProcess = Math.abs(to - from) + 1;
         this.progressBar.setMaximum(this.totalProcess);
+
+        // Set up calcel button
+        this.cancelButton.setText("Cancel");
+
         // Get number of average frame with sanity check
         String avgStr = this.gazeAverageTextField.getText();
         int averageFrames = 1;
@@ -106,9 +110,9 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             this.gazeAverageTextField.setText(String.valueOf(averageFrames));
             repaint();
         }
-        if (!(eyeOnlyCheckBox.isSelected() || screenOnlyCheckBox.isSelected() || 
-                eyeInCornerCheckBox.isSelected() || screenInCornerCheckBox.isSelected() ||
-                sideBySideCheckBox.isSelected())) {
+        if (!(eyeOnlyCheckBox.isSelected() || screenOnlyCheckBox.isSelected()
+                || eyeInCornerCheckBox.isSelected() || screenInCornerCheckBox.isSelected()
+                || sideBySideCheckBox.isSelected())) {
             // None is selected so warn the user and do nothing
             // Show warning dialog
             JOptionPane.showMessageDialog(this, "Please select at least one export type.",
@@ -124,8 +128,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             createMovieFile = false;
         }
         // Check if ffmpeg is needed
-        if (this.movieOnlyRadioButton.isSelected() ||
-                this.movieAndFramesRadioButton.isSelected()) {
+        if (this.movieOnlyRadioButton.isSelected()
+                || this.movieAndFramesRadioButton.isSelected()) {
             File ffmpegFile = FFMPEGHandler.getFFMPEGExecutable(this);
             if (ffmpegFile == null) {
                 return true;
@@ -135,21 +139,23 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         this.startButton.setEnabled(false);
         this.testButton.setEnabled(false);
         String currentFullScreenDir = null;
-        if(this.sceneSourceComboBox.getSelectedIndex() == 1){
+        if (this.sceneSourceComboBox.getSelectedIndex() == 1) {
             // Sanity check
-            if(this.fullScreenDir.trim().length() > 1){
+            if (this.fullScreenDir.trim().length() > 1) {
                 currentFullScreenDir = this.fullScreenDir;
             }
         }
 
+        this.isExporting = true;
         this.movieFrameExporter.exportThread(exportDirectory, currentFullScreenDir,
-                Double.parseDouble(this.imageInCornetScaleTextField.getText())/100d,
-                Double.parseDouble(this.mainImageScaleTextField.getText())/100d,
+                Double.parseDouble(this.imageInCornetScaleTextField.getText()) / 100d,
+                Double.parseDouble(this.mainImageScaleTextField.getText()) / 100d,
                 from, to,
                 this.drawCornerCheckBox.isSelected(), this.eyeOnlyCheckBox.isSelected(),
                 this.screenOnlyCheckBox.isSelected(), this.sideBySideCheckBox.isSelected(),
                 this.eyeInCornerCheckBox.isSelected(), this.screenInCornerCheckBox.isSelected(),
                 createMovieFile, deleteMoviePictureFile, averageFrames);
+        
         return false;
     }
 
@@ -207,7 +213,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         imageInCornetScaleTextField = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
         jPanel7 = new javax.swing.JPanel();
         sceneSourceComboBox = new javax.swing.JComboBox();
         jLabel10 = new javax.swing.JLabel();
@@ -424,7 +429,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jSeparator3.setPreferredSize(new java.awt.Dimension(6, 25));
         jPanel5.add(jSeparator3);
 
-        imageInCornetScaleTextField.setText("20");
+        imageInCornetScaleTextField.setText("25");
         imageInCornetScaleTextField.setEnabled(false);
         imageInCornetScaleTextField.setInputVerifier(textFieldPosFloatInputVerifier1);
         imageInCornetScaleTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -436,9 +441,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         jLabel8.setLabelFor(imageInCornetScaleTextField);
         jLabel8.setText("Corner image scale");
 
-        jLabel9.setText("%");
+        jLabel9.setText("% of the main image");
         jLabel9.setToolTipText("This scaling overwrite %scale of scene source when the scene is in the corner.");
-        jLabel9.setEnabled(false);
 
         org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -447,7 +451,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
             .add(jPanel6Layout.createSequentialGroup()
                 .add(jLabel8)
                 .add(2, 2, 2)
-                .add(imageInCornetScaleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                .add(imageInCornetScaleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
                 .add(2, 2, 2)
                 .add(jLabel9))
         );
@@ -460,10 +464,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
         );
 
         jPanel5.add(jPanel6);
-
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator2.setPreferredSize(new java.awt.Dimension(6, 25));
-        jPanel5.add(jSeparator2);
 
         sceneSourceComboBox.setModel(new javax.swing.DefaultComboBoxModel(SCENE_SOURCE_CHOICE));
 
@@ -495,6 +495,11 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel5, 0, 0, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -510,18 +515,13 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(toTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .add(fromTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
+                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(exportLocationTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -538,24 +538,26 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                             .add(jLabel3)
                             .add(toTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(14, 14, 14))
+                .add(20, 20, 20))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        if (this.movieFrameExporter != null) {
+        if (this.movieFrameExporter != null && this.isExporting) {
             this.movieFrameExporter.cancel();
         }
 
-        this.dispose();
+        if (!this.isExporting) {
+            this.dispose();
+        }
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
@@ -646,8 +648,8 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
     private void eyeInCornerCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_eyeInCornerCheckBoxStateChanged
         updateCornerScaleEnable();
+        updateSceneSourceScalingEnable();
     }//GEN-LAST:event_eyeInCornerCheckBoxStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JButton cancelButton;
@@ -682,7 +684,6 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField mainImageScaleTextField;
     private javax.swing.JRadioButton movieAndFramesRadioButton;
@@ -711,6 +712,7 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
                 this.cancelButton.setText("Close");
                 this.startButton.setEnabled(true);
                 this.testButton.setEnabled(true);
+                this.isExporting = false;
             } else {
                 this.progressBar.setString(evt.getPropertyName() + " " + completed + " of " + this.totalProcess);
             }
@@ -725,14 +727,15 @@ public class ExportMovieJFrame extends javax.swing.JFrame implements PropertyCha
 
     protected void updateCornerScaleEnable() {
         this.imageInCornetScaleTextField.setEnabled(
-                this.eyeInCornerCheckBox.isSelected() ||
-                this.screenInCornerCheckBox.isSelected());
+                this.eyeInCornerCheckBox.isSelected()
+                || this.screenInCornerCheckBox.isSelected());
     }
 
     protected void updateSceneSourceScalingEnable() {
-        boolean enable = (this.screenOnlyCheckBox.isSelected() ||
-                this.screenInCornerCheckBox.isSelected() ||
-                this.sideBySideCheckBox.isSelected() );
+        boolean enable = (this.screenOnlyCheckBox.isSelected()
+                || this.screenInCornerCheckBox.isSelected()
+                || this.eyeInCornerCheckBox.isSelected()
+                || this.sideBySideCheckBox.isSelected());
 
         this.mainImageScaleTextField.setEditable(enable);
         this.sceneSourceComboBox.setEnabled(enable);

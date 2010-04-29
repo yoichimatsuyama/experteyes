@@ -371,7 +371,7 @@ public class FrameManager {
         if (picData != null) {
             RenderedOp op = null;
             try {
-                op = JAI.create("fileload", frameDirectory + picData);
+                op = JAI.create("fileload", frameDir + picData);
             } catch (java.lang.IllegalArgumentException e) {
                 //e.printStackTrace();
                 return null;
