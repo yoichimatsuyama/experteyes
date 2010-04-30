@@ -257,7 +257,7 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
                 this.interactivePanel.getHeight() / 2 - this.gradientPanel1.getGradientBoxHeight() / 2,
                 this.gradientPanel1.getGradientBoxWidth(),
                 this.gradientPanel1.getGradientBoxHeight());
-        
+
         this.gradientPanel1.setListener(new GradientPanel.GradientPanelListener() {
 
             @Override
@@ -411,17 +411,19 @@ public class FitEyeModelSetup extends javax.swing.JFrame implements FitEyeModelS
 
     private void changeFrame() {
         // grab the value and load the image
-        frameNum = frameSlider.getValue();
+        this.frameNum = frameSlider.getValue();
+        /**
+         * Try setting gray level then if nothing is set then simply signal
+         * a change.  We need this because selectGrayLevelFromDistance triggers
+         * the change in colorSelection so there is no need to signal it twice
+         * by calling colorSelectionHandleSliderStateChange
+         */
+        selectParametersFromDistance();
+
         setFrame(frameNum);
         if (eyeFiles != null && eyeFiles.length > frameNum) {
             this.fileNameTextField.setText(eyeFiles[frameNum].getName());
-            /**
-             * Try setting gray level then if nothing is set then simply signal
-             * a change.  We need this because selectGrayLevelFromDistance triggers
-             * the change in colorSelection so there is no need to signal it twice
-             * by calling colorSelectionHandleSliderStateChange
-             */
-            selectParametersFromDistance();
+
             triggerAutoFitEyeModelRecompute();
         }
     }
