@@ -489,8 +489,8 @@ private void unsharpCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
     setUnshrapenConfigEnable(enable);
     if (enable) {
         // Set default values
-        setSigma(DEFAULT_SIGMA);
-        setSharpeningFactor(DEFAULT_SHARPENINGFACTOR);
+        //setSigma(DEFAULT_SIGMA);
+        //setSharpeningFactor(DEFAULT_SHARPENINGFACTOR);
     }
 
     // Trigger change
