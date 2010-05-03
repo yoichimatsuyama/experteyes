@@ -24,64 +24,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*
- * GraphTabPanel.java
- *
- * Created on October 8, 2007, 4:16 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 package eyetrackercalibrator.gui;
 
-import eyetrackercalibrator.framemanaging.CornerDistanceXYDataSet;
-import eyetrackercalibrator.framemanaging.CornerSimilarityXYDataSet;
 import eyetrackercalibrator.framemanaging.CorniaReflectXYDataSet;
 import eyetrackercalibrator.framemanaging.FrameManager;
 import eyetrackercalibrator.framemanaging.FrameSynchronizor;
+import eyetrackercalibrator.framemanaging.IlluminationXYDataSet;
+import eyetrackercalibrator.framemanaging.InformationDatabase;
 import eyetrackercalibrator.framemanaging.PupilXYDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 
 /**
  *
- * @author rakavipa
+ * @author SQ
  */
-public class FrameInfoGraphTabPanel extends GraphTabPanel {
+public class TrialMarkingGraphPanel extends GraphTabPanel {
 
-    protected CornerSimilarityXYDataSet cornerSimilarityXYDataSet = null;
-    protected CornerDistanceXYDataSet cornerDistanceXYDataSet = null;
+    protected IlluminationXYDataSet illuminationDataSet = null;
     protected PupilXYDataset pupilXYDataset = null;
     protected CorniaReflectXYDataSet corniaXYDataset = null;
-    // Edit tab order and label here
-    // For legend name.  Edit appropriate XYDataset class
-    protected final static int INDEX_PUPIL_GRAPH_PANEL = 0;
-    protected final static int INDEX_REFLECTION_GRAPH_PANEL = 1;
-    protected final static int INDEX_CORNER_SIM_GRAPH_PANEL = 2;
-    protected final static int INDEX_CORNER_DIST_GRAPH_PANEL = 3;
     protected final static String[] graphName = {
+        "Illumination",
         "Pupil Loction",
         "Cornia Reflection",
-        "Corner Similarity",
-        "Corner Distance"
     };
-
+    protected final static int INDEX_ILLUMINATION_GRAPH_PANEL = 0;
+    protected final static int INDEX_PUPIL_GRAPH_PANEL = 1;
+    protected final static int INDEX_REFLECTION_GRAPH_PANEL = 2;
+    IlluminationXYDataSet dataSet = null;
     protected FrameSynchronizor frameSynchronizor = null;
 
-    /**
-     * Creates a new instance of GraphTabPanel
-     * To populate the panel with information, setFrameManager must be called
-     */
-    public FrameInfoGraphTabPanel() {
+    public TrialMarkingGraphPanel() {
         super(graphName);
     }
 
     @Override
     protected void createAllCharts() {
         // Create pupil graph panel
+        this.graphPanel[INDEX_ILLUMINATION_GRAPH_PANEL] = createChartPanel(null, 500, 525);
         this.graphPanel[INDEX_PUPIL_GRAPH_PANEL] = createChartPanel(null, 500, 525);
         this.graphPanel[INDEX_REFLECTION_GRAPH_PANEL] = createChartPanel(null, 500, 525);
-        this.graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL] = createChartPanel(null, 500, 1);
-        this.graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL] = createChartPanel(null, 500, 55);
     }
 
     /**
@@ -104,35 +86,9 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         }
     }
 
-    public void setScreenFrameManager(FrameManager screenFrameManager) {
-        if (screenFrameManager != null) {
-            // Populate corner similarity graph
-            this.cornerSimilarityXYDataSet =
-                    new CornerSimilarityXYDataSet(screenFrameManager, 510);
-            this.cornerSimilarityXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
-            setDataSet(
-                    cornerSimilarityXYDataSet,
-                    graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL]);
-
-            this.cornerDistanceXYDataSet = new CornerDistanceXYDataSet(screenFrameManager, 500);
-            this.cornerDistanceXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
-            setDataSet(cornerDistanceXYDataSet, graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL]);
-        } else {
-            // Otherwise clear out all data
-            DefaultXYDataset emptyDataSet = new DefaultXYDataset();
-            setDataSet(emptyDataSet, graphPanel[INDEX_CORNER_SIM_GRAPH_PANEL]);
-            setDataSet(emptyDataSet, graphPanel[INDEX_CORNER_DIST_GRAPH_PANEL]);
-        }
-    }
-
     public void setFrameSynchronizor(FrameSynchronizor frameSynchronizor) {
         this.frameSynchronizor = frameSynchronizor;
-        if (this.cornerSimilarityXYDataSet != null) {
-            this.cornerSimilarityXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
-        }
-        if (this.cornerDistanceXYDataSet != null) {
-            this.cornerDistanceXYDataSet.setFrameSynchronizor(this.frameSynchronizor);
-        }
+
         if (this.corniaXYDataset != null) {
             this.corniaXYDataset.setFrameSynchronizor(this.frameSynchronizor);
         }
@@ -140,5 +96,18 @@ public class FrameInfoGraphTabPanel extends GraphTabPanel {
         if (this.pupilXYDataset != null) {
             this.pupilXYDataset.setFrameSynchronizor(this.frameSynchronizor);
         }
+
+        if (this.illuminationDataSet != null) {
+            this.illuminationDataSet.setFrameSynchronizor(frameSynchronizor);
+        }
+    }
+
+    /** Setting data set for the illumination graph
+     * @param infoDatabase
+     */
+    public void setIlluminationDataSet(InformationDatabase infoDatabase) {
+        this.illuminationDataSet = new IlluminationXYDataSet(infoDatabase);
+        this.illuminationDataSet.setFrameSynchronizor(this.frameSynchronizor);
+        setDataSet(illuminationDataSet, this.graphPanel[INDEX_ILLUMINATION_GRAPH_PANEL]);
     }
 }

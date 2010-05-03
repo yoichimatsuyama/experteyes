@@ -140,6 +140,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         this.zoomPanel = new ZoomJPanel();
         this.zoomPanel.addDoneButtonActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doneZoomingActionPerformed(e);
             }

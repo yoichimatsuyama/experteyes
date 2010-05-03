@@ -84,7 +84,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     TrialMarker trialMarking = null;
     DefaultListModel trialSet = new DefaultListModel();
     LinkedList<IntervalMarker> freeIntervalMarkersList = new LinkedList<IntervalMarker>();
-    private IlluminationGraphTabPanel graphTabPanel;
+    private TrialMarkingGraphPanel graphTabPanel;
     IntervalMarkerManager intervalMarkerManager = null;
     public static String TRIAL_HANDLER_ELEMENT_NAME = "TrialHandlerClass";
     private InformationDatabase informationDatabase;
@@ -101,7 +101,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         // Graph tab panel has to be added outside since group layout will prevent
         // JGraphPanel from displaying properly
         GroupLayout layout = (GroupLayout) getLayout();
-        graphTabPanel = new IlluminationGraphTabPanel();
+        graphTabPanel = new TrialMarkingGraphPanel();
         graphTabPanel.setFixVerticalSize(247);
         layout.replace(graphHolder, graphTabPanel);
 
@@ -190,7 +190,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
 
     public void setInformationDatabase(InformationDatabase informationDatabase) {
         this.informationDatabase = informationDatabase;
-        graphTabPanel.setDataSet(informationDatabase);
+        graphTabPanel.setIlluminationDataSet(informationDatabase);
     }
 
     /**
@@ -207,6 +207,9 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
     public void setEyeFrameManager(FrameManager eyeFrameManager) {
         // Register framemanager to animation timer
         timer.setEyeFrameManager(eyeFrameManager);
+
+        // Register framemanager to graph display
+        graphTabPanel.setEyeFrameManager(eyeFrameManager);
 
         // Set total frame for frame scrolling
         setTotalFrame(timer.getScreenFrameManager(), eyeFrameManager);
