@@ -37,8 +37,6 @@ import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.gui.util.AnimationTimer;
 import eyetrackercalibrator.gui.util.CompletionListener;
 import eyetrackercalibrator.gui.util.IntervalMarkerManager;
-import eyetrackercalibrator.math.CornerCorrection;
-import eyetrackercalibrator.math.CornerCorrection.Corner;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
@@ -655,64 +653,6 @@ private void detectCornerButtonActionPerformed(java.awt.event.ActionEvent evt) {
     handleDetectCornerButton();
 
 }//GEN-LAST:event_detectCornerButtonActionPerformed
-
-    private void correctCorner(ProgressJDialog progressDialog) {
-        CornerCorrection cornerCorrection = new CornerCorrection();
-
-        // Get all select errors
-        Object[] errorArray = errorList.getSelectedValues();
-
-        int completed = 0;
-
-        for (int i = 0; i < errorArray.length; i++) {
-            ErrorMarking error = (ErrorMarking) errorArray[i];
-
-            Corner corner = Corner.BOTTOMLEFT;
-            // Get a corner to correct and show warning if there are more than
-            // one bad corner
-            int count = 0;
-            if (error.bottomleft) {
-                count++;
-                corner = Corner.BOTTOMLEFT;
-            }
-            if (error.bottomright) {
-                count++;
-                corner = Corner.BOTTOMRIGHT;
-            }
-            if (error.topleft) {
-                count++;
-                corner = Corner.TOPLEFT;
-            }
-            if (error.topright) {
-                count++;
-                corner = Corner.TOPRIGHT;
-            }
-            if (count != 1) {
-                // Spit warning if there are too many or too few
-                // Open dialog to warn user
-                if (count > 1) {
-                    JOptionPane.showMessageDialog(this,
-                            "There are more than one incorrect corner in frame " +
-                            +error.startSceneFrame + " to " + error.stopSceneFrame +
-                            ". They cannot be corrected",
-                            "Unable to correct corners",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-
-                completed += error.stopSceneFrame = error.startSceneFrame + 1;
-                progressDialog.setProgrss(completed);
-            } else {
-                // Iterate correction through frame range
-                for (int j = error.startSceneFrame; j <= error.stopSceneFrame; j++) {
-
-                    cornerCorrection.correctCorner(j, timer.getScreenFrameManager(), corner);
-
-                    completed++;
-                    progressDialog.setProgrss(completed);
-                }
-            }
-        }
-    }
 
     private void setErrorButtonsEnable(boolean v) {
         eyeVectorToggleButton.setEnabled(v);

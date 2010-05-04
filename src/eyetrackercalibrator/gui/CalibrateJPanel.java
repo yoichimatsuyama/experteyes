@@ -64,11 +64,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import org.jdesktop.layout.GroupLayout;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -85,21 +87,23 @@ import org.jfree.chart.plot.XYPlot;
  * @author  ruj
  */
 public class CalibrateJPanel extends javax.swing.JPanel {
-    public static final String CALIBRATE_POINT_ELEMENT = "calibrate";
 
     public static final String[] FITTING_EQUATION_CHOICE = new String[]{"2nd degree", "3rd degree"};
-    public static final String LINEAREYEGAZEINTERPOLATIONRANGE_ELEMENT = "lineareyegazeinterpolationrange";
-    public static final String RANGE_ISCALIBRATIONPOINTPOSITIONLOCATED_ATTRIBUTE = "iscalibrationpointpositionlocated";
-    public static final String RANGE_STARTSCREENFRAME_ATTRIBUTE = "startscreenframe";
-    public static final String SECONDARYEYEGAZECOEFF_ELEMENT = "secondaryeyegazecoeff";
     public static int TOTAL_CALIBRATION_X = 5;
     public static int TOTAL_CALIBRATION_Y = 5;
+    protected static final String CALIBRATE_POINT_ELEMENT = "calibrate";
     protected static final String CALIBRATE_POINT_X_ATTRIBUTE = "x";
     protected static final String CALIBRATE_POINT_Y_ATTRIBUTE = "y";
     protected static final String EYEGAZECOEFF_ELEMENT = "eyegazecoeff";
+    protected static final String SECONDARYEYEGAZECOEFF_ELEMENT = "secondaryeyegazecoeff";
+    protected static final String COEFF_ATTRIBUTE = "c";
+    protected static final String FITTING_EQUATION_ATTRIBUTE = "equation";
+    protected static final String LINEAREYEGAZEINTERPOLATIONRANGE_ELEMENT = "lineareyegazeinterpolationrange";
     protected static final String LINEAREYEGAZEINTERPOLATIONRANGE_FROM_ATTRIBUTE = "from";
     protected static final String LINEAREYEGAZEINTERPOLATIONRANGE_TO_ATTRIBUTE = "to";
     protected static final String RANGE_ELEMENT = "range";
+    protected static final String RANGE_ISCALIBRATIONPOINTPOSITIONLOCATED_ATTRIBUTE = "iscalibrationpointpositionlocated";
+    protected static final String RANGE_STARTSCREENFRAME_ATTRIBUTE = "startscreenframe";
     protected static final String RANGE_POINTTYPE_ATTRIBUTE = "pointtype";
     protected static final String RANGE_SELECTEDX_ATTRIBUTE = "selectedx";
     protected static final String RANGE_SELECTEDY_ATTRIBUTE = "selectedy";
@@ -110,6 +114,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     protected static final String SCREENPOINT_FRAME_ATTRIBUTE = "frame";
     protected static final String SCREENPOINT_X_ATTRIBUTE = "x";
     protected static final String SCREENPOINT_Y_ATTRIBUTE = "y";
+    protected static final String XCOEFF_ELEMENT = "xcoeff";
+    protected static final String YCOEFF_ELEMENT = "ycoeff";
     double[][][] eyeGazeCoefficient = null;
     Point[] screenViewMark = null;
     Point2D.Double selectedPoint = null;
@@ -139,6 +145,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     private CalibrationPointPositionFinderRunner calibrationPointPositionFinderRunner = null;
     private CalibrationType currentCalibrationType = CalibrationInfo.CalibrationType.Primary;
     private DegreeErrorComputer degreeErrorComputer;
+    private boolean warnuser = true;
 
     /** Creates new form NewJPanel */
     public CalibrateJPanel() {
@@ -193,6 +200,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         // Add listener to calibration point selector
         calibrationPointSelectorJPanel.addMarkingButtonActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 handleCalibrationMarkingButtonActionPerformed(e);
             }
@@ -209,6 +217,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         // Add listener to mouse click on graph
         graphTabPanel.addChartProgressListener(new ChartProgressListener() {
 
+            @Override
             public void chartProgress(ChartProgressEvent chartProgressEvent) {
                 if (chartProgressEvent.getType() == ChartProgressEvent.DRAWING_FINISHED) {
                     JFreeChart chart = chartProgressEvent.getChart();
@@ -227,6 +236,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 FrameScrollingJPanel.CURRENT_FRAME_CHANGE,
                 new PropertyChangeListener() {
 
+                    @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         frameChangeHandler(evt);
                     }
@@ -690,10 +700,10 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     Element rangeElem = (Element) rangeIt.next();
 
                     int startEyeFrame = Integer.parseInt(
-                            rangeElem.getAttributeValue("starteyeframe"));
+                            rangeElem.getAttributeValue(RANGE_STARTEYEFRAME_ATTRIBUTE));
 
                     int stopEyeFrame = Integer.parseInt(
-                            rangeElem.getAttributeValue("stopeyeframe"));
+                            rangeElem.getAttributeValue(RANGE_STOPEYEFRAME_ATTRIBUTE));
 
                     // Populate screenInfo database with screenFocus
                     for (Iterator pointIt = rangeElem.getChildren().iterator();
@@ -701,7 +711,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         Element pointElem = (Element) pointIt.next();
 
                         int frame = Integer.parseInt(
-                                pointElem.getAttributeValue("frame"));
+                                pointElem.getAttributeValue(SCREENPOINT_FRAME_ATTRIBUTE));
 
                         Point p = new Point();
 
@@ -719,8 +729,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         }
                         // Set focus location
                         screenFocus[0].setLocation(
-                                Integer.parseInt(pointElem.getAttributeValue(CALIBRATE_POINT_X_ATTRIBUTE)),
-                                Integer.parseInt(pointElem.getAttributeValue(CALIBRATE_POINT_Y_ATTRIBUTE)));
+                                Integer.parseInt(pointElem.getAttributeValue(SCREENPOINT_X_ATTRIBUTE)),
+                                Integer.parseInt(pointElem.getAttributeValue(SCREENPOINT_Y_ATTRIBUTE)));
                         screenInfo.setMarkedPoints(screenFocus);
 
                         // Put back to database
@@ -728,19 +738,19 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     }
 
                     Point2D.Double userSelectedCalibrationPosition = new Point2D.Double(
-                            Double.parseDouble(rangeElem.getAttributeValue("selectedx")),
-                            Double.parseDouble(rangeElem.getAttributeValue("selectedy")));
+                            Double.parseDouble(rangeElem.getAttributeValue(RANGE_SELECTEDX_ATTRIBUTE)),
+                            Double.parseDouble(rangeElem.getAttributeValue(RANGE_SELECTEDY_ATTRIBUTE)));
 
                     boolean iscalibrationpointpositionlocated =
                             Boolean.parseBoolean(
-                            rangeElem.getAttributeValue("iscalibrationpointpositionlocated"));
+                            rangeElem.getAttributeValue(RANGE_ISCALIBRATIONPOINTPOSITIONLOCATED_ATTRIBUTE));
 
                     int startScreenFrame = Integer.parseInt(
-                            rangeElem.getAttributeValue("startscreenframe"));
+                            rangeElem.getAttributeValue(RANGE_STARTSCREENFRAME_ATTRIBUTE));
                     int stopScreenFrame = Integer.parseInt(
-                            rangeElem.getAttributeValue("stopscreenframe"));
+                            rangeElem.getAttributeValue(RANGE_STOPSCREENFRAME_ATTRIBUTE));
 
-                    String pointTypeString = rangeElem.getAttributeValue("pointtype");
+                    String pointTypeString = rangeElem.getAttributeValue(RANGE_POINTTYPE_ATTRIBUTE);
                     CalibrationInfo.CalibrationType pointType =
                             CalibrationInfo.CalibrationType.Primary;
                     if (pointTypeString != null) {
@@ -773,7 +783,6 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                         frame = synchronizor.sceneFrameToSyncFrame(stopScreenFrame);
                     }
                     marker.setEndValue(frame);
-                    ;
                 }
             }
 
@@ -789,21 +798,48 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     }
 
     private void loadEyegazeCoeff(Element eyeGazeElement, int i) {
-        Element xcoeffElement = eyeGazeElement.getChild("xcoeff");
-        Element ycoeffElement = eyeGazeElement.getChild("ycoeff");
-        if (xcoeffElement != null && ycoeffElement != null) {
-            this.eyeGazeCoefficient[i] = new double[2][];
+        // Turn off warning temporary
+        boolean currentSetting = this.warnuser;
+        this.warnuser = false;
 
-            double[] buffer1 = new double[xcoeffElement.getAttributes().size()];
-            double[] buffer2 = new double[buffer1.length];
-            for (int j = 0; j < buffer1.length; j++) {
-                buffer1[j] = Double.parseDouble(xcoeffElement.getAttributeValue("c" + j));
-                buffer2[j] = Double.parseDouble(ycoeffElement.getAttributeValue("c" + j));
+        String value = eyeGazeElement.getAttributeValue(FITTING_EQUATION_ATTRIBUTE);
+        if (value != null && value.equals(FITTING_EQUATION_CHOICE[1])) {
+            // This is 3rd degree
+            this.fittingEquationChoiceComboBox.setSelectedIndex(1);
+        } else {
+            // default to 2 degree
+            this.fittingEquationChoiceComboBox.setSelectedIndex(0);
+        }
+
+        Element xcoeffElement = eyeGazeElement.getChild(XCOEFF_ELEMENT);
+        Element ycoeffElement = eyeGazeElement.getChild(YCOEFF_ELEMENT);
+        this.eyeGazeCoefficient[i] = new double[2][];
+        if (xcoeffElement != null) {
+
+            List attributeList = xcoeffElement.getAttributes();
+
+            double[] buffer = new double[attributeList.size()];
+            for (int j = 0; j < buffer.length; j++) {
+                buffer[j] = Double.parseDouble(xcoeffElement.getAttributeValue(COEFF_ATTRIBUTE + j));
             }
 
-            this.eyeGazeCoefficient[i][0] = buffer1;
-            this.eyeGazeCoefficient[i][1] = buffer2;
+            this.eyeGazeCoefficient[i][0] = buffer;
         }
+
+        if (ycoeffElement != null) {
+            
+            List attributeList = ycoeffElement.getAttributes();
+
+            double[] buffer = new double[attributeList.size()];
+            for (int j = 0; j < buffer.length; j++) {
+                buffer[j] = Double.parseDouble(xcoeffElement.getAttributeValue(COEFF_ATTRIBUTE + j));
+            }
+
+            this.eyeGazeCoefficient[i][1] = buffer;
+        }
+
+        // Restore warning
+        this.warnuser = currentSetting;
     }
 
     /** 
@@ -931,19 +967,25 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     }
 
     private void saveEyeCoeff(Element eyeGaze, Element root, double[][] coeff) {
+        // Get current equation type
+        int index = this.fittingEquationChoiceComboBox.getSelectedIndex();
+
+        eyeGaze.setAttribute(FITTING_EQUATION_ATTRIBUTE, FITTING_EQUATION_CHOICE[index]);
+
         if (coeff[0] != null) {
-            Element coeffElement = new Element("xcoeff");
+            Element coeffElement = new Element(XCOEFF_ELEMENT);
+
             for (int i = 0; i < coeff[0].length; i++) {
-                coeffElement.setAttribute("c" + i, String.valueOf(coeff[0][i]));
+                coeffElement.setAttribute(COEFF_ATTRIBUTE + i, String.valueOf(coeff[0][i]));
             }
 
             eyeGaze.addContent(coeffElement);
         }
 
         if (coeff[1] != null) {
-            Element coeffElement = new Element("ycoeff");
+            Element coeffElement = new Element(YCOEFF_ELEMENT);
             for (int i = 0; i < coeff[1].length; i++) {
-                coeffElement.setAttribute("c" + i, String.valueOf(coeff[1][i]));
+                coeffElement.setAttribute(COEFF_ATTRIBUTE + i, String.valueOf(coeff[1][i]));
             }
 
             eyeGaze.addContent(coeffElement);
@@ -1064,7 +1106,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             // Do 2nd degree
             primaryCalibrator = new CalibrateEyeGazeQR(CalibrateEyeGazeQR.FittingEquation.SECOND_DEGREE_POLYNOMIAL);
             secondaryCalibrator = new CalibrateEyeGazeQR(CalibrateEyeGazeQR.FittingEquation.SECOND_DEGREE_POLYNOMIAL);
-        }else{
+        } else {
             // Do third degree
             primaryCalibrator = new CalibrateEyeGazeQR(CalibrateEyeGazeQR.FittingEquation.THIRD_DEGREE_POLYNOMIAL);
             secondaryCalibrator = new CalibrateEyeGazeQR(CalibrateEyeGazeQR.FittingEquation.THIRD_DEGREE_POLYNOMIAL);
@@ -1109,6 +1151,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         final Thread primaryCalibrationThread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 // Start computation
                 try {
@@ -1124,6 +1167,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         final Thread secondaryCalibrationThread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 // Start computation
                 try {
@@ -1139,6 +1183,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     primaryCalibrationThread.join();
@@ -1261,11 +1306,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         graphHolder.setLayout(graphHolderLayout);
         graphHolderLayout.setHorizontalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 789, Short.MAX_VALUE)
+            .add(0, 796, Short.MAX_VALUE)
         );
         graphHolderLayout.setVerticalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 361, Short.MAX_VALUE)
+            .add(0, 372, Short.MAX_VALUE)
         );
 
         backButton.setText("Back"); // NOI18N
@@ -1288,6 +1333,11 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         jLabel2.setText("Fitting equation:");
 
         fittingEquationChoiceComboBox.setModel(new javax.swing.DefaultComboBoxModel(FITTING_EQUATION_CHOICE));
+        fittingEquationChoiceComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fittingEquationChoiceComboBoxActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout bottomPanelLayout = new org.jdesktop.layout.GroupLayout(bottomPanel);
         bottomPanel.setLayout(bottomPanelLayout);
@@ -1307,7 +1357,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(fittingEquationChoiceComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(460, Short.MAX_VALUE))
+                .addContainerGap(494, Short.MAX_VALUE))
         );
         bottomPanelLayout.setVerticalGroup(
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1409,13 +1459,13 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         controlPanel.setLayout(controlPanelLayout);
         controlPanelLayout.setHorizontalGroup(
             controlPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
             .add(controlPanelLayout.createSequentialGroup()
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 143, Short.MAX_VALUE)
                 .add(deleteButton))
             .add(controlPanelLayout.createSequentialGroup()
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
                 .addContainerGap())
         );
         controlPanelLayout.setVerticalGroup(
@@ -1447,7 +1497,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(controlPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1608,6 +1658,7 @@ private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.even
                 timer.getScreenFrameManager(), fullScreenFrameDirectory,
                 new CompletionListener() {
 
+                    @Override
                     public void fullCompletion() {
                         calibrationPointPositionFindingCompleteHandler();
                     }
@@ -1639,6 +1690,25 @@ private void useCorneaReflectionCheckBoxActionPerformed(java.awt.event.ActionEve
     JOptionPane.showMessageDialog(this, "Changing this option makes the current calibration invalid.  You will need to recalibrate.", "Calibration Option Changes", JOptionPane.WARNING_MESSAGE);
     timer.getEyeGazeComputing().setUsingCorneaReflect(this.useCorneaReflectionCheckBox.isSelected());
 }//GEN-LAST:event_useCorneaReflectionCheckBoxActionPerformed
+
+private void fittingEquationChoiceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fittingEquationChoiceComboBoxActionPerformed
+    //Warn if user wants to
+    if (this.warnuser) {
+        String[] options = {"OK", "Do not warn me again"};
+
+
+        int v = JOptionPane.showOptionDialog(this,
+                "Calibration fitting equaltion has changed. "
+                + "Please click on calibration button for it to take effect.",
+                "Calibration fitting equation changes",
+                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                options, options[0]);
+        if (v == JOptionPane.NO_OPTION) {
+            this.warnuser = false;
+        }
+    }
+
+}//GEN-LAST:event_fittingEquationChoiceComboBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
     private javax.swing.JPanel bottomPanel;
