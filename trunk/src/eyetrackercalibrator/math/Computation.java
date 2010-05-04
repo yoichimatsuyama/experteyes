@@ -63,8 +63,8 @@ public class Computation {
             Point2D topLeft, Point2D topRight,
             Point2D bottomLeft, Point2D bottomRight) {
         // Sanity check
-        if (trueScreenDimension == null || pos == null || topLeft == null ||
-                topRight == null || bottomLeft == null || bottomRight == null) {
+        if (trueScreenDimension == null || pos == null || topLeft == null
+                || topRight == null || bottomLeft == null || bottomRight == null) {
             return null;
         }
 
@@ -110,15 +110,15 @@ public class Computation {
         if (devider == 0) {
             return null;
         }
-        A[3][1] = ((x[1] - x[2] + x[3] - x[4]) * (y[4] - y[3]) - (y[1] - y[2] + y[3] - y[4]) * (x[4] - x[3])) /
-                ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
+        A[3][1] = ((x[1] - x[2] + x[3] - x[4]) * (y[4] - y[3]) - (y[1] - y[2] + y[3] - y[4]) * (x[4] - x[3]))
+                / ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
 
         devider = ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
         if (devider == 0) {
             return null;
         }
-        A[3][2] = ((y[1] - y[2] + y[3] - y[4]) * (x[2] - x[3]) - (x[1] - x[2] + x[3] - x[4]) * (y[2] - y[3])) /
-                ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
+        A[3][2] = ((y[1] - y[2] + y[3] - y[4]) * (x[2] - x[3]) - (x[1] - x[2] + x[3] - x[4]) * (y[2] - y[3]))
+                / ((x[2] - x[3]) * (y[4] - y[3]) - (x[4] - x[3]) * (y[2] - y[3]));
         A[1][1] = x[2] - x[1] + A[3][1] * x[2];
         A[2][1] = y[2] - y[1] + A[3][1] * y[2];
         A[1][2] = x[4] - x[1] + A[3][2] * x[4];
@@ -442,9 +442,14 @@ public class Computation {
                 computeTwoVariablePolynomial(x, y, c[1]));
     }
 
-
+    /** Compute Degree 2 or 3 polynomial when possible */
     public static double computeTwoVariablePolynomial(double x, double y, double[] c) {
-        return c[0] + c[1] * x + c[2] * y + c[3] * x * y + c[4] * x * x + c[5] * y * y;
+        double v = c[0] + c[1] * x + c[2] * y + c[3] * x * y + c[4] * x * x + c[5] * y * y;
+        if (c.length >= 10) {
+            v = c[6] * x * y * y + c[7] * y * x * x + c[8] * x * x * x + c[9] * y * y * y;
+        }
+
+        return v;
     }
 
     /**

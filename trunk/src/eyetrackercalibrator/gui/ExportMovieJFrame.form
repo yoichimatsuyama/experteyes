@@ -68,8 +68,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="toTextField" alignment="0" pref="123" max="32767" attributes="1"/>
-                          <Component id="fromTextField" alignment="0" pref="123" max="32767" attributes="1"/>
+                          <Component id="toTextField" alignment="0" pref="177" max="32767" attributes="1"/>
+                          <Component id="fromTextField" alignment="0" pref="177" max="32767" attributes="1"/>
                       </Group>
                   </Group>
               </Group>

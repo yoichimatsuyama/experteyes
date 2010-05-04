@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*     * Redistributions of source code must retain the above copyright
-*       notice, this list of conditions and the following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright
-*       notice, this list of conditions and the following disclaimer in the
-*       documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Experteyes nor the
-*       names of its contributors may be used to endorse or promote products
-*       derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2009 by Thomas Busey and Ruj Akavipat
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Experteyes nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Thomas Busey and Ruj Akavipat ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Thomas Busey and Ruj Akavipat BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 /*
  * To change this template, choose Tools | Templates
@@ -52,11 +52,31 @@ import org.apache.commons.math.linear.RealMatrixImpl;
  */
 public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
 
+    public CalibrateEyeGazeQR(FittingEquation fittingEquationType) {
+        this.fittingEquationType = fittingEquationType;
+    }
     private CalibrateEyeGazeListener listener;
+    private FittingEquation fittingEquationType = FittingEquation.SECOND_DEGREE_POLYNOMIAL;
+
+    public enum FittingEquation {
+
+        SECOND_DEGREE_POLYNOMIAL, THIRD_DEGREE_POLYNOMIAL
+    }
 
     @Override
     public double[][] calibrate(Point2D[] eyeVector, Point2D[] calibratePoints) {
-        final int TOTAL_COEFF = 6;
+        final int TOTAL_COEFF;
+
+        switch (this.fittingEquationType) {
+            case SECOND_DEGREE_POLYNOMIAL:
+                TOTAL_COEFF = 6;
+                break;
+            case THIRD_DEGREE_POLYNOMIAL:
+                TOTAL_COEFF = 10;
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported fitting equation: " + this.fittingEquationType);
+        }
 
         // For sanity
         final int totalSamples = Math.min(eyeVector.length, calibratePoints.length);
@@ -79,6 +99,12 @@ public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
             A[i][3] = x * y;
             A[i][4] = x * x;
             A[i][5] = y * y;
+            if (this.fittingEquationType == FittingEquation.THIRD_DEGREE_POLYNOMIAL) {
+                A[i][6] = x * y * y;
+                A[i][7] = y * x * x;
+                A[i][8] = x * x * x;
+                A[i][9] = y * y * y;
+            }
         }
         RealMatrixImpl matrixA = new RealMatrixImpl(A);
 
@@ -97,8 +123,8 @@ public class CalibrateEyeGazeQR implements CalibrateEyeGaze {
 
         /** Find (Q^T)V */
         RealMatrix qT = qRDecomposition.getQ().transpose();
-        RealMatrix qTVx = qT.multiply(vectorVx).getSubMatrix(0, TOTAL_COEFF-1, 0, 0);
-        RealMatrix qTVy = qT.multiply(vectorVy).getSubMatrix(0, TOTAL_COEFF-1, 0, 0);
+        RealMatrix qTVx = qT.multiply(vectorVx).getSubMatrix(0, TOTAL_COEFF - 1, 0, 0);
+        RealMatrix qTVy = qT.multiply(vectorVy).getSubMatrix(0, TOTAL_COEFF - 1, 0, 0);
 
         /** Solve system Rc = (Q^T)v*/
         RealMatrix r = qRDecomposition.getR().getSubMatrix(
