@@ -827,7 +827,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         }
 
         if (ycoeffElement != null) {
-            
+
             List attributeList = ycoeffElement.getAttributes();
 
             double[] buffer = new double[attributeList.size()];

@@ -49,14 +49,16 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <Component id="showDegreeErrorCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="554" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="showEstimatinoGridCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="389" max="32767" attributes="0"/>
                   <Component id="snapShotButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="closeButton" min="-2" max="-2" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="progressBar" pref="871" max="32767" attributes="0"/>
+                  <Component id="progressBar" pref="953" max="32767" attributes="0"/>
                   <EmptySpace min="18" pref="18" max="18" attributes="0"/>
               </Group>
           </Group>
@@ -68,6 +70,7 @@
                       <Component id="snapShotButton" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="closeButton" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="showDegreeErrorCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="showEstimatinoGridCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
@@ -104,6 +107,14 @@
         </Component>
         <Component class="javax.swing.JProgressBar" name="progressBar">
         </Component>
+        <Component class="javax.swing.JCheckBox" name="showEstimatinoGridCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Show estimation grid"/>
+          </Properties>
+          <Events>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="showEstimatinoGridCheckBoxStateChanged"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel1">
@@ -121,7 +132,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jTabbedPane1" alignment="0" pref="895" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" alignment="0" pref="985" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
