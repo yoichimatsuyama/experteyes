@@ -78,6 +78,11 @@ public class CalibratingViewJDialog
     private int snapShotHeight = 0;
     private DegreeErrorComputer degreeErrorComputer = null;
     private Point[][] combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][0];
+    private Point[][] estimationGridPoints = new Point[TOTAL_CALIBRATION_TYPE][];
+    private double minEyeVectorX = Double.MAX_VALUE;
+    private double minEyeVectorY = Double.MAX_VALUE;
+    private double maxEyeVectorX = 0;
+    private double maxEyeVectorY = 0;
 
     /** Listener for progress */
     private class MyCalibrateEyeGazeListener implements CalibrateEyeGazeListener {
@@ -94,6 +99,7 @@ public class CalibratingViewJDialog
             formatter = new DecimalFormat("0.000");
         }
 
+        @Override
         public void update(double[][] c, double cost) {
             coeff[this.calibrationType] = c;
             Point2D accuracy = estimatingPoints(this.calibrationType);
@@ -114,6 +120,7 @@ public class CalibratingViewJDialog
             progressBar.repaint();
         }
 
+        @Override
         public void completeStage(int stage) {
             progress[this.calibrationType] = (double) stage * this.stageProgress;
             double totalProgress = 0;
@@ -167,6 +174,7 @@ public class CalibratingViewJDialog
         snapShotButton = new javax.swing.JButton();
         showDegreeErrorCheckBox = new javax.swing.JCheckBox();
         progressBar = new javax.swing.JProgressBar();
+        showEstimatinoGridCheckBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -200,19 +208,28 @@ public class CalibratingViewJDialog
             }
         });
 
+        showEstimatinoGridCheckBox.setText("Show estimation grid");
+        showEstimatinoGridCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                showEstimatinoGridCheckBoxStateChanged(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .add(showDegreeErrorCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 464, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showEstimatinoGridCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 389, Short.MAX_VALUE)
                 .add(snapShotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(closeButton))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE)
+                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
                 .add(18, 18, 18))
         );
         jPanel2Layout.setVerticalGroup(
@@ -221,7 +238,8 @@ public class CalibratingViewJDialog
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
                     .add(snapShotButton)
                     .add(closeButton)
-                    .add(showDegreeErrorCheckBox))
+                    .add(showDegreeErrorCheckBox)
+                    .add(showEstimatinoGridCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -256,7 +274,7 @@ public class CalibratingViewJDialog
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 895, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -353,6 +371,12 @@ public class CalibratingViewJDialog
         repaint();
 }//GEN-LAST:event_showDegreeErrorCheckBoxActionPerformed
 
+    private void showEstimatinoGridCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_showEstimatinoGridCheckBoxStateChanged
+
+        
+
+    }//GEN-LAST:event_showEstimatinoGridCheckBoxStateChanged
+
     /**
      * @param pos Position defined by the constant (PRIMARY, SECONDARY, TEST)
      */
@@ -371,6 +395,27 @@ public class CalibratingViewJDialog
         if (pos >= 0 && pos < TOTAL_INFO_TYPE) {
             this.eyeVector[pos] = eyeVector;
         }
+
+        // Compute mesh from calibration
+        // Determine the bound of mesh
+        // Get minimum x
+        double minX = Double.MAX_VALUE;
+        double maxX = 0;
+        double minY = Double.MAX_VALUE;
+        double maxY = 0;
+
+        for (int i = 0; i < eyeVector.length; i++) {
+            Point2D.Double v = eyeVector[i];
+            minX = Math.min(minX, v.x);
+            maxX = Math.max(maxX, v.x);
+            minY = Math.min(minY, v.y);
+            maxY = Math.max(maxY, v.y);
+        }
+
+        this.minEyeVectorX = Math.min(this.minEyeVectorX, minX);
+        this.minEyeVectorY = Math.min(this.minEyeVectorY, minY);
+        this.maxEyeVectorX = Math.max(this.maxEyeVectorX, maxX);
+        this.maxEyeVectorY = Math.max(this.maxEyeVectorY, maxY);
     }
 
     public Point[][] getCorrectPoints() {
@@ -456,6 +501,8 @@ public class CalibratingViewJDialog
                 this.estimatedTestPoints[i][j] = new Point(10, 10);
             }
         }
+
+
 
         // Set display
         if (this.correctPoints[PRIMARY] != null) {
@@ -595,6 +642,7 @@ public class CalibratingViewJDialog
     private javax.swing.JProgressBar progressBar;
     private eyetrackercalibrator.gui.MarkableJLabel secondaryMarkableJLabel;
     private javax.swing.JCheckBox showDegreeErrorCheckBox;
+    private javax.swing.JCheckBox showEstimatinoGridCheckBox;
     private javax.swing.JButton snapShotButton;
     // End of variables declaration//GEN-END:variables
 }
