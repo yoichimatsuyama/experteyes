@@ -157,6 +157,9 @@ public class MovieFrameExporter {
             boolean createMovieFile, boolean deleteMoviePictureFile,
             int averageFrames) {
 
+        // Reset average eye gaze.  This is necessary or we will get the wrong gaze data.
+        resetAverageEyeGaze();
+
         // Make sure fullSceneDir is in correct form
         if (fullSceneDir != null) {
             File dir = new File(fullSceneDir);
@@ -525,6 +528,11 @@ public class MovieFrameExporter {
      */
     LinkedList<Point.Double> gazeList = null;
     int gazeAverageRangeNextFrame = 0;
+
+    private void resetAverageEyeGaze(){
+        this.gazeList = null;
+        this.gazeAverageRangeNextFrame = 0;
+    }
 
     private Point.Double getNextAverageEyeGaze(
             int start, int range, double scaleFactor) {
