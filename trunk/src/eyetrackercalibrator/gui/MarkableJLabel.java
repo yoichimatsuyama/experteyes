@@ -72,6 +72,8 @@ public class MarkableJLabel extends JLabel {
     private boolean isReversingRedMarks = false;
     private Point[] whiteMarkedPoints = null;
     private boolean isReversingWhiteMarks = false;
+    private Point[] cyanMarkedPoints = null;
+    private boolean isReversingCyanMarks = false;
     private Color color = Color.GREEN;
     private RotatedEllipse2D greenEllisp = null;
     private RotatedEllipse2D redEllisp = null;
@@ -95,7 +97,7 @@ public class MarkableJLabel extends JLabel {
 
     public enum MarkColor {
 
-        GREEN, RED, BLUE, YELLOW, WHITE
+        GREEN, RED, BLUE, YELLOW, WHITE, CYAN
     }
 
     public enum CornerColor {
@@ -148,13 +150,20 @@ public class MarkableJLabel extends JLabel {
             drawMarks(g, Color.YELLOW, yellowMarkedPoints);
         }
 
-        if (this.isReversingYellowMarks) {
+        if (this.isReversingWhiteMarks) {
             drawReverseMarks(g, Color.WHITE, whiteMarkedPoints, width, height);
         } else {
 
             drawMarks(g, Color.WHITE, whiteMarkedPoints);
         }
-        
+
+        if (this.isReversingCyanMarks) {
+            drawReverseMarks(g, Color.cyan, cyanMarkedPoints, width, height);
+        } else {
+
+            drawMarks(g, Color.cyan, cyanMarkedPoints);
+        }
+
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform oldTransform = g2d.getTransform();
         if (greenEllisp != null) {
@@ -323,6 +332,8 @@ public class MarkableJLabel extends JLabel {
                 return this.yellowMarkedPoints;
             case WHITE:
                 return this.whiteMarkedPoints;
+            case CYAN:
+                return this.cyanMarkedPoints;
             default: // Green by default
                 return greenMarkedPoints;
         }
@@ -345,6 +356,10 @@ public class MarkableJLabel extends JLabel {
             case WHITE:
                 this.whiteMarkedPoints = markedPoints;
                 this.isReversingWhiteMarks = isReversed;
+                break;
+            case CYAN:
+                this.cyanMarkedPoints = markedPoints;
+                this.isReversingCyanMarks = isReversed;
                 break;
             default: // Green by default
                 this.greenMarkedPoints = markedPoints;

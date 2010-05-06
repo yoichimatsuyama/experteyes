@@ -78,11 +78,13 @@ public class CalibratingViewJDialog
     private int snapShotHeight = 0;
     private DegreeErrorComputer degreeErrorComputer = null;
     private Point[][] combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][0];
-    private Point[][] estimationGridPoints = new Point[TOTAL_CALIBRATION_TYPE][];
     private double minEyeVectorX = Double.MAX_VALUE;
     private double minEyeVectorY = Double.MAX_VALUE;
     private double maxEyeVectorX = 0;
     private double maxEyeVectorY = 0;
+    // Parameters for displaying the calibration estimation grid
+    private Point[][] estimationGridPoints = new Point[TOTAL_CALIBRATION_TYPE][];
+    private final static Color ESTIMATION_GRID_COLOR = Color.cyan;
 
     /** Listener for progress */
     private class MyCalibrateEyeGazeListener implements CalibrateEyeGazeListener {
@@ -128,6 +130,10 @@ public class CalibratingViewJDialog
                 totalProgress += progress[i];
             }
             progressBar.setValue((int) totalProgress);
+
+            // Create estimation grid points
+            createEstimationGrid();
+
             getParent().repaint();
         }
     }
@@ -169,12 +175,15 @@ public class CalibratingViewJDialog
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        textFieldEmptyPositiveDoubleInputVerifier1 = new eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier();
         jPanel2 = new javax.swing.JPanel();
         closeButton = new javax.swing.JButton();
         snapShotButton = new javax.swing.JButton();
         showDegreeErrorCheckBox = new javax.swing.JCheckBox();
         progressBar = new javax.swing.JProgressBar();
         showEstimatinoGridCheckBox = new javax.swing.JCheckBox();
+        eyeVectorSpacingTextField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -215,6 +224,19 @@ public class CalibratingViewJDialog
             }
         });
 
+        eyeVectorSpacingTextField.setText(".1");
+        eyeVectorSpacingTextField.setEnabled(false);
+        eyeVectorSpacingTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
+        eyeVectorSpacingTextField.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                eyeVectorSpacingTextFieldInputMethodTextChanged(evt);
+            }
+        });
+
+        jLabel1.setText("Eyevector spacing");
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -223,13 +245,17 @@ public class CalibratingViewJDialog
                 .add(showDegreeErrorCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showEstimatinoGridCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 389, Short.MAX_VALUE)
+                .add(12, 12, 12)
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(eyeVectorSpacingTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 38, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 371, Short.MAX_VALUE)
                 .add(snapShotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(closeButton))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
+                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 961, Short.MAX_VALUE)
                 .add(18, 18, 18))
         );
         jPanel2Layout.setVerticalGroup(
@@ -239,7 +265,9 @@ public class CalibratingViewJDialog
                     .add(snapShotButton)
                     .add(closeButton)
                     .add(showDegreeErrorCheckBox)
-                    .add(showEstimatinoGridCheckBox))
+                    .add(showEstimatinoGridCheckBox)
+                    .add(eyeVectorSpacingTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -372,10 +400,33 @@ public class CalibratingViewJDialog
 }//GEN-LAST:event_showDegreeErrorCheckBoxActionPerformed
 
     private void showEstimatinoGridCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_showEstimatinoGridCheckBoxStateChanged
+        // Enable/disable the spacing accordingly
+        this.eyeVectorSpacingTextField.setEnabled(this.showDegreeErrorCheckBox.isSelected());
 
-        
+        if(this.showDegreeErrorCheckBox.isSelected()){
+            this.primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[0], 
+                    MarkableJLabel.MarkColor.CYAN, false);
+            this.secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[1],
+                    MarkableJLabel.MarkColor.CYAN, false);
+        }else{
+            this.primaryMarkableJLabel.setMarkedPoints(null,
+                    MarkableJLabel.MarkColor.CYAN, false);
+            this.secondaryMarkableJLabel.setMarkedPoints(null,
+                    MarkableJLabel.MarkColor.CYAN, false);
+        }
+
+        repaint();
 
     }//GEN-LAST:event_showEstimatinoGridCheckBoxStateChanged
+
+    private void eyeVectorSpacingTextFieldInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_eyeVectorSpacingTextFieldInputMethodTextChanged
+
+        // Recompute the grid and update
+        createEstimationGrid();
+
+        repaint();
+
+    }//GEN-LAST:event_eyeVectorSpacingTextFieldInputMethodTextChanged
 
     /**
      * @param pos Position defined by the constant (PRIMARY, SECONDARY, TEST)
@@ -631,8 +682,39 @@ public class CalibratingViewJDialog
     public void setDegreeErrorComputer(DegreeErrorComputer degreeErrorComputer) {
         this.degreeErrorComputer = degreeErrorComputer;
     }
+
+    private void createEstimationGrid() {
+        // Get spacing
+        double spacing = Double.parseDouble(this.eyeVectorSpacingTextField.getText());
+
+        // Compute how many points we need
+        int totalPoints = (int) ((this.maxEyeVectorX - this.minEyeVectorX) / spacing + 1)
+                * (int) ((this.maxEyeVectorY - this.minEyeVectorY) / spacing + 1);
+
+        for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+            // Check and see if we have enough array
+            if (this.estimatedPoints[i] == null || this.estimatedPoints[i].length != totalPoints) {
+                this.estimatedPoints[i] = new Point[totalPoints];
+            }// Else we already have enough space. No need to do anything
+
+            int count = 0;
+            for (double x = this.minEyeVectorX; x <= this.maxEyeVectorX; x += spacing) {
+                for (double y = this.minEyeVectorY; x <= this.maxEyeVectorY; y += spacing) {
+                    if (this.estimatedPoints[i][count] == null) {
+                        this.estimatedPoints[i][count] = new Point();
+                    }
+
+                    // Compute eye gaze
+                    this.estimatedPoints[i][count].setLocation(Computation.computeEyeGazePoint(x, y, this.coeff[i]));
+
+                }
+            }
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
+    private javax.swing.JTextField eyeVectorSpacingTextField;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -644,5 +726,6 @@ public class CalibratingViewJDialog
     private javax.swing.JCheckBox showDegreeErrorCheckBox;
     private javax.swing.JCheckBox showEstimatinoGridCheckBox;
     private javax.swing.JButton snapShotButton;
+    private eyetrackercalibrator.gui.util.TextFieldEmptyPositiveDoubleInputVerifier textFieldEmptyPositiveDoubleInputVerifier1;
     // End of variables declaration//GEN-END:variables
 }
