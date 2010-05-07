@@ -78,13 +78,25 @@ public class CalibratingViewJDialog
     private int snapShotHeight = 0;
     private DegreeErrorComputer degreeErrorComputer = null;
     private Point[][] combinedTestPoints = new Point[TOTAL_CALIBRATION_TYPE][0];
-    private double minEyeVectorX = Double.MAX_VALUE;
-    private double minEyeVectorY = Double.MAX_VALUE;
-    private double maxEyeVectorX = 0;
-    private double maxEyeVectorY = 0;
+    private double minEyeVectorX = Double.POSITIVE_INFINITY;
+    private double minEyeVectorY = Double.POSITIVE_INFINITY;
+    private double maxEyeVectorX = Double.NEGATIVE_INFINITY;
+    private double maxEyeVectorY = Double.NEGATIVE_INFINITY;
     // Parameters for displaying the calibration estimation grid
     private Point[][] estimationGridPoints = new Point[TOTAL_CALIBRATION_TYPE][];
     private final static Color ESTIMATION_GRID_COLOR = Color.cyan;
+
+    private void handleShowEstimationGrid() {
+        this.eyeVectorSpacingTextField.setEnabled(this.showEstimatinoGridCheckBox.isSelected());
+        if (this.showEstimatinoGridCheckBox.isSelected()) {
+            this.primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[0], MarkableJLabel.MarkColor.CYAN, false);
+            this.secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[1], MarkableJLabel.MarkColor.CYAN, false);
+        } else {
+            this.primaryMarkableJLabel.setMarkedPoints(null, MarkableJLabel.MarkColor.CYAN, false);
+            this.secondaryMarkableJLabel.setMarkedPoints(null, MarkableJLabel.MarkColor.CYAN, false);
+        }
+        repaint();
+    }
 
     /** Listener for progress */
     private class MyCalibrateEyeGazeListener implements CalibrateEyeGazeListener {
@@ -218,20 +230,18 @@ public class CalibratingViewJDialog
         });
 
         showEstimatinoGridCheckBox.setText("Show estimation grid");
-        showEstimatinoGridCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                showEstimatinoGridCheckBoxStateChanged(evt);
+        showEstimatinoGridCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showEstimatinoGridCheckBoxActionPerformed(evt);
             }
         });
 
-        eyeVectorSpacingTextField.setText(".1");
+        eyeVectorSpacingTextField.setText("10");
         eyeVectorSpacingTextField.setEnabled(false);
         eyeVectorSpacingTextField.setInputVerifier(textFieldEmptyPositiveDoubleInputVerifier1);
-        eyeVectorSpacingTextField.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                eyeVectorSpacingTextFieldInputMethodTextChanged(evt);
+        eyeVectorSpacingTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eyeVectorSpacingTextFieldActionPerformed(evt);
             }
         });
 
@@ -255,7 +265,7 @@ public class CalibratingViewJDialog
                 .add(closeButton))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 961, Short.MAX_VALUE)
+                .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1112, Short.MAX_VALUE)
                 .add(18, 18, 18))
         );
         jPanel2Layout.setVerticalGroup(
@@ -302,7 +312,7 @@ public class CalibratingViewJDialog
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1144, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -399,34 +409,17 @@ public class CalibratingViewJDialog
         repaint();
 }//GEN-LAST:event_showDegreeErrorCheckBoxActionPerformed
 
-    private void showEstimatinoGridCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_showEstimatinoGridCheckBoxStateChanged
-        // Enable/disable the spacing accordingly
-        this.eyeVectorSpacingTextField.setEnabled(this.showDegreeErrorCheckBox.isSelected());
-
-        if(this.showDegreeErrorCheckBox.isSelected()){
-            this.primaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[0], 
-                    MarkableJLabel.MarkColor.CYAN, false);
-            this.secondaryMarkableJLabel.setMarkedPoints(this.estimatedPoints[1],
-                    MarkableJLabel.MarkColor.CYAN, false);
-        }else{
-            this.primaryMarkableJLabel.setMarkedPoints(null,
-                    MarkableJLabel.MarkColor.CYAN, false);
-            this.secondaryMarkableJLabel.setMarkedPoints(null,
-                    MarkableJLabel.MarkColor.CYAN, false);
-        }
-
-        repaint();
-
-    }//GEN-LAST:event_showEstimatinoGridCheckBoxStateChanged
-
-    private void eyeVectorSpacingTextFieldInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_eyeVectorSpacingTextFieldInputMethodTextChanged
-
-        // Recompute the grid and update
+    private void eyeVectorSpacingTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eyeVectorSpacingTextFieldActionPerformed
+// Recompute the grid and update
         createEstimationGrid();
 
-        repaint();
+        handleShowEstimationGrid();
+    }//GEN-LAST:event_eyeVectorSpacingTextFieldActionPerformed
 
-    }//GEN-LAST:event_eyeVectorSpacingTextFieldInputMethodTextChanged
+    private void showEstimatinoGridCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showEstimatinoGridCheckBoxActionPerformed
+
+        handleShowEstimationGrid();
+    }//GEN-LAST:event_showEstimatinoGridCheckBoxActionPerformed
 
     /**
      * @param pos Position defined by the constant (PRIMARY, SECONDARY, TEST)
@@ -450,10 +443,10 @@ public class CalibratingViewJDialog
         // Compute mesh from calibration
         // Determine the bound of mesh
         // Get minimum x
-        double minX = Double.MAX_VALUE;
-        double maxX = 0;
-        double minY = Double.MAX_VALUE;
-        double maxY = 0;
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
 
         for (int i = 0; i < eyeVector.length; i++) {
             Point2D.Double v = eyeVector[i];
@@ -685,28 +678,42 @@ public class CalibratingViewJDialog
 
     private void createEstimationGrid() {
         // Get spacing
-        double spacing = Double.parseDouble(this.eyeVectorSpacingTextField.getText());
+        double spacing = 0;
+        try {
+            spacing = Double.parseDouble(this.eyeVectorSpacingTextField.getText());
+        } catch (NumberFormatException numberFormatException) {
+            return;
+        }
 
-        // Compute how many points we need
-        int totalPoints = (int) ((this.maxEyeVectorX - this.minEyeVectorX) / spacing + 1)
-                * (int) ((this.maxEyeVectorY - this.minEyeVectorY) / spacing + 1);
+        // Sanity check
+        if (spacing > 0) {
 
-        for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
-            // Check and see if we have enough array
-            if (this.estimatedPoints[i] == null || this.estimatedPoints[i].length != totalPoints) {
-                this.estimatedPoints[i] = new Point[totalPoints];
-            }// Else we already have enough space. No need to do anything
+            // Compute how many points we need
+            int totalPoints = (int) ((this.maxEyeVectorX - this.minEyeVectorX) / spacing + 1)
+                    * (int) ((this.maxEyeVectorY - this.minEyeVectorY) / spacing + 1);
 
-            int count = 0;
-            for (double x = this.minEyeVectorX; x <= this.maxEyeVectorX; x += spacing) {
-                for (double y = this.minEyeVectorY; x <= this.maxEyeVectorY; y += spacing) {
-                    if (this.estimatedPoints[i][count] == null) {
-                        this.estimatedPoints[i][count] = new Point();
+            for (int i = 0; i < TOTAL_CALIBRATION_TYPE; i++) {
+                // If we don't have calibration coeff yet, there is no need to compute
+                if (this.coeff != null && this.coeff[i] != null) {
+
+                    // Check and see if we have enough array
+                    if (this.estimatedPoints[i] == null || this.estimatedPoints[i].length != totalPoints) {
+                        this.estimatedPoints[i] = new Point[totalPoints];
+                    }// Else we already have enough space. No need to do anything
+
+                    int count = 0;
+                    for (double x = this.minEyeVectorX; x <= this.maxEyeVectorX; x += spacing) {
+                        for (double y = this.minEyeVectorY; y <= this.maxEyeVectorY; y += spacing) {
+                            if (this.estimatedPoints[i][count] == null) {
+                                this.estimatedPoints[i][count] = new Point();
+                            }
+
+                            this.estimatedPoints[i][count].setLocation(Computation.computeEyeGazePoint(x, y, this.coeff[i]));
+
+                            count++;
+
+                        }
                     }
-
-                    // Compute eye gaze
-                    this.estimatedPoints[i][count].setLocation(Computation.computeEyeGazePoint(x, y, this.coeff[i]));
-
                 }
             }
         }
