@@ -832,7 +832,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
             double[] buffer = new double[attributeList.size()];
             for (int j = 0; j < buffer.length; j++) {
-                buffer[j] = Double.parseDouble(xcoeffElement.getAttributeValue(COEFF_ATTRIBUTE + j));
+                buffer[j] = Double.parseDouble(ycoeffElement.getAttributeValue(COEFF_ATTRIBUTE + j));
             }
 
             this.eyeGazeCoefficient[i][1] = buffer;
