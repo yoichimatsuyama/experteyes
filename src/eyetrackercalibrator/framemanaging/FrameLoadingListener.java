@@ -40,5 +40,5 @@ package eyetrackercalibrator.framemanaging;
  * @author rakavipa
  */
 public interface FrameLoadingListener {
-    void update(String updateText, int totalLoad, int totalFrame);
+    public void update(String updateText, int totalLoad, int totalFail, int totalFrame);
 }

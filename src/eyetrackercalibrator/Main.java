@@ -825,7 +825,7 @@ public class Main extends javax.swing.JFrame {
                         public void propertyChange(PropertyChangeEvent evt) {
                             Integer totalLoaded = (Integer) evt.getNewValue();
                             frameLoadingListener.update(totalLoaded + " of " + totalFrame,
-                                    totalLoaded, totalFrame);
+                                    totalLoaded, 0, totalFrame);
                         }
                     });
             computeIlluminationRangeThread.start();

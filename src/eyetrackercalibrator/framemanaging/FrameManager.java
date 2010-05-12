@@ -258,13 +258,10 @@ public class FrameManager {
             this.setTotalFrames(filenames.length);
 
             // Update progress
-            frameLoadingListener.update("Loading file listing", 0, 100);
+            frameLoadingListener.update("Loading file listing", 0, 0, 100);
 
-            // Clear all previous data if load all files
-//            if (total == 0) {
-//                this.numberToFrameInfoMap.clear();
-//                this.numberToFrameMap.clear();
-//            }
+            // Recording number failing
+            int totalFail = 0;
 
             if (filenames != null && filenames.length > 0) {
                 // Sort file names
@@ -295,10 +292,13 @@ public class FrameManager {
                     } else {
                         // Remove information if it's not there
                         numberToFrameInfoMap.remove(new Integer(i + 1));
+
+                        // Mark failing
+                        totalFail++;
                     }
 
                     // Update progress
-                    frameLoadingListener.update((i + 1) + " of " + filenames.length, i, filenames.length);
+                    frameLoadingListener.update((i + 1) + " of " + filenames.length, i, totalFail, filenames.length);
                     //Thread.yield();
                 }
 
@@ -313,7 +313,7 @@ public class FrameManager {
                 }
 
                 // Update the last progress
-                frameLoadingListener.update("Completed " + filenames.length + " frames", filenames.length, filenames.length);
+                frameLoadingListener.update("Completed " + filenames.length + " frames", filenames.length, totalFail, filenames.length);
             } else {
                 logger.info("No file is found in " + frameDirectoryName);
                 success = false;
@@ -424,9 +424,9 @@ public class FrameManager {
         this.frameLoadingListener = listener;
         // Init listener
         if (getTotalFrames() < 1) {
-            listener.update("N/A", 0, 100);
+            listener.update("N/A", 0, 0, 100);
         } else {
-            listener.update("Completed total " + getTotalFrames(), getTotalFrames(), getTotalFrames());
+            listener.update("Completed total " + getTotalFrames(), getTotalFrames(), 0, getTotalFrames());
         }
     }
 

@@ -605,8 +605,14 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
     public FrameLoadingListener getEyeFrameLoadingListener() {
         return new FrameLoadingListener() {
 
-            public void update(String updateText, int totalLoad, int totalFrame) {
-                eyeFrameLoadedProgressBar.setString(updateText);
+            @Override
+            public void update(String updateText, int totalLoad, int totalFail, int totalFrame) {
+                String output = updateText;
+                if(totalFail > 0){
+                    output = output + " Failed: " + totalFail;
+                }
+
+                eyeFrameLoadedProgressBar.setString(output);
                 eyeFrameLoadedProgressBar.setMaximum(totalFrame);
                 eyeFrameLoadedProgressBar.setValue(totalLoad);
             }
@@ -664,8 +670,14 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
     public FrameLoadingListener getScreenFrameLoadingListener() {
         return new FrameLoadingListener() {
 
-            public void update(String updateText, int totalLoad, int totalFrame) {
-                screenFrameLoadedProgressBar.setString(updateText);
+            @Override
+            public void update(String updateText, int totalLoad, int totalFail, int totalFrame) {
+                String output = updateText;
+                if(totalFail > 0){
+                    output = output + " Failed: " + totalFail;
+                }
+                
+                screenFrameLoadedProgressBar.setString(output);
                 screenFrameLoadedProgressBar.setMaximum(totalFrame);
                 screenFrameLoadedProgressBar.setValue(totalLoad);
             }
