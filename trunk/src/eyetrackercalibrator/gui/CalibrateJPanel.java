@@ -69,8 +69,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
+import javax.vecmath.Point3i;
 import org.jdesktop.layout.GroupLayout;
-import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -847,8 +847,13 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      * @return 0,0 if the frame is not a calibration frame. Otherwise return
      * the coordinate (top left is 1,1 and bottom right is TOTAL_CALIBRATION_X and TOTAL_CALIBRATION_X)
      */
-    public Point frameToCalibrationPoint(int screenFrameNumber) {
-        Point point = null;
+    public class CalibationPoint{
+        public Point location = new Point();
+        public CalibrationType type = CalibrationType.Primary;
+    }
+    
+    public CalibationPoint frameToCalibrationPoint(int screenFrameNumber) {
+        CalibationPoint point = null;
 
         for (int x = 1; x <= TOTAL_CALIBRATION_X && point == null; x++) {
             for (int y = 1; y <= TOTAL_CALIBRATION_Y && point == null; y++) {
@@ -859,7 +864,10 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     CalibrationInfo info = (CalibrationInfo) en.nextElement();
                     if (screenFrameNumber >= info.startSceneFrame
                             && screenFrameNumber <= info.stopSceneFrame) {
-                        point = new Point(x, y);
+
+                        point = new  CalibationPoint();
+                        point.location.setLocation(x, y);
+                        point.type = info.calibrationType;
                     }
                 }
             }

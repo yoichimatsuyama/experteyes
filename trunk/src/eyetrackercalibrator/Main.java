@@ -43,6 +43,7 @@ import eyetrackercalibrator.framemanaging.ScreenFrameManager;
 import eyetrackercalibrator.framemanaging.ScreenViewFrameInfo;
 import eyetrackercalibrator.framemanaging.SynchronizationPoint;
 import eyetrackercalibrator.gui.CalibrateJPanel;
+import eyetrackercalibrator.gui.CalibrateJPanel.CalibationPoint;
 import eyetrackercalibrator.gui.CleanDataJPanel;
 import eyetrackercalibrator.gui.ErrorMarking;
 import eyetrackercalibrator.gui.ExportMovieJFrame;
@@ -257,9 +258,10 @@ public class Main extends javax.swing.JFrame {
                     sceneWidth, sceneHeight);
 
             // Scan through each frame
+            CalibationPoint calibrationPoint;
             for (int i = 1; i <= totalFrame; i++) {
 
-                Point calibrationPoint =
+                calibrationPoint =
                         calibrateJPanel.frameToCalibrationPoint(
                         this.frameSynchronizor.getSceneFrame(i));
                 if (calibrationPoint != null) {
@@ -877,7 +879,7 @@ public class Main extends javax.swing.JFrame {
 
             } else if ("Clean Data".equals(evt.getActionCommand())) {
 
-                // Set calibrate panel offset
+                // Set scaling factor
                 cleanDataJPanel.setEyeGazeScaleFactor(
                         screenFrameManager.getScreenInfoScalefactor());
 
@@ -994,7 +996,7 @@ public class Main extends javax.swing.JFrame {
 
             ImportMovieJFrame importMovieJFrame = new ImportMovieJFrame(new File(importLocation));
             importMovieJFrame.setTitle("Importing " + type + " movie frames");
-            importMovieJFrame.setImageFilePrefix(type+"_");
+            importMovieJFrame.setImageFilePrefix(type + "_");
             importMovieJFrame.setVisible(true);
 
         }
@@ -1385,6 +1387,7 @@ public class Main extends javax.swing.JFrame {
 
         // Check for eye calibration vector
         double[][] gazeCoefficient = calibrateJPanel.getEyeGazeCoefficient(0);
+
         if (gazeCoefficient == null) {
             // Show error that there is no gaze coefficient
             JOptionPane.showMessageDialog(null,
@@ -1477,13 +1480,13 @@ public class Main extends javax.swing.JFrame {
 
                     /** If not a trial check if this is a calibration */
                     if (trialName == null) {
-                        Point calibrationPoint = calibrateJPanel.frameToCalibrationPoint(
+                        CalibationPoint calibrationPoint = calibrateJPanel.frameToCalibrationPoint(
                                 this.frameSynchronizor.getSceneFrame(i));
                         if (calibrationPoint != null) {
-                            calibrationName = "C_" + calibrationPoint.x + "_"
-                                    + calibrationPoint.y;
-                            calibrationNumber = -(calibrationPoint.x
-                                    + (calibrationPoint.y - 1)
+                            calibrationName = "C_" + calibrationPoint.location.x + "_"
+                                    + calibrationPoint.location.y + "_" + calibrationPoint.type;
+                            calibrationNumber = -(calibrationPoint.location.x
+                                    + (calibrationPoint.location.y - 1)
                                     * CalibrateJPanel.TOTAL_CALIBRATION_X);
                         } else {
                             calibrationName = null;
