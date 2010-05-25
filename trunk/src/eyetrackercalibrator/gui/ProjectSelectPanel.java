@@ -609,7 +609,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
             public void update(String updateText, int totalLoad, int totalFail, int totalFrame) {
                 String output = updateText;
                 if(totalFail > 0){
-                    output = output + " Failed: " + totalFail;
+                    output = output + " Gaze files not loaded: " + totalFail;
                 }
 
                 eyeFrameLoadedProgressBar.setString(output);
@@ -674,7 +674,7 @@ public class ProjectSelectPanel extends javax.swing.JPanel implements CleanDataJ
             public void update(String updateText, int totalLoad, int totalFail, int totalFrame) {
                 String output = updateText;
                 if(totalFail > 0){
-                    output = output + " Failed: " + totalFail;
+                    output = output + " Corner files not loaded: " + totalFail;
                 }
                 
                 screenFrameLoadedProgressBar.setString(output);

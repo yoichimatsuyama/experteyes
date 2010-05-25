@@ -575,7 +575,7 @@ public class Main extends javax.swing.JFrame {
         String importLocation = this.projectSelectPanel.getEyeFrameDirectory();
         if (importLocation == null || importLocation.trim().length() < 1) {
             JOptionPane.showMessageDialog(this,
-                    "You need to specify eye frame directoty in the project and populate them with movies frames first.",
+                    "You need to specify eye frame directory in the project and populate them with movies frames first.",
                     "Missing Information", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -989,7 +989,7 @@ public class Main extends javax.swing.JFrame {
         if (importLocation == null || importLocation.trim().length() < 1) {
             // Prompt user to enter the location
             JOptionPane.showMessageDialog(this,
-                    "You need to specify " + type + " frame directoty in the project.",
+                    "You need to specify " + type + " frame directory in the project.",
                     "Missing Information", JOptionPane.ERROR_MESSAGE);
             return;
         } else {
