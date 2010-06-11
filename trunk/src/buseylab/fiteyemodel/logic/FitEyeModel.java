@@ -45,213 +45,232 @@ import org.spaceroots.mantissa.optimization.PointCostPair;
 import buseylab.fiteyemodel.util.ParameterList;
 import buseylab.fiteyemodel.util.Parameters;
 
-/**
- * 
- * @author dwyatte
- * 
- * TO DO:
- * find a way to write out goodness of fit
- * 
- *///Class to evaluate the difference between 2 images by sum squared error
-//extends canvas because it draws the result
-/******************************************************************************
- * 
- * 
- *
- *****************************************************************************///class to drive the minimization
-class ImgDiffErr implements CostFunction, ConvergenceChecker {
-
-    public boolean isCRCircle = false;
-    public boolean isAlive = true;
-    private FittingListener listener;
-    // pupil/cr search space
-    Rectangle searchRect;
-    Rectangle originalSearchRect;
-    // the eye model, actual eye image, and a pointer to which image to draw 
-    BufferedImage eyeModel, eyeImg, imgToDraw;
-    Graphics eyeModelGraphics;
-    Graphics2D eyeModelGraphics2D;
-    // gray values
-    int pupilGray, crGray, backgroundGray;
-    // pixels for both of our images. 
-    // eyeModelPixels is in RGB packed bytes (but is a grayscale image so we can just mask off a channel)
-    // eyeImgPixels is in grayscale values
-    int[] eyeModelPixels, eyeImgPixels;
-    // ellipses for the pupil and cr
-    RotatedEllipse2D pupil, cr;
-
-    public RotatedEllipse2D getCr() {
-        return cr;
-    }
-
-    public void setCr(RotatedEllipse2D cr) {
-        this.cr = cr;
-    }
-
-    public RotatedEllipse2D getPupil() {
-        return pupil;
-    }
-
-    public void setPupil(RotatedEllipse2D pupil) {
-        this.pupil = pupil;
-    }
-    // convergence threshold: difference between SSE and SSE of last iterations
-    double diffThresh = 100;
-    // sum of squared error for 2 images
-    double SSE, diff;
-    double lastSSE = diffThresh;    // SSE of last iteration
-    // current parameters
-    double[] params;
-    // initializes model to an eye Image
-
-    public void initModel(BufferedImage eyeImg) {
-        this.eyeImg = eyeImg;
-
-        // Create usable search rec
-        this.searchRect = new Rectangle(this.originalSearchRect);
-        this.searchRect.width = Math.min(
-                this.eyeImg.getWidth() - this.searchRect.x,
-                this.searchRect.width);
-        this.searchRect.height = Math.min(
-                this.eyeImg.getHeight() - this.searchRect.y,
-                this.searchRect.height);
-
-        eyeImgPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(eyeImg,
-                (int) searchRect.getX(), (int) searchRect.getY(),
-                (int) searchRect.getWidth(), (int) searchRect.getHeight()));
-        // create eye model
-        eyeModel = new BufferedImage(eyeImg.getWidth(), eyeImg.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
-        eyeModelGraphics = eyeModel.getGraphics();
-        eyeModelGraphics2D = (Graphics2D) eyeModelGraphics;
-    }
-
-    /*
-     * evaluation function if isCircle is true the cost only care for 7 elements
-     * in parames instead of all 8
-     */
-    @Override
-    public double cost(double[] params) throws CostException {
-        // save params
-        this.params = params;
-        /* at each iteration
-         * fill background with gray bg color
-         * draw pupil with pupil gray and params
-         * draw cr with cr gray and params
-         * then get pixels for eyeModel and eyeImage and sum squared differences
-         * return sum as error
-         */
-
-        eyeModelGraphics.setColor(new Color(backgroundGray, backgroundGray, backgroundGray));
-        eyeModelGraphics.fillRect(0, 0, eyeModel.getWidth(), eyeModel.getHeight());
-
-
-        eyeModelGraphics2D.setColor(new Color(pupilGray, pupilGray, pupilGray));
-        pupil.setFrameFromDiagonal(params[0], params[1], params[2], params[3]);
-
-        if (pupil.getAngle() != 0) {
-            AffineTransform oldTransform = eyeModelGraphics2D.getTransform();
-
-            eyeModelGraphics2D.setTransform(AffineTransform.getRotateInstance(
-                    pupil.getAngle(), pupil.getCenterX(), pupil.getCenterY()));
-            eyeModelGraphics2D.fill(pupil);
-
-            eyeModelGraphics2D.setTransform(oldTransform);
-        } else {
-            eyeModelGraphics2D.fill(pupil);
-        }
-
-        eyeModelGraphics2D.setColor(new Color(crGray, crGray, crGray));
-
-        if (crGray > 0) {
-            if (this.isCRCircle) {
-                cr.setFrameFromDiagonal(params[4], params[5], params[6], params[5] + params[4] - params[6]);
-            } else {
-                cr.setFrameFromDiagonal(params[4], params[5], params[6], params[7]);
-            }
-        }else{
-            cr.setFrame(0, 0, 0, 0);
-        }
-
-        // turn this off when cr is empty
-        if (crGray > 0) {
-            eyeModelGraphics2D.fill(cr);
-        }
-
-        eyeModelPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(
-                eyeModel, (int) searchRect.getX(), (int) searchRect.getY(),
-                (int) searchRect.getWidth(), (int) searchRect.getHeight()));
-        lastSSE = SSE;
-        SSE = 0;
-        for (int i = 0; i < eyeImgPixels.length; i++) {
-            SSE += (eyeModelPixels[i] - eyeImgPixels[i]) * (eyeModelPixels[i] - eyeImgPixels[i]);
-        }
-
-        // If there is a listener tell it about current fit
-        if (this.listener != null) {
-            this.listener.setFit(cr, pupil);
-        }
-
-        return SSE;
-    }
-
-    // getters/setters
-    public void setPupilGray(int pupilGray) {
-        this.pupilGray = pupilGray;
-    }
-
-    public void setCRGray(int crGray) {
-        this.crGray = crGray;
-    }
-
-    public void setBackgroundGray(int backgroundGray) {
-        this.backgroundGray = backgroundGray;
-    }
-
-    public void setSearchRect(Rectangle searchRect) {
-        this.originalSearchRect = searchRect;
-    }
-
-    public BufferedImage getEyeModel() {
-        return eyeModel;
-    }
-
-    public double[] getParams() {
-        return params;
-    }
-
-    /* ignore the simplex points and instead look at the difference between 
-     * current sse and lastsse to check for convergence
-     */
-    @Override
-    public boolean converged(PointCostPair[] simplex) {
-        if (this.isAlive) {
-            diff = Math.abs(lastSSE - SSE);
-
-            if (diff < diffThresh) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            // Stop the program by forcing to sudden converge
-            return true;
-        }
-    }
-
-    // returns SSE
-    public double getSSE() {
-        return SSE;
-    }
-
-    public void setListener(FittingListener listener) {
-        this.listener = listener;
-    }
-}
-
 public class FitEyeModel implements Runnable {
-    // gradient descent step size
 
+    public static final int INDEX_PUPIL_TOP_LEFT_X = 0;
+    public static final int INDEX_PUPIL_TOP_LEFT_Y = 1;
+    public static final int INDEX_PUPIL_BOTTOM_RIGHT_X = 2;
+    public static final int INDEX_PUPIL_BOTTOM_RIGHT_Y = 3;
+    public static final int INDEX_CR_TOP_LEFT_X = 4;
+    public static final int INDEX_CR_TOP_LEFT_Y = 5;
+    public static final int INDEX_CR_BOTTOM_RIGHT_X = 6;
+    public static final int INDEX_CR_BOTTOM_RIGHT_Y = 7;
+
+    /**
+     *
+     * @author dwyatte
+     *
+     * TO DO:
+     * find a way to write out goodness of fit
+     *
+     *///Class to evaluate the difference between 2 images by sum squared error
+//extends canvas because it draws the result
+    /******************************************************************************
+     *
+     *
+     *
+     *****************************************************************************///class to drive the minimization
+    class ImgDiffErr implements CostFunction, ConvergenceChecker {
+
+        public boolean isCRCircle = false;
+        public boolean isAlive = true;
+        private FittingListener listener;
+        // pupil/cr search space
+        Rectangle searchRect;
+        Rectangle originalSearchRect;
+        // the eye model, actual eye image, and a pointer to which image to draw
+        BufferedImage eyeModel, eyeImg, imgToDraw;
+        Graphics eyeModelGraphics;
+        Graphics2D eyeModelGraphics2D;
+        // gray values
+        int pupilGray, crGray, backgroundGray;
+        // pixels for both of our images.
+        // eyeModelPixels is in RGB packed bytes (but is a grayscale image so we can just mask off a channel)
+        // eyeImgPixels is in grayscale values
+        int[] eyeModelPixels, eyeImgPixels;
+        // ellipses for the pupil and cr
+        RotatedEllipse2D pupil, cr;
+
+        public RotatedEllipse2D getCr() {
+            return cr;
+        }
+
+        public void setCr(RotatedEllipse2D cr) {
+            this.cr = cr;
+        }
+
+        public RotatedEllipse2D getPupil() {
+            return pupil;
+        }
+
+        public void setPupil(RotatedEllipse2D pupil) {
+            this.pupil = pupil;
+        }
+        // convergence threshold: difference between SSE and SSE of last iterations
+        double diffThresh = 100;
+        // sum of squared error for 2 images
+        double SSE, diff;
+        double lastSSE = diffThresh;    // SSE of last iteration
+        // current parameters
+        double[] params;
+        // initializes model to an eye Image
+
+        public void initModel(BufferedImage eyeImg) {
+            this.eyeImg = eyeImg;
+
+            // Create usable search rec
+            this.searchRect = new Rectangle(this.originalSearchRect);
+            this.searchRect.width = Math.min(
+                    this.eyeImg.getWidth() - this.searchRect.x,
+                    this.searchRect.width);
+            this.searchRect.height = Math.min(
+                    this.eyeImg.getHeight() - this.searchRect.y,
+                    this.searchRect.height);
+
+            eyeImgPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(eyeImg,
+                    (int) searchRect.getX(), (int) searchRect.getY(),
+                    (int) searchRect.getWidth(), (int) searchRect.getHeight()));
+            // create eye model
+            eyeModel = new BufferedImage(eyeImg.getWidth(), eyeImg.getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+            eyeModelGraphics = eyeModel.getGraphics();
+            eyeModelGraphics2D = (Graphics2D) eyeModelGraphics;
+        }
+
+        /*
+         * evaluation function if isCircle is true the cost only care for 7 elements
+         * in parames instead of all 8
+         */
+        @Override
+        public double cost(double[] params) throws CostException {
+            // save params
+            this.params = params;
+            /* at each iteration
+             * fill background with gray bg color
+             * draw pupil with pupil gray and params
+             * draw cr with cr gray and params
+             * then get pixels for eyeModel and eyeImage and sum squared differences
+             * return sum as error
+             */
+
+            eyeModelGraphics.setColor(new Color(backgroundGray, backgroundGray, backgroundGray));
+            eyeModelGraphics.fillRect(0, 0, eyeModel.getWidth(), eyeModel.getHeight());
+
+
+            eyeModelGraphics2D.setColor(new Color(pupilGray, pupilGray, pupilGray));
+            pupil.setFrameFromDiagonal(params[INDEX_PUPIL_TOP_LEFT_X],
+                    params[INDEX_PUPIL_TOP_LEFT_Y],
+                    params[INDEX_PUPIL_BOTTOM_RIGHT_X],
+                    params[INDEX_PUPIL_BOTTOM_RIGHT_Y]);
+
+            if (pupil.getAngle() != 0) {
+                AffineTransform oldTransform = eyeModelGraphics2D.getTransform();
+
+                eyeModelGraphics2D.setTransform(AffineTransform.getRotateInstance(
+                        pupil.getAngle(), pupil.getCenterX(), pupil.getCenterY()));
+                eyeModelGraphics2D.fill(pupil);
+
+                eyeModelGraphics2D.setTransform(oldTransform);
+            } else {
+                eyeModelGraphics2D.fill(pupil);
+            }
+
+            eyeModelGraphics2D.setColor(new Color(crGray, crGray, crGray));
+
+            if (crGray > 0) {
+                if (this.isCRCircle) {
+                    cr.setFrameFromDiagonal(params[INDEX_CR_TOP_LEFT_X],
+                            params[INDEX_CR_TOP_LEFT_Y],
+                            params[INDEX_CR_BOTTOM_RIGHT_X],
+                            params[INDEX_CR_TOP_LEFT_Y] + 
+                            params[INDEX_CR_BOTTOM_RIGHT_X] -
+                            params[INDEX_CR_TOP_LEFT_X]);
+                } else {
+                    cr.setFrameFromDiagonal(params[INDEX_CR_TOP_LEFT_X],
+                            params[INDEX_CR_TOP_LEFT_Y],
+                            params[INDEX_CR_BOTTOM_RIGHT_X],
+                            params[INDEX_CR_BOTTOM_RIGHT_Y]);
+                }
+            } else {
+                cr.setFrame(0, 0, 0, 0);
+            }
+
+            // turn this off when cr is empty
+            if (crGray > 0) {
+                eyeModelGraphics2D.fill(cr);
+            }
+
+            eyeModelPixels = ImageUtils.RGBtoGray(ImageUtils.getPixels(
+                    eyeModel, (int) searchRect.getX(), (int) searchRect.getY(),
+                    (int) searchRect.getWidth(), (int) searchRect.getHeight()));
+            lastSSE = SSE;
+            SSE = 0;
+            for (int i = 0; i < eyeImgPixels.length; i++) {
+                SSE += (eyeModelPixels[i] - eyeImgPixels[i]) * (eyeModelPixels[i] - eyeImgPixels[i]);
+            }
+
+            // If there is a listener tell it about current fit
+            if (this.listener != null) {
+                this.listener.setFit(cr, pupil);
+            }
+
+            return SSE;
+        }
+
+        // getters/setters
+        public void setPupilGray(int pupilGray) {
+            this.pupilGray = pupilGray;
+        }
+
+        public void setCRGray(int crGray) {
+            this.crGray = crGray;
+        }
+
+        public void setBackgroundGray(int backgroundGray) {
+            this.backgroundGray = backgroundGray;
+        }
+
+        public void setSearchRect(Rectangle searchRect) {
+            this.originalSearchRect = searchRect;
+        }
+
+        public BufferedImage getEyeModel() {
+            return eyeModel;
+        }
+
+        public double[] getParams() {
+            return params;
+        }
+
+        /* ignore the simplex points and instead look at the difference between
+         * current sse and lastsse to check for convergence
+         */
+        @Override
+        public boolean converged(PointCostPair[] simplex) {
+            if (this.isAlive) {
+                diff = Math.abs(lastSSE - SSE);
+
+                if (diff < diffThresh) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                // Stop the program by forcing to sudden converge
+                return true;
+            }
+        }
+
+        // returns SSE
+        public double getSSE() {
+            return SSE;
+        }
+
+        public void setListener(FittingListener listener) {
+            this.listener = listener;
+        }
+    }
+    // gradient descent step size
     final static int STEP_SIZE = 5;
     // Create instace of class holding function to be minimized
     ImgDiffErr funct = new ImgDiffErr();    // where to save gaze data
@@ -444,15 +463,15 @@ public class FitEyeModel implements Runnable {
                 start = new double[8];
             }
 
-            start[0] = pupil.getX();
-            start[1] = pupil.getY();
-            start[2] = pupil.getMaxX();
-            start[3] = pupil.getMaxY();
-            start[4] = cr.getX();
-            start[5] = cr.getY();
-            start[6] = cr.getMaxX();
+            start[INDEX_PUPIL_TOP_LEFT_X] = pupil.getX();
+            start[INDEX_PUPIL_TOP_LEFT_Y] = pupil.getY();
+            start[INDEX_PUPIL_BOTTOM_RIGHT_X] = pupil.getMaxX();
+            start[INDEX_PUPIL_BOTTOM_RIGHT_Y] = pupil.getMaxY();
+            start[INDEX_CR_TOP_LEFT_X] = cr.getX();
+            start[INDEX_CR_TOP_LEFT_Y] = cr.getY();
+            start[INDEX_CR_BOTTOM_RIGHT_X] = cr.getMaxX();
             if (!this.parameters.isCRCircle) {
-                start[7] = cr.getMaxY();
+                start[INDEX_CR_BOTTOM_RIGHT_Y] = cr.getMaxY();
             }
 
             double[] end = new double[start.length];
@@ -473,13 +492,18 @@ public class FitEyeModel implements Runnable {
 
             // now that the minimization is complete, get the final parameters
             double[] params = funct.getParams();
-            pupilCenterX = params[0] + ((params[2] - params[0]) / 2.0);
-            pupilCenterY = params[1] + ((params[3] - params[1]) / 2.0);
-            crCenterX = params[4] + ((params[6] - params[4]) / 2.0);
+            pupilCenterX = params[INDEX_PUPIL_TOP_LEFT_X]
+                    + ((params[INDEX_PUPIL_BOTTOM_RIGHT_X] - params[INDEX_PUPIL_TOP_LEFT_X]) / 2.0);
+            pupilCenterY = params[INDEX_PUPIL_TOP_LEFT_Y]
+                    + ((params[INDEX_PUPIL_BOTTOM_RIGHT_Y] - params[INDEX_PUPIL_TOP_LEFT_Y]) / 2.0);
+            crCenterX = params[INDEX_CR_TOP_LEFT_X]
+                    + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
             if (this.parameters.isCRCircle) {
-                crCenterY = params[5] + ((params[6] - params[5]) / 2.0);
+                crCenterY = params[INDEX_CR_TOP_LEFT_Y]
+                        + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
             } else {
-                crCenterY = params[5] + ((params[7] - params[5]) / 2.0);
+                crCenterY = params[INDEX_CR_TOP_LEFT_Y]
+                        + ((params[INDEX_CR_BOTTOM_RIGHT_Y] - params[INDEX_CR_TOP_LEFT_Y]) / 2.0);
             }
 
             // Write out when there is an output file
@@ -487,16 +511,23 @@ public class FitEyeModel implements Runnable {
                 output = new FileWriter(this.outputFile);
                 output.write(eyeFilename + "\t" + pupilCenterX + "\t" + pupilCenterY + "\t"
                         + crCenterX + "\t" + crCenterY + "\t" + "\n");
-                // also write out our final parameters
-                // TL = top left, BR = bottom right
-                // pupilTLX, pupilTLY, pupilBRX, pupilBRY, crTLX, crTLY, crBRX, crBRY
+                /* also write out our final parameters
+                 * TL = top left, BR = bottom right
+                 * pupilTLX, pupilTLY, pupilBRX, pupilBRY, crTLX, crTLY, and crBRX
+                 * crBRY is written off only when CR is not circle
+                 */
                 for (int i = 0; i < params.length; i++) {
                     output.write(params[i] + "\t");
-                    // Special case for circle
+
                 }
+                // Special case for circle
                 if (this.parameters.isCRCircle) {
+                    double topRightY = params[INDEX_CR_TOP_LEFT_Y]
+                            + params[INDEX_CR_BOTTOM_RIGHT_X]
+                            - params[INDEX_CR_TOP_LEFT_X];
+
                     // Write height equal to width in case of the circle
-                    output.write(params[params.length - 1] + "\t");
+                    output.write(topRightY + "\t");
                 }
                 // also write out our goodness of fit, pupil angle and cr angle
                 output.write("\n" + funct.getSSE() + "\t"
