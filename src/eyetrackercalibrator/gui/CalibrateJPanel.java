@@ -847,11 +847,12 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      * @return 0,0 if the frame is not a calibration frame. Otherwise return
      * the coordinate (top left is 1,1 and bottom right is TOTAL_CALIBRATION_X and TOTAL_CALIBRATION_X)
      */
-    public class CalibationPoint{
+    public class CalibationPoint {
+
         public Point location = new Point();
         public CalibrationType type = CalibrationType.Primary;
     }
-    
+
     public CalibationPoint frameToCalibrationPoint(int screenFrameNumber) {
         CalibationPoint point = null;
 
@@ -865,7 +866,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     if (screenFrameNumber >= info.startSceneFrame
                             && screenFrameNumber <= info.stopSceneFrame) {
 
-                        point = new  CalibationPoint();
+                        point = new CalibationPoint();
                         point.location.setLocation(x, y);
                         point.type = info.calibrationType;
                     }
@@ -1656,11 +1657,27 @@ private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.even
         // Set running flag
         this.isRunningCalibrationPointPositionFinding = true;
 
+        /* Sanity check if fullscreen frame dir exists or not.  If not then
+         * default to small scene dir.
+         */
+        String fullScreenFrameUsableDir = this.fullScreenFrameDirectory;
+        if (fullScreenFrameUsableDir == null) {
+            // Go by default
+            fullScreenFrameUsableDir = this.timer.getScreenFrameManager().getFrameDirectory();
+        } else {
+            File test = new File(fullScreenFrameUsableDir);
+            if (!test.exists()) {
+                // Go by default
+                fullScreenFrameUsableDir = this.timer.getScreenFrameManager().getFrameDirectory();
+            }
+        }
+
+
         // Create a thread for running calibration point location
         this.calibrationPointPositionFinderRunner =
                 new CalibrationPointPositionFinderRunner(
                 projectLocation, calibrationSet,
-                timer.getScreenFrameManager(), fullScreenFrameDirectory,
+                timer.getScreenFrameManager(), fullScreenFrameUsableDir,
                 new CompletionListener() {
 
                     @Override
