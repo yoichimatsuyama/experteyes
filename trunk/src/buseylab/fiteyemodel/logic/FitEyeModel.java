@@ -153,18 +153,19 @@ public class FitEyeModel implements Runnable {
              * return sum as error
              */
 
-            //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_Y]<params[INDEX_CR_TOP_LEFT_Y])
-            {
-               // System.out.print("Corneal reflection y values are reversed\n");
+            if (this.isCRCircle) {
+            } else {
+                //check for corneal reflection reversals
+                if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
+                    // System.out.print("Corneal reflection y values are reversed\n");
 //reverse values
-                double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
-                params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
-                params[INDEX_CR_TOP_LEFT_Y] = temp;
+                    double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
+                    params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
+                    params[INDEX_CR_TOP_LEFT_Y] = temp;
+                }
             }
-             //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_X]<params[INDEX_CR_TOP_LEFT_X])
-            {
+            //check for corneal reflection reversals
+            if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
                 //System.out.print("Corneal reflection x values are reversed\n");
 //reverse values
                 double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
@@ -200,9 +201,9 @@ public class FitEyeModel implements Runnable {
                     cr.setFrameFromDiagonal(params[INDEX_CR_TOP_LEFT_X],
                             params[INDEX_CR_TOP_LEFT_Y],
                             params[INDEX_CR_BOTTOM_RIGHT_X],
-                            params[INDEX_CR_TOP_LEFT_Y] + 
-                            params[INDEX_CR_BOTTOM_RIGHT_X] -
-                            params[INDEX_CR_TOP_LEFT_X]);
+                            params[INDEX_CR_TOP_LEFT_Y]
+                            + params[INDEX_CR_BOTTOM_RIGHT_X]
+                            - params[INDEX_CR_TOP_LEFT_X]);
                 } else {
                     cr.setFrameFromDiagonal(params[INDEX_CR_TOP_LEFT_X],
                             params[INDEX_CR_TOP_LEFT_Y],
@@ -511,19 +512,20 @@ public class FitEyeModel implements Runnable {
             // now that the minimization is complete, get the final parameters
             double[] params = funct.getParams();
 
-              //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_Y]<params[INDEX_CR_TOP_LEFT_Y])
-            {
-                //System.out.print("Corneal reflection y values are reversed. Fixing...\n");
+            if (this.parameters.isCRCircle) {
+            } else {
+                //check for corneal reflection reversals
+                if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
+                    //System.out.print("Corneal reflection y values are reversed. Fixing...\n");
 //reverse values
-                double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
-                params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
-                params[INDEX_CR_TOP_LEFT_Y] = temp;
+                    double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
+                    params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
+                    params[INDEX_CR_TOP_LEFT_Y] = temp;
+                }
             }
-             //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_X]<params[INDEX_CR_TOP_LEFT_X])
-            {
-               // System.out.print("Corneal reflection x values are reversed. Fixing...\n");
+            //check for corneal reflection reversals
+            if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
+                // System.out.print("Corneal reflection x values are reversed. Fixing...\n");
 //reverse values
                 double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
                 params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
