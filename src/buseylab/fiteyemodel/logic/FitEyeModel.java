@@ -107,7 +107,7 @@ public class FitEyeModel implements Runnable {
             this.pupil = pupil;
         }
         // convergence threshold: difference between SSE and SSE of last iterations
-        double diffThresh = 100;
+        double diffThresh = 110;
         // sum of squared error for 2 images
         double SSE, diff;
         double lastSSE = diffThresh;    // SSE of last iteration
@@ -152,7 +152,7 @@ public class FitEyeModel implements Runnable {
              * then get pixels for eyeModel and eyeImage and sum squared differences
              * return sum as error
              */
-
+if (1==1){
             if (this.isCRCircle) {
             } else {
                 //check for corneal reflection reversals
@@ -172,6 +172,7 @@ public class FitEyeModel implements Runnable {
                 params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
                 params[INDEX_CR_TOP_LEFT_X] = temp;
             }
+}
             eyeModelGraphics.setColor(new Color(backgroundGray, backgroundGray, backgroundGray));
             eyeModelGraphics.fillRect(0, 0, eyeModel.getWidth(), eyeModel.getHeight());
 
@@ -290,7 +291,8 @@ public class FitEyeModel implements Runnable {
         }
     }
     // gradient descent step size
-    final static int STEP_SIZE = 5;
+    final static int STEP_SIZE = 6;
+    final static int CR_STEP_SIZE = 6;
     // Create instace of class holding function to be minimized
     ImgDiffErr funct = new ImgDiffErr();    // where to save gaze data
     final static String GAZE_ROOT = "Gaze";    // filenames
@@ -495,13 +497,22 @@ public class FitEyeModel implements Runnable {
 
             double[] end = new double[start.length];
             for (int j = 0; j < end.length; j++) {
-                end[j] = start[j] + STEP_SIZE;
+                if (j < 5) {
+                    end[j] = start[j] + STEP_SIZE;
+                } else {
+                    end[j] = start[j] + CR_STEP_SIZE;
+                }
             }
 
             // Lets move back from starting point be step size as well
             for (int j = 0; j < start.length; j++) {
-                start[j] -= STEP_SIZE;
+                if (j < 5) {
+                    start[j] -= STEP_SIZE;
+                } else {
+                    start[j] -= CR_STEP_SIZE;
+                }
             }
+
 
             // Set if we are considering CR as circle
             funct.isCRCircle = this.parameters.isCRCircle;
@@ -512,6 +523,8 @@ public class FitEyeModel implements Runnable {
             // now that the minimization is complete, get the final parameters
             double[] params = funct.getParams();
 
+            if (1==1)
+            {
             if (this.parameters.isCRCircle) {
             } else {
                 //check for corneal reflection reversals
@@ -531,7 +544,7 @@ public class FitEyeModel implements Runnable {
                 params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
                 params[INDEX_CR_TOP_LEFT_X] = temp;
             }
-
+            }
 
             pupilCenterX = params[INDEX_PUPIL_TOP_LEFT_X]
                     + ((params[INDEX_PUPIL_BOTTOM_RIGHT_X] - params[INDEX_PUPIL_TOP_LEFT_X]) / 2.0);
@@ -584,6 +597,7 @@ public class FitEyeModel implements Runnable {
             e.printStackTrace();
         }
 
+
         if (this.terminationListener != null) {
             this.terminationListener.complete();
         }
@@ -592,15 +606,19 @@ public class FitEyeModel implements Runnable {
     static public RotatedEllipse2D findCR(BufferedImage image, Rectangle searchArea,
             int threshold) {
         return findThresholdEllisp(image, searchArea, threshold, false, false);
+
+
     }
 
     static public RotatedEllipse2D findPupil(BufferedImage image, Rectangle searchArea,
             int threshold, boolean isOriented) {
         return findThresholdEllisp(image, searchArea, threshold, true, isOriented);
+
+
     }
 
     /**
-     * This method find a biggest black filled ellisp from input image by 
+     * This method find a biggest black filled ellisp from input image by
      * chaning it to gray scale picture then threshold the grayscaled image.
      * The ellisp orientation is computed using the moment of the blob
      * @param image Input image
@@ -619,27 +637,44 @@ public class FitEyeModel implements Runnable {
                 searchArea.y,
                 searchArea.width,
                 searchArea.height));
+
+
         int[] threshPixels = ImageUtils.threshold(eyeImgPixels,
                 threshold);
 
+
+
         if (isInverted) {
             threshPixels = ImageUtils.invertPixels(threshPixels);
-        }
 
-        // label the image and get the labels
+
+        } // label the image and get the labels
         //ImageLabel il = new ImageLabel(image.getWidth());
         ImageLabel il = new ImageLabel();
+
+
         int[] labeledEye = il.doLabel(threshPixels,
                 searchArea.width,
                 searchArea.height);
+
+
         int[] labelColors = il.getLabelColors();
 
         // labelColors has a zero in it for black. remove it
+
+
         int[] tmp = new int[labelColors.length - 1];
+
+
         int tmpIdx = 0;
-        for (int i = 0; i < labelColors.length; i++) {
+
+
+        for (int i = 0; i
+                < labelColors.length; i++) {
             if (labelColors[i] != 0) {
                 tmp[tmpIdx++] = labelColors[i];
+
+
             }
         }
 
@@ -647,32 +682,52 @@ public class FitEyeModel implements Runnable {
 
         // if label Colors is empty, the whole image was threhsolded to black/white.
         // the frame is probably a blink; return 0,0
+
+
         if (labelColors.length == 0) {
             System.out.println("No components found");
+
+
             return new RotatedEllipse2D(0, 0, 0, 0, 0);
-        }
 
 
-        // now calculate the mass of each label
+        } // now calculate the mass of each label
         int[] masses = new int[labelColors.length];
-        for (int labelIdx = 0; labelIdx < labelColors.length; labelIdx++) {
+
+
+        for (int labelIdx = 0; labelIdx
+                < labelColors.length; labelIdx++) {
             int curLabel = labelColors[labelIdx];
+
+
             int mass = 0;
-            for (int imageIdx = 0; imageIdx < labeledEye.length; imageIdx++) {
+
+
+            for (int imageIdx = 0; imageIdx
+                    < labeledEye.length; imageIdx++) {
                 if (labeledEye[imageIdx] == curLabel) {
                     mass++;
+
+
                 }
             }
             masses[labelIdx] = mass;
-        }
 
-        // component with the largest mass is what we want
+
+        } // component with the largest mass is what we want
         int maxMass = 0;
+
+
         int maxMassInd = 0;
-        for (int i = 0; i < masses.length; i++) {
+
+
+        for (int i = 0; i
+                < masses.length; i++) {
             if (masses[i] > maxMass) {
                 maxMass = masses[i];
                 maxMassInd = i;
+
+
             }
         }
         // now get its corresponding label
@@ -680,35 +735,69 @@ public class FitEyeModel implements Runnable {
 
         // get the x's and y's associated with the crLabel
         // minX and minY are the top left corner of the ellipse
+
+
         int minX = searchArea.width - 1;
+
+
         int minY = searchArea.height - 1;
         // maxX and maxY are the width and height
+
+
         int maxX = 0;
+
+
         int maxY = 0;
+
+
         int[][] labeledEye2D = buseylab.fiteyemodel.logic.MatlabUtils.reshape(
                 labeledEye, searchArea.width, searchArea.height);
 
+
+
         double Sx = 0;
+
+
         double Sy = 0;
+
+
         double Sxx = 0;
+
+
         double Syy = 0;
+
+
         double Sxy = 0;
+
+
         double area = 0;
 
-        for (int i = 0; i < labeledEye2D.length; i++) {
-            for (int j = 0; j < labeledEye2D[0].length; j++) {
+
+
+        for (int i = 0; i
+                < labeledEye2D.length; i++) {
+            for (int j = 0; j
+                    < labeledEye2D[0].length; j++) {
                 if (labeledEye2D[i][j] == crLabel) {
                     if (i > maxX) {
                         maxX = i;
+
+
                     }
                     if (j > maxY) {
                         maxY = j;
+
+
                     }
                     if (i < minX) {
                         minX = i;
+
+
                     }
                     if (j < minY) {
                         minY = j;
+
+
                     }
 
                     if (isOriented) {
@@ -719,23 +808,40 @@ public class FitEyeModel implements Runnable {
                         Sxy += i * j;
                         Syy += j * j;
                         area++;
+
                     }
+
+
                 }
             }
         }
 
         double angle = 0;
+
+
         if (isOriented) {
             // Compute moment angle
             double Mx = Sxx - Sx * Sx / area;
+
+
             double My = Syy - Sy * Sy / area;
+
+
             double Mxy = Sxy - Sx * Sy / area;
             angle = Math.PI / 2 - Math.atan((Mx - My + Math.sqrt((Mx - My) * (Mx - My) + 4 * Mxy * Mxy)) / (2 * Mxy));
+
+
         }
 
         int crX = minX;
+
+
         int crY = minY;
+
+
         int crWidth = maxX - minX;
+
+
         int crHeight = maxY - minY;
 
         RotatedEllipse2D ellipse = new RotatedEllipse2D(crX, crY, crWidth, crHeight, angle);
@@ -744,10 +850,15 @@ public class FitEyeModel implements Runnable {
         ellipse.x = ellipse.x + searchArea.x;
         ellipse.y = ellipse.y + searchArea.y;
 
+
+
         return ellipse;
+
+
     }
 
     public void kill() {
         this.funct.isAlive = false;
+
     }
 }
