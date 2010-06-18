@@ -55,6 +55,9 @@ public class FitEyeModel implements Runnable {
     public static final int INDEX_CR_TOP_LEFT_Y = 5;
     public static final int INDEX_CR_BOTTOM_RIGHT_X = 6;
     public static final int INDEX_CR_BOTTOM_RIGHT_Y = 7;
+    public static final int NUM_PARAMS_FULL_MODEL = 8;
+    public static final int NUM_PARAMS_CR_IS_CIRCLE = 7;
+    public static final int NUM_PARAMS_JUST_PUPIL = 4;
 
     /**
      *
@@ -152,27 +155,30 @@ public class FitEyeModel implements Runnable {
              * then get pixels for eyeModel and eyeImage and sum squared differences
              * return sum as error
              */
-if (1==1){
-            if (this.isCRCircle) {
-            } else {
-                //check for corneal reflection reversals
-                if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
-                    // System.out.print("Corneal reflection y values are reversed\n");
+            if (crGray > 0) {
+
+                if (1 == 1) {
+                    if (this.isCRCircle) {
+                    } else {
+                        //check for corneal reflection reversals
+                        if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
+                            // System.out.print("Corneal reflection y values are reversed\n");
 //reverse values
-                    double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
-                    params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
-                    params[INDEX_CR_TOP_LEFT_Y] = temp;
+                            double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
+                            params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
+                            params[INDEX_CR_TOP_LEFT_Y] = temp;
+                        }
+                    }
+                    //check for corneal reflection reversals
+                    if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
+                        //System.out.print("Corneal reflection x values are reversed\n");
+//reverse values
+                        double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
+                        params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
+                        params[INDEX_CR_TOP_LEFT_X] = temp;
+                    }
                 }
             }
-            //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
-                //System.out.print("Corneal reflection x values are reversed\n");
-//reverse values
-                double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
-                params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
-                params[INDEX_CR_TOP_LEFT_X] = temp;
-            }
-}
             eyeModelGraphics.setColor(new Color(backgroundGray, backgroundGray, backgroundGray));
             eyeModelGraphics.fillRect(0, 0, eyeModel.getWidth(), eyeModel.getHeight());
 
@@ -478,23 +484,29 @@ if (1==1){
 
             // set up starts and ends for each iteration
             double[] start;
-            if (this.parameters.isCRCircle) {
-                start = new double[7];
+
+            if (this.parameters.crGrayValue > 0) {
+                if (this.parameters.isCRCircle) {
+                    start = new double[NUM_PARAMS_CR_IS_CIRCLE];
+                } else {
+                    start = new double[NUM_PARAMS_FULL_MODEL];
+                }
             } else {
-                start = new double[8];
+                start = new double[NUM_PARAMS_JUST_PUPIL];
             }
 
             start[INDEX_PUPIL_TOP_LEFT_X] = pupil.getX();
             start[INDEX_PUPIL_TOP_LEFT_Y] = pupil.getY();
             start[INDEX_PUPIL_BOTTOM_RIGHT_X] = pupil.getMaxX();
             start[INDEX_PUPIL_BOTTOM_RIGHT_Y] = pupil.getMaxY();
-            start[INDEX_CR_TOP_LEFT_X] = cr.getX();
-            start[INDEX_CR_TOP_LEFT_Y] = cr.getY();
-            start[INDEX_CR_BOTTOM_RIGHT_X] = cr.getMaxX();
-            if (!this.parameters.isCRCircle) {
-                start[INDEX_CR_BOTTOM_RIGHT_Y] = cr.getMaxY();
+            if (this.parameters.crGrayValue > 0) {
+                start[INDEX_CR_TOP_LEFT_X] = cr.getX();
+                start[INDEX_CR_TOP_LEFT_Y] = cr.getY();
+                start[INDEX_CR_BOTTOM_RIGHT_X] = cr.getMaxX();
+                if (!this.parameters.isCRCircle) {
+                    start[INDEX_CR_BOTTOM_RIGHT_Y] = cr.getMaxY();
+                }
             }
-
             double[] end = new double[start.length];
             for (int j = 0; j < end.length; j++) {
                 if (j < 5) {
@@ -523,43 +535,51 @@ if (1==1){
             // now that the minimization is complete, get the final parameters
             double[] params = funct.getParams();
 
-            if (1==1)
-            {
-            if (this.parameters.isCRCircle) {
-            } else {
-                //check for corneal reflection reversals
-                if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
-                    //System.out.print("Corneal reflection y values are reversed. Fixing...\n");
+            if (this.parameters.crGrayValue > 0) {
+
+                if (1 == 1) {
+                    if (this.parameters.isCRCircle) {
+                    } else {
+                        //check for corneal reflection reversals
+                        if (params[INDEX_CR_BOTTOM_RIGHT_Y] < params[INDEX_CR_TOP_LEFT_Y]) {
+                            //System.out.print("Corneal reflection y values are reversed. Fixing...\n");
 //reverse values
-                    double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
-                    params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
-                    params[INDEX_CR_TOP_LEFT_Y] = temp;
+                            double temp = params[INDEX_CR_BOTTOM_RIGHT_Y];
+                            params[INDEX_CR_BOTTOM_RIGHT_Y] = params[INDEX_CR_TOP_LEFT_Y];
+                            params[INDEX_CR_TOP_LEFT_Y] = temp;
+                        }
+                    }
+                    //check for corneal reflection reversals
+                    if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
+                        // System.out.print("Corneal reflection x values are reversed. Fixing...\n");
+//reverse values
+                        double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
+                        params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
+                        params[INDEX_CR_TOP_LEFT_X] = temp;
+                    }
                 }
             }
-            //check for corneal reflection reversals
-            if (params[INDEX_CR_BOTTOM_RIGHT_X] < params[INDEX_CR_TOP_LEFT_X]) {
-                // System.out.print("Corneal reflection x values are reversed. Fixing...\n");
-//reverse values
-                double temp = params[INDEX_CR_BOTTOM_RIGHT_X];
-                params[INDEX_CR_BOTTOM_RIGHT_X] = params[INDEX_CR_TOP_LEFT_X];
-                params[INDEX_CR_TOP_LEFT_X] = temp;
-            }
-            }
-
             pupilCenterX = params[INDEX_PUPIL_TOP_LEFT_X]
                     + ((params[INDEX_PUPIL_BOTTOM_RIGHT_X] - params[INDEX_PUPIL_TOP_LEFT_X]) / 2.0);
             pupilCenterY = params[INDEX_PUPIL_TOP_LEFT_Y]
                     + ((params[INDEX_PUPIL_BOTTOM_RIGHT_Y] - params[INDEX_PUPIL_TOP_LEFT_Y]) / 2.0);
-            crCenterX = params[INDEX_CR_TOP_LEFT_X]
-                    + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
-            if (this.parameters.isCRCircle) {
-                crCenterY = params[INDEX_CR_TOP_LEFT_Y]
-                        + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
-            } else {
-                crCenterY = params[INDEX_CR_TOP_LEFT_Y]
-                        + ((params[INDEX_CR_BOTTOM_RIGHT_Y] - params[INDEX_CR_TOP_LEFT_Y]) / 2.0);
-            }
 
+            if (this.parameters.crGrayValue > 0) {
+                crCenterX = params[INDEX_CR_TOP_LEFT_X]
+                        + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
+
+                if (this.parameters.isCRCircle) {
+                    crCenterY = params[INDEX_CR_TOP_LEFT_Y]
+                            + ((params[INDEX_CR_BOTTOM_RIGHT_X] - params[INDEX_CR_TOP_LEFT_X]) / 2.0);
+                } else {
+                    crCenterY = params[INDEX_CR_TOP_LEFT_Y]
+                            + ((params[INDEX_CR_BOTTOM_RIGHT_Y] - params[INDEX_CR_TOP_LEFT_Y]) / 2.0);
+                }
+            } else {
+
+                crCenterX = 0;
+                crCenterY = 0;
+            }
             // Write out when there is an output file
             if (this.outputFile != null) {
                 output = new FileWriter(this.outputFile);
@@ -574,14 +594,23 @@ if (1==1){
                     output.write(params[i] + "\t");
 
                 }
-                // Special case for circle
-                if (this.parameters.isCRCircle) {
-                    double topRightY = params[INDEX_CR_TOP_LEFT_Y]
-                            + params[INDEX_CR_BOTTOM_RIGHT_X]
-                            - params[INDEX_CR_TOP_LEFT_X];
 
-                    // Write height equal to width in case of the circle
-                    output.write(topRightY + "\t");
+                if (this.parameters.crGrayValue > 0) {
+
+                    // Special case for circle
+
+                    if (this.parameters.isCRCircle) {
+                        double topRightY = params[INDEX_CR_TOP_LEFT_Y]
+                                + params[INDEX_CR_BOTTOM_RIGHT_X]
+                                - params[INDEX_CR_TOP_LEFT_X];
+
+                        // Write height equal to width in case of the circle
+                        output.write(topRightY + "\t");
+                    }
+                } else {
+                    //write out dummy coordinates since no cr
+                    output.write(0.0 + "\t" + 0.0 + "\t" + 0.0 + "\t" + 0.0 + "\t");
+
                 }
                 // also write out our goodness of fit, pupil angle and cr angle
                 output.write("\n" + funct.getSSE() + "\t"
