@@ -37,6 +37,7 @@ import eyetrackercalibrator.gui.util.StreamGobbler;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -50,6 +51,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -445,6 +447,15 @@ public class MovieFrameExporter {
                 this.listener.propertyChange(new PropertyChangeEvent(this,
                         "Completed with errors increating movies", end, end));
             }
+            //open folder for person
+              try {
+                        // Show results
+                        Desktop.getDesktop().open(exportDirectory);
+                    } catch (IOException ex) {
+                        //Logger.getLogger(ImportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }catch(Exception ex){
+                        // Ignore every other exception.. This should take care of Missing Desktop in 1.5
+                    }
         }
     }
 
