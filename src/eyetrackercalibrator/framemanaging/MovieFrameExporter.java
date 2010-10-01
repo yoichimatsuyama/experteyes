@@ -616,7 +616,10 @@ public class MovieFrameExporter {
                         (x[halfPoint] + x[halfPoint + 1]) / 2,
                         (y[halfPoint] + y[halfPoint + 1]) / 2);
             } else {
-                eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);
+                try
+                {eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);}//Need to do error checking on this
+                catch (java.lang.ArrayIndexOutOfBoundsException e)
+                {eyeGaze = null;}
             }
         } else {
             eyeGaze = null;
