@@ -270,9 +270,21 @@ public class MovieFrameExporter {
                     this.frameSynchronizor.getEyeFrame(i), eyeFrameManager,
                     eyeDefaultSize, mainImageScale);
 
-            // Get average eye gaze
-            Point2D.Double point = getNextAverageEyeGaze(
-                    start, averageFrames, scaleFactor);
+            // Get average eye gaze - THIS CODE HAS A BUG IN IT THAT DOESN'T ALIGN
+            //THE POINTS TO THE SCENE DATA AT ALL- CHECK BLINKS
+            //Point2D.Double point = getNextAverageEyeGaze(
+                    //start, averageFrames, scaleFactor);
+  Point2D.Double point = getNextAverageEyeGazeSimple(
+                    i, averageFrames, scaleFactor);
+
+        //EyeViewFrameInfo info = null;
+      //  int eyeFrameNum = this.frameSynchronizor.getEyeFrame(i);
+            //    info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
+             //           eyeFrameNum);
+           //Point2D.Double point = computeEyeGaze(scaleFactor, this.frameSynchronizor.getEyeFrame(i), info);
+
+
+
             if (point != null) {
                 gazePoint.setLocation(point);
             } else {
@@ -445,7 +457,7 @@ public class MovieFrameExporter {
                         "Completed successfully", end, end));
             } else {
                 this.listener.propertyChange(new PropertyChangeEvent(this,
-                        "Completed with errors increating movies", end, end));
+                        "Completed with errors in creating movies (ffmpeg)", end, end));
             }
             //open folder for person
               try {
@@ -545,6 +557,69 @@ public class MovieFrameExporter {
         this.gazeAverageRangeNextFrame = 0;
     }
 
+
+    //re-write this to do a simple median
+    private Point.Double getNextAverageEyeGazeSimple(
+            int start, int range, double scaleFactor) {
+        EyeViewFrameInfo info = null;
+        Point2D.Double eyeGaze = null;
+            LinkedList<Point.Double> simpleGazeList = null;
+
+            simpleGazeList = new LinkedList<Point.Double>();
+            // Populate the list from start to completion of range
+            for (int i = 0; i < range; i++) {
+                int eyeFrameNum = this.frameSynchronizor.getEyeFrame(start + i - range/2);
+                info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
+                        eyeFrameNum);
+
+                if (info != null) {
+                    // Compute scaled eye gaze
+                    eyeGaze = computeEyeGaze(scaleFactor, eyeFrameNum, info);
+                    simpleGazeList.add(eyeGaze);
+                } else {
+                    simpleGazeList.add(null);
+                }
+            }
+
+
+        Point.Double[] pointArray = simpleGazeList.toArray(new Point.Double[0]);
+        if (pointArray.length > 0) {
+            // Find medien of x and y seperately when one exists
+            double[] x = new double[pointArray.length];
+            double[] y = new double[pointArray.length];
+            int totalMissing = 0;
+            for (int i = 0; i < pointArray.length; i++) {
+                if (pointArray[i] != null) {
+                    x[i] = pointArray[i].x;
+                    y[i] = pointArray[i].y;
+                } else {
+                    x[i] = -100000;
+                    y[i] = -100000;
+                    totalMissing++;
+                }
+            }
+            Arrays.sort(x);
+            Arrays.sort(y);
+            int dataLength = pointArray.length - totalMissing;
+
+            int halfPoint = Math.max(dataLength / 2 - 1, 0) + totalMissing;
+            if (dataLength > 1 && dataLength % 2 != 0) {
+                eyeGaze = new Point2D.Double(
+                        (x[halfPoint] + x[halfPoint + 1]) / 2,
+                        (y[halfPoint] + y[halfPoint + 1]) / 2);
+            } else {
+                try
+                {eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);}//Need to do error checking on this
+                catch (java.lang.ArrayIndexOutOfBoundsException e)
+                {eyeGaze = null;}
+            }
+        } else {
+            eyeGaze = null;
+        }
+
+        return eyeGaze;
+    }
+
     private Point.Double getNextAverageEyeGaze(
             int start, int range, double scaleFactor) {
         EyeViewFrameInfo info = null;
@@ -568,7 +643,7 @@ public class MovieFrameExporter {
                     this.gazeList.add(null);
                 }
             }
-            this.gazeAverageRangeNextFrame = firstFrame + range;
+            this.gazeAverageRangeNextFrame = firstFrame + range;//THIS IS IN THE WRONG COORDINATES! IT SHOULD BE IN EYE FRAME COORDINATES NOT SCENE FRAME
         } else {
             // Fetch the next one
             info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
