@@ -31,7 +31,11 @@
 package eyetrackercalibrator.math;
 
 import eyetrackercalibrator.framemanaging.EyeViewFrameInfo;
+import eyetrackercalibrator.gui.CalibrateJPanel;
+import eyetrackercalibrator.gui.DriftCorrectionInfo;
 import java.awt.geom.Point2D;
+import java.util.Enumeration;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -45,6 +49,7 @@ public class EyeGazeComputing {
     private double[][] primaryEyeCoeff;
     private double[][] secondaryEyeCoeff;
     private boolean usingCorneaReflect = true;
+    private DefaultListModel allDriftCorrectionSets;
 
     public boolean isUsingCorneaReflect() {
         return usingCorneaReflect;
@@ -52,6 +57,10 @@ public class EyeGazeComputing {
 
     public void setUsingCorneaReflect(boolean usingCorneaReflect) {
         this.usingCorneaReflect = usingCorneaReflect;
+    }
+
+    public void setAllDriftCorrectionSets(DefaultListModel allDriftCorrectionSets) {
+        this.allDriftCorrectionSets = allDriftCorrectionSets;
     }
 
     public enum ComputingApproach {
@@ -122,6 +131,27 @@ public class EyeGazeComputing {
         return point;
     }
 
+    private Point2D applyDriftCorrection(DefaultListModel allDriftCorrectionSets, int eyeFrameNumber, Point2D scenePoint) {
+        //search through drift correction sets, find the one with the closest eye frame
+        //that is SMALLER than the current eyeFrameNumber. Get correction and apply it
+        int MinDistance = Integer.MAX_VALUE;
+        Point2D.Double driftCorrectionToApply = new Point2D.Double(0, 0);
+        for (Enumeration en = allDriftCorrectionSets.elements();
+                en.hasMoreElements();) {
+            // Add calibration points
+            DriftCorrectionInfo driftCorrectionInfo = (DriftCorrectionInfo) en.nextElement();
+            int thisDistance = eyeFrameNumber - driftCorrectionInfo.startEyeFrame;
+            if (thisDistance >= 0) {
+                if (thisDistance < MinDistance) {
+                    MinDistance = thisDistance;
+                }
+                driftCorrectionToApply.setLocation(driftCorrectionInfo.GetCumulativeError());
+            }
+        }
+        Point2D driftCorrectedPoint = new Point2D.Double(scenePoint.getX() - driftCorrectionToApply.getX(), scenePoint.getY() - driftCorrectionToApply.getY());
+        return (driftCorrectedPoint);
+    }
+
     /**
      * Compute eyegaze using the method specified by parameters
      * @param x x component of an eye vector
@@ -151,11 +181,11 @@ public class EyeGazeComputing {
                         // Compute linear estimation
                         double frameAdvanced = currentFrame - startFrame;
 
-                        double px = startPoint.getX() +
-                                (endPoint.getX() - startPoint.getX()) * frameAdvanced * this.linearInterpolationFactor;
+                        double px = startPoint.getX()
+                                + (endPoint.getX() - startPoint.getX()) * frameAdvanced * this.linearInterpolationFactor;
 
-                        double py = startPoint.getY() +
-                                (endPoint.getY() - startPoint.getY()) * frameAdvanced * this.linearInterpolationFactor;
+                        double py = startPoint.getY()
+                                + (endPoint.getY() - startPoint.getY()) * frameAdvanced * this.linearInterpolationFactor;
 
                         point = new Point2D.Double(px, py);
                     }
@@ -165,6 +195,13 @@ public class EyeGazeComputing {
                 if (this.primaryEyeCoeff != null) {
                     // Compute eye gaze point
                     point = Computation.computeEyeGazePoint(x, y, this.primaryEyeCoeff);
+
+                    //first check to see if there are any drift correction points
+                    if (allDriftCorrectionSets != null)
+                    {
+                    point = applyDriftCorrection(allDriftCorrectionSets, currentFrame, point);
+                    }
+                    
                 }
         }
 

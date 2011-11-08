@@ -80,7 +80,7 @@ public class CalibrationInfo extends FrameMarker{
                 show += "Secondary calibration<br>";
                 break;
             case Testing:
-                show += "Testing point<br>";
+                show += "Drift Correction Point<br>";
                 break;
             default:
                 show += "Primary calibration<br>";

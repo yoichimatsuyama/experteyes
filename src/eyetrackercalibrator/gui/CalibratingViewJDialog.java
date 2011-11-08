@@ -623,6 +623,16 @@ public class CalibratingViewJDialog
                 for (int j = 0; j < eyeVector[i].length; j++) {
                     Point2D.Double point = Computation.computeEyeGazePoint(
                             eyeVector[i][j].x, eyeVector[i][j].y, coeff[pos]);
+
+                    /*
+                     * could correct for drift using the last drift
+                     */
+                   /* if (allDriftCorrectionSets != null)
+                    {
+                    point = applyDriftCorrection(allDriftCorrectionSets, currentFrame, point);
+                    }
+                    * 
+                    */
                     estimatedTestPoints[pos][m].setLocation(point);
                     if (this.degreeErrorComputer != null && this.combinedTestPoints[pos][m] != null) {
                         totalTestDegreeError += this.degreeErrorComputer.degreeError(

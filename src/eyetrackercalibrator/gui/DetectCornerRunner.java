@@ -326,6 +326,12 @@ public class DetectCornerRunner extends Thread {
         // Erase traing file
         gwtGridFile.delete();
 
+        //TAB changed- announce that we are complete before loading is finished
+        // Fully complete
+        if (this.listener != null) {
+            this.listener.fullCompletion();
+        }
+
         // Reload frames
         for (int i = 0; i < this.ranges.length; i++) {
             this.screenFrameManager.loadFrames(
@@ -336,10 +342,7 @@ public class DetectCornerRunner extends Thread {
                     true);
         }
 
-        // Fully complete
-        if (this.listener != null) {
-            this.listener.fullCompletion();
-        }
+       
     }
 
     public void kill() {

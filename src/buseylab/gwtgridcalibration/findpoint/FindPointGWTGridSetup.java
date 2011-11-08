@@ -56,7 +56,7 @@ public class FindPointGWTGridSetup {
     double sigma = 1.0 * Math.PI;
     int numOrientations = 8;
     int numScales = 8;
-    int size = 256;
+    int size = 128;
     Point translatedClick;
     GWTGrid gwtgrids;
     

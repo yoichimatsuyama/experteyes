@@ -42,6 +42,7 @@ import eyetrackercalibrator.math.EyeGazeComputing;
 import eyetrackercalibrator.trialmanaging.BothMatchingTrialFileHandler;
 import eyetrackercalibrator.trialmanaging.LeftRightBothMatchingTrialFileHandler;
 import eyetrackercalibrator.trialmanaging.ListATrialFileHandler;
+import eyetrackercalibrator.trialmanaging.PresentationFileHandler;
 import eyetrackercalibrator.trialmanaging.Trial;
 import eyetrackercalibrator.trialmanaging.TrialFileHandler;
 import eyetrackercalibrator.trialmanaging.TrialMarker;
@@ -840,6 +841,7 @@ public class TrialMarkingJPanel extends javax.swing.JPanel {
         fileChooser.addChoosableFileFilter(new BothMatchingTrialFileHandler());
         fileChooser.addChoosableFileFilter(new LeftRightBothMatchingTrialFileHandler());
         fileChooser.addChoosableFileFilter(new ListATrialFileHandler());
+        fileChooser.addChoosableFileFilter(new PresentationFileHandler());
 
         Trial t = null;
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {

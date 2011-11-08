@@ -367,11 +367,20 @@ public class Main extends javax.swing.JFrame {
     private void exportMovies() {
         int eyeFrame, screenFrame;
 
+        File defaultPathToMovieFrames = new File(this.projectSelectPanel.getScreenFrameDirectory());
+
         ExportMovieJFrame exportMovieJFrame = new ExportMovieJFrame(
-                projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
+                defaultPathToMovieFrames, DISPLAY_WIDTH, DISPLAY_HEIGHT,
                 this.eyeGazeComputing, this.frameSynchronizor,
                 this.eyeFrameManager, this.screenFrameManager,
                 this.projectSelectPanel.getFullScreenFrameDirectory());
+
+        //ExportMovieJFrame exportMovieJFrame = new ExportMovieJFrame(
+         //       projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
+          //      this.eyeGazeComputing, this.frameSynchronizor,
+           //     this.eyeFrameManager, this.screenFrameManager,
+            //    this.projectSelectPanel.getFullScreenFrameDirectory());
+
         exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
     }

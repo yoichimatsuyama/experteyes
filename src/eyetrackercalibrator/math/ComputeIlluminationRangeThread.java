@@ -70,6 +70,7 @@ public class ComputeIlluminationRangeThread extends Thread {
         double[] pixels;// = new double[image.getHeight() * image.getWidth()];
 
         for (int i = startFrame; i <= endFrame && alive; i++) {
+        //for (int i = 7019; i <= endFrame && alive; i++) {
             //        String name = screenFrameManager.getFrameFileName(i);
             image = screenFrameManager.getFrame(i);
 
@@ -89,8 +90,15 @@ public class ComputeIlluminationRangeThread extends Thread {
                     illumination += pixels[j];
                 }
                 illumination = illumination / pixels.length;
+                 if (pixels.length == 0)
+            {
+                System.out.println("Pixel length is zero");
+            }
             }
             // Put data to database
+           // System.out.println("Illumination = " + illumination);
+           
+
             informationDatabase.putInfo(i, illumination);
 
             if (this.listener != null) {

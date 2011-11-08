@@ -44,6 +44,7 @@ import eyetrackercalibrator.gui.util.GUIUtil;
 import eyetrackercalibrator.gui.util.IntervalMarkerManager;
 import eyetrackercalibrator.math.CalibrateEyeGaze;
 import eyetrackercalibrator.math.CalibrateEyeGazeQR;
+import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.DegreeErrorComputer;
 import eyetrackercalibrator.math.EyeGazeComputing;
 import java.awt.Component;
@@ -146,6 +147,9 @@ public class CalibrateJPanel extends javax.swing.JPanel {
     private CalibrationType currentCalibrationType = CalibrationInfo.CalibrationType.Primary;
     private DegreeErrorComputer degreeErrorComputer;
     private boolean warnuser = true;
+    private double[][] primaryEyeCoeff;
+    private DriftCorrectionInfo driftCorrectionInfo;
+    public DefaultListModel allDriftCorrectionSets = null;
 
     /** Creates new form NewJPanel */
     public CalibrateJPanel() {
@@ -490,7 +494,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Set label accordingly
         updateCalibrationStoredLabel(this.calibrationIndex);
-
+        //update to allow for drift correct
+        updateDriftCorrectionOffsets();
         repaint();
     }
 
@@ -523,6 +528,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
 
         // Cause information panel to update display
         calibrateList.repaint();
+         //update to allow for drift correct
+        updateDriftCorrectionOffsets();
 
     }
 
@@ -795,6 +802,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             // Display current selection
             calibrateList.setModel(calibrationSet[this.calibrationIndex]);
         }
+                updateDriftCorrectionOffsets();
+
     }
 
     private void loadEyegazeCoeff(Element eyeGazeElement, int i) {
@@ -841,6 +850,140 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         // Restore warning
         this.warnuser = currentSetting;
     }
+
+
+    /*
+     * Strategy: parse through all calibration sets and find the testing ones.
+     * For each testing set, get the eye vector and project into the scene camera
+     * to get the
+     *
+     */
+
+    public DefaultListModel getAllDriftCorrectionSets(){
+        return allDriftCorrectionSets;
+    }
+
+    private void updateDriftCorrectionOffsets() {
+
+        //can't do anything if have no primary calibration
+
+        this.primaryEyeCoeff = this.timer.getEyeGazeComputing().getPrimaryEyeCoeff();
+        if (this.primaryEyeCoeff == null) {
+            return;
+        }
+
+        //destroy old one if necessary
+        allDriftCorrectionSets = new DefaultListModel();
+
+
+        FrameManager eyeFrameManager = timer.getEyeFrameManager();
+        FrameManager screenFrameManager = timer.getScreenFrameManager();
+
+        for (int pos = 0; pos < this.calibrationSet.length; pos++) {
+            // For each calibration add point
+            for (Enumeration en = calibrationSet[pos].elements();
+                    en.hasMoreElements();) {
+                // Add calibration points
+                CalibrationInfo info = (CalibrationInfo) en.nextElement();
+
+                int screenFrame = info.startSceneFrame;
+                int eyeFrame = info.startEyeFrame;
+
+                Point2D.Double cumulativeError = new Point2D.Double(0, 0);
+                int numPointsAccumulated = 0;
+
+                while (screenFrame <= info.stopSceneFrame) {
+                    // Get screen info
+                    ScreenViewFrameInfo screenFrameInfo =
+                            (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(screenFrame);
+
+                    // Get corresponding eye vector
+                    EyeViewFrameInfo eyeFrameInfo =
+                            (EyeViewFrameInfo) eyeFrameManager.getFrameInfo(eyeFrame);
+
+                    // Sanity check
+                    if (screenFrameInfo != null && eyeFrameInfo != null
+                            && screenFrameInfo.getMarkedPoints() != null) {
+                        Point2D.Double calPoint = new Point2D.Double();
+                        calPoint.setLocation(
+                                screenFrameInfo.getMarkedPoints()[0]);
+
+                        Point2D.Double eyeVecPoint = this.timer.getEyeGazeComputing().getEyeVector(eyeFrameInfo);
+
+                        /*
+                         * need to project into scene camera space using
+                         * the PRIMARY calibration (and should only do this if we have one)
+                         * make sure we don't actually correct for drift here!
+                         */
+                        Point2D.Double currentProjectedEyeGazePoint;
+
+                        switch (info.calibrationType) {
+                            case Testing:
+                                //first get the (non drift corrected!) primary projection
+                                this.primaryEyeCoeff = this.timer.getEyeGazeComputing().getPrimaryEyeCoeff();
+                                if (this.primaryEyeCoeff != null) {
+                                    // Compute eye gaze point
+                                    currentProjectedEyeGazePoint = Computation.computeEyeGazePoint(eyeVecPoint.x, eyeVecPoint.y, this.primaryEyeCoeff);
+
+                                    //should do some error checking beyond null
+                                    if (currentProjectedEyeGazePoint != null) {
+                                        double errorX = currentProjectedEyeGazePoint.x - calPoint.x;
+                                        double errorY = currentProjectedEyeGazePoint.y - calPoint.y;
+                                        cumulativeError.x = cumulativeError.x + errorX;
+                                        cumulativeError.y = cumulativeError.y + errorY;
+                                        numPointsAccumulated = numPointsAccumulated + 1;
+                                    }
+
+
+                                }
+                                //next, compare it against the place where clicked in the scene view, in calPoint
+
+
+                                // testList.add(calPoint);
+                                // testEyeVecList.add(eyeVecPoint);
+                                break;
+                            case Secondary:
+                                //don't do anything
+                                break;
+                            default:
+                            //don't do anything
+                        }
+                    }
+
+                    // Move to next frame in the range
+                    screenFrame++;
+                    eyeFrame++;
+                }
+                //now get average drift for this set of points
+                if (numPointsAccumulated > 0) {
+                    cumulativeError.x = cumulativeError.x / (double) numPointsAccumulated;
+                    cumulativeError.y = cumulativeError.y / (double) numPointsAccumulated;
+                    //now add the following variables to the list of drift correction points
+                    /*
+                     * info.startSceneFrame;
+                     * info.startEyeFrame;
+                     * cumulativeError
+                     *
+                     */
+                    this.driftCorrectionInfo = new DriftCorrectionInfo(info.startEyeFrame, info.startSceneFrame, cumulativeError);
+
+                    final DriftCorrectionInfo driftCorrectionSetInfo = this.driftCorrectionInfo;
+
+
+                    //Set user selected point
+                    //driftCorrectionSetInfo.cumulativeError = cumulativeError;
+
+                    // Add point to proper calibration
+                    allDriftCorrectionSets.addElement(driftCorrectionSetInfo);
+                }
+            }
+        }
+        //at this point we have accumulated all of the drift point sets
+        //need to sort them 
+                timer.getEyeGazeComputing().setAllDriftCorrectionSets(allDriftCorrectionSets);
+
+    }
+
 
     /** 
      * Convert a screen frame number to a calibration point.
@@ -1128,6 +1271,14 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 primaryCalibrator.getTotalStages()
                 + secondaryCalibrator.getTotalStages());
 
+        /*
+         * Could correct testArray with the last drift correction point
+         */
+ //if (allDriftCorrectionSets != null)
+             //       {
+                    //point = applyDriftCorrection(allDriftCorrectionSets, Integer.MAX_VALUE, point);
+              //      }
+
         panel.setCorrectPoints(calArray, testArray);
         panel.setEyeVector(primeEyeVecArray, CalibratingViewJDialog.PRIMARY);
         panel.setEyeVector(secondaryEyeVecArray, CalibratingViewJDialog.SECONDARY);
@@ -1401,7 +1552,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.LINE_AXIS));
 
-        jLabel1.setText("<html>Locate Calibration Points' Positions:<html>"); // NOI18N
+        jLabel1.setText("<html>Locate Calibration Points Positions:<html>"); // NOI18N
         jPanel2.add(jLabel1);
 
         locateCalibrationPointsPositionsButton.setText("Start"); // NOI18N
@@ -1415,7 +1566,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         pointTypeButtonGroup.add(testingPointsRadioButton);
-        testingPointsRadioButton.setText("Testing Points"); // NOI18N
+        testingPointsRadioButton.setText("Drift Correction Points"); // NOI18N
         testingPointsRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 testingPointsRadioButtonActionPerformed(evt);
@@ -1583,6 +1734,8 @@ private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Set label accordingly
     updateCalibrationStoredLabel(this.calibrationIndex);
+    //update to allow for drift correct
+        updateDriftCorrectionOffsets();
 }//GEN-LAST:event_deleteButtonActionPerformed
 
 private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calibrateButtonActionPerformed
@@ -1604,7 +1757,7 @@ private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     if (!process) {
         result = JOptionPane.showConfirmDialog(this,
                 "You have some unprocessed calibration points.  The calibration results may be incorrect.  Select OK to proceed with calibration.",
-                "Unprocess Calibration Points Exist", JOptionPane.OK_CANCEL_OPTION);
+                "Unprocessed Calibration Points Exist", JOptionPane.OK_CANCEL_OPTION);
     }
     if (result == JOptionPane.OK_OPTION) {
         // Done calibrating allow button to be pressed
@@ -1612,6 +1765,9 @@ private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         backButton.setEnabled(false);
 
         calibrate();
+
+        //update to allow for drift correct
+        updateDriftCorrectionOffsets();
     }
 }//GEN-LAST:event_calibrateButtonActionPerformed
 
@@ -1648,6 +1804,8 @@ private void locateCalibrationPointsPositionsButtonActionPerformed(java.awt.even
                         info.isCalibrationPointPositionLocated = false;
                     }
                 }
+                //update to allow for drift correct
+                updateDriftCorrectionOffsets();
             } else {
                 // Does nothing if the user say no
                 return;
