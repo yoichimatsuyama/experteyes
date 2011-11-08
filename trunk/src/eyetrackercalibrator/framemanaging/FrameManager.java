@@ -280,6 +280,8 @@ public class FrameManager {
                     }
                     // Try reading associate information file (Assume same file name but .txt)
                     File infoFile = getInfoFile(infoDir, filenames[i]);
+                    if (infoFile.exists())
+                    {
                     FrameInfo info = this.frameInfoClass.getInstance(infoFile,
                             new File(frameDirectoryName, filenames[i]),
                             (FrameInfo) numberToFrameInfoMap.get(i + 1));
@@ -290,13 +292,46 @@ public class FrameManager {
                         // Add to database
                         numberToFrameInfoMap.put(new Integer(i + 1), info);
                     } else {
-                        // Remove information if it's not there
-                        numberToFrameInfoMap.remove(new Integer(i + 1));
 
-                        // Mark failing
-                        totalFail++;
+                        //Try again just to be sure...
+    //        for (int thistry = 1; thistry < 4; i++)
+//{
+//                System.out.print("Pausing loading to wait for system to recover");
+//                try{
+ //   Thread.sleep(1000);} catch (InterruptedException e) {
+//}
+                        info = this.frameInfoClass.getInstance(infoFile,
+                                new File(frameDirectoryName, filenames[i]),
+                                (FrameInfo) numberToFrameInfoMap.get(i + 1));
+                        if (info != null) {
+                            // Set source file too
+                            info.setSourceFileName(filenames[i]);
+
+                            // Add to database
+                            numberToFrameInfoMap.put(new Integer(i + 1), info);
+                        } else {
+                            // Remove information if it's not there
+                            numberToFrameInfoMap.remove(new Integer(i + 1));
+
+                            // Mark failing
+                            totalFail++;
+                            if ((i > 1300) & (i < 37000)) {
+                                System.out.println("loadframes failing...");
+                            }
+                        }
+}
                     }
+                   // }
+                    else
+                    {
+                            totalFail++;
+ if ((i > 1300) & (i < 37000)) {
+                                System.out.println("file doesn't exist...");
+                            }
+                    //doesn't exist
+                                                    numberToFrameInfoMap.remove(new Integer(i + 1));
 
+                    }
                     // Update progress
                     frameLoadingListener.update((i + 1) + " of " + filenames.length, i, totalFail, filenames.length);
                     //Thread.yield();
@@ -304,7 +339,7 @@ public class FrameManager {
 
                 // Clear the left over information in case there are less files
                 int currentSize = Math.max(numberToFrameInfoMap.size(), numberToFrameMap.size());
-                if(currentSize > filenames.length){
+                if (currentSize > filenames.length) {
                     // Get rid of the excess
                     for (int i = filenames.length + 1; i <= currentSize; i++) {
                         numberToFrameInfoMap.remove(i);
@@ -349,9 +384,9 @@ public class FrameManager {
 
         @Override
         public boolean accept(File file, String string) {
-            return !file.isHidden() && !string.startsWith(".") && (string.endsWith(".jpg") ||
-                    string.endsWith(".png") || string.endsWith(".gif") ||
-                    string.endsWith(".tif") || string.endsWith(".tiff"));
+            return !file.isHidden() && !string.startsWith(".") && (string.endsWith(".jpg")
+                    || string.endsWith(".png") || string.endsWith(".gif")
+                    || string.endsWith(".tif") || string.endsWith(".tiff"));
         }
     }
 

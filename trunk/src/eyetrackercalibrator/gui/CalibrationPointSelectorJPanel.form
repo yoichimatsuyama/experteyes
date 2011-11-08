@@ -60,23 +60,23 @@
               <Group type="102" attributes="0">
                   <Component id="buttonPanel1" min="-2" pref="26" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel3" pref="74" max="32767" attributes="0"/>
+                  <Component id="jPanel3" pref="78" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonPanel2" min="-2" pref="26" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel8" pref="74" max="32767" attributes="0"/>
+                  <Component id="jPanel8" pref="79" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonPanel3" min="-2" pref="26" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel9" pref="75" max="32767" attributes="0"/>
+                  <Component id="jPanel9" pref="79" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonPanel4" min="-2" pref="26" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel10" pref="75" max="32767" attributes="0"/>
+                  <Component id="jPanel10" pref="79" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonPanel5" min="-2" pref="26" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel11" pref="78" max="32767" attributes="0"/>
+                  <Component id="jPanel11" pref="82" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -922,7 +922,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="pointTypeViewGroup"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Test Points"/>
+            <Property name="text" type="java.lang.String" value="Drift Correction Points"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showRadioButtonActionPerformed"/>

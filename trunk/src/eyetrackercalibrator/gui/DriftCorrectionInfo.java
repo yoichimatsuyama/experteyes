@@ -28,24 +28,38 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package eyetrackercalibrator.trialmanaging;
+package eyetrackercalibrator.gui;
 
-import java.util.Vector;
+import eyetrackercalibrator.gui.util.FrameMarker;
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import org.jfree.chart.plot.IntervalMarker;
 
 /**
  *
- * @author eeglab
+ * @author Tom. Not sure if it should extend FrameMarker or something else
  */
-public class Trial {
-
-    public Vector<TrialInfo> trialInfos;
-
-    static public class TrialInfo {
-
-        public String name;
-        public long startTime;
-        public long endTime;
+public class DriftCorrectionInfo extends FrameMarker{
+    private Point2D cumulativeError = new Point2D.Double(0,0);
+   
+    public DriftCorrectionInfo() {
     }
-}
 
-  
+    public Point2D GetCumulativeError()
+    {
+        return(this.cumulativeError);
+    }
+
+
+
+    public DriftCorrectionInfo(
+            int startEyeFrame, int startScreenFrame,
+            Point2D cumulativeError) {
+        this.startEyeFrame = startEyeFrame;
+        this.startSceneFrame = startScreenFrame;
+        this.cumulativeError = cumulativeError;
+       
+
+    }
+
+}

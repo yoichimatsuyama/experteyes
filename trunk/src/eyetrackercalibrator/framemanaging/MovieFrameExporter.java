@@ -136,7 +136,8 @@ public class MovieFrameExporter {
             final boolean withCorners, final boolean eyeOnly, final boolean screenOnly,
             final boolean sideBySide, final boolean eyeInCorner, final boolean screenInCorner,
             final boolean createMovieFile, final boolean deleteMoviePictureFile,
-            final int averageFrames) {
+            final int averageFrames,
+            final boolean useMedian) {
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -145,7 +146,7 @@ public class MovieFrameExporter {
                         cornerImageScale, mainImageScale,
                         start, end, withCorners, eyeOnly,
                         screenOnly, sideBySide, eyeInCorner, screenInCorner,
-                        createMovieFile, deleteMoviePictureFile, averageFrames);
+                        createMovieFile, deleteMoviePictureFile, averageFrames, useMedian);
             }
         });
         t.start();
@@ -157,7 +158,7 @@ public class MovieFrameExporter {
             boolean withCorners, boolean eyeOnly, boolean sceneOnly,
             boolean sideBySide, boolean eyeInCorner, boolean sceneInCorner,
             boolean createMovieFile, boolean deleteMoviePictureFile,
-            int averageFrames) {
+            int averageFrames, boolean useMedian) {
 
         // Reset average eye gaze.  This is necessary or we will get the wrong gaze data.
         resetAverageEyeGaze();
@@ -273,15 +274,15 @@ public class MovieFrameExporter {
             // Get average eye gaze - THIS CODE HAS A BUG IN IT THAT DOESN'T ALIGN
             //THE POINTS TO THE SCENE DATA AT ALL- CHECK BLINKS
             //Point2D.Double point = getNextAverageEyeGaze(
-                    //start, averageFrames, scaleFactor);
-  Point2D.Double point = getNextAverageEyeGazeSimple(
-                    i, averageFrames, scaleFactor);
+            //start, averageFrames, scaleFactor);
+            Point2D.Double point = getNextAverageEyeGazeSimple(
+                    i, averageFrames, scaleFactor, useMedian);
 
-        //EyeViewFrameInfo info = null;
-      //  int eyeFrameNum = this.frameSynchronizor.getEyeFrame(i);
+            //EyeViewFrameInfo info = null;
+            //  int eyeFrameNum = this.frameSynchronizor.getEyeFrame(i);
             //    info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
-             //           eyeFrameNum);
-           //Point2D.Double point = computeEyeGaze(scaleFactor, this.frameSynchronizor.getEyeFrame(i), info);
+            //           eyeFrameNum);
+            //Point2D.Double point = computeEyeGaze(scaleFactor, this.frameSynchronizor.getEyeFrame(i), info);
 
 
 
@@ -460,14 +461,14 @@ public class MovieFrameExporter {
                         "Completed with errors in creating movies (ffmpeg)", end, end));
             }
             //open folder for person
-              try {
-                        // Show results
-                        Desktop.getDesktop().open(exportDirectory);
-                    } catch (IOException ex) {
-                        //Logger.getLogger(ImportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }catch(Exception ex){
-                        // Ignore every other exception.. This should take care of Missing Desktop in 1.5
-                    }
+            try {
+                // Show results
+                Desktop.getDesktop().open(exportDirectory);
+            } catch (IOException ex) {
+                //Logger.getLogger(ImportMovieJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                // Ignore every other exception.. This should take care of Missing Desktop in 1.5
+            }
         }
     }
 
@@ -552,34 +553,33 @@ public class MovieFrameExporter {
     LinkedList<Point.Double> gazeList = null;
     int gazeAverageRangeNextFrame = 0;
 
-    private void resetAverageEyeGaze(){
+    private void resetAverageEyeGaze() {
         this.gazeList = null;
         this.gazeAverageRangeNextFrame = 0;
     }
 
-
     //re-write this to do a simple median
     private Point.Double getNextAverageEyeGazeSimple(
-            int start, int range, double scaleFactor) {
+            int start, int range, double scaleFactor, boolean useMedian) {
         EyeViewFrameInfo info = null;
         Point2D.Double eyeGaze = null;
-            LinkedList<Point.Double> simpleGazeList = null;
+        LinkedList<Point.Double> simpleGazeList = null;
 
-            simpleGazeList = new LinkedList<Point.Double>();
-            // Populate the list from start to completion of range
-            for (int i = 0; i < range; i++) {
-                int eyeFrameNum = this.frameSynchronizor.getEyeFrame(start + i - range/2);
-                info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
-                        eyeFrameNum);
+        simpleGazeList = new LinkedList<Point.Double>();
+        // Populate the list from start to completion of range
+        for (int i = 0; i < range; i++) {
+            int eyeFrameNum = this.frameSynchronizor.getEyeFrame(start + i - range / 2);
+            info = (EyeViewFrameInfo) this.eyeFrameManager.getFrameInfo(
+                    eyeFrameNum);
 
-                if (info != null) {
-                    // Compute scaled eye gaze
-                    eyeGaze = computeEyeGaze(scaleFactor, eyeFrameNum, info);
-                    simpleGazeList.add(eyeGaze);
-                } else {
-                    simpleGazeList.add(null);
-                }
+            if (info != null) {
+                // Compute scaled eye gaze
+                eyeGaze = computeEyeGaze(scaleFactor, eyeFrameNum, info);
+                simpleGazeList.add(eyeGaze);
+            } else {
+                simpleGazeList.add(null);
             }
+        }
 
 
         Point.Double[] pointArray = simpleGazeList.toArray(new Point.Double[0]);
@@ -588,10 +588,16 @@ public class MovieFrameExporter {
             double[] x = new double[pointArray.length];
             double[] y = new double[pointArray.length];
             int totalMissing = 0;
+            int numGood = 0;
+            double sumX = 0;
+            double sumY = 0;
             for (int i = 0; i < pointArray.length; i++) {
                 if (pointArray[i] != null) {
                     x[i] = pointArray[i].x;
                     y[i] = pointArray[i].y;
+                    sumX = sumX + x[i];
+                    sumY = sumY + y[i];
+                    numGood = numGood + 1;
                 } else {
                     x[i] = -100000;
                     y[i] = -100000;
@@ -608,11 +614,22 @@ public class MovieFrameExporter {
                         (x[halfPoint] + x[halfPoint + 1]) / 2,
                         (y[halfPoint] + y[halfPoint + 1]) / 2);
             } else {
-                try
-                {eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);}//Need to do error checking on this
-                catch (java.lang.ArrayIndexOutOfBoundsException e)
-                {eyeGaze = null;}
+                try {
+                    eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);
+                }//Need to do error checking on this
+                catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                    eyeGaze = null;
+                }
             }
+if (useMedian == false)
+{
+            //Do average instead
+            if (numGood > 0) {
+                eyeGaze = new Point2D.Double(sumX / numGood, sumY / numGood);
+            } else {
+                eyeGaze = null;
+            }
+}
         } else {
             eyeGaze = null;
         }
@@ -691,10 +708,12 @@ public class MovieFrameExporter {
                         (x[halfPoint] + x[halfPoint + 1]) / 2,
                         (y[halfPoint] + y[halfPoint + 1]) / 2);
             } else {
-                try
-                {eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);}//Need to do error checking on this
-                catch (java.lang.ArrayIndexOutOfBoundsException e)
-                {eyeGaze = null;}
+                try {
+                    eyeGaze = new Point2D.Double(x[halfPoint], y[halfPoint]);
+                }//Need to do error checking on this
+                catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                    eyeGaze = null;
+                }
             }
         } else {
             eyeGaze = null;
@@ -723,7 +742,12 @@ public class MovieFrameExporter {
 
     private void writeImage(BufferedImage image, File outputFile) {
         // Store the image in the TIFF format.
+        try{
         JAI.create("filestore", image, outputFile.getAbsolutePath(), "TIFF", null);
+        }
+        catch (Exception ex){
+        System.out.print("problem writing file");
+        }
     }
 
     /**
@@ -1020,8 +1044,7 @@ public class MovieFrameExporter {
     }
 
     private BufferedImage renderSideBySideImage(
-            BufferedImage eyeImage, BufferedImage screenImage
-            ){//double largerImageScale) {
+            BufferedImage eyeImage, BufferedImage screenImage) {//double largerImageScale) {
         BufferedImage image = new BufferedImage(
                 eyeImage.getWidth() + screenImage.getWidth(),
                 Math.max(eyeImage.getHeight(), screenImage.getHeight()),
@@ -1058,10 +1081,10 @@ public class MovieFrameExporter {
 
         if (newHeight > mainScaledHeight) {
             // Height is out of bound after scaling so have to scale by height
-            newCornerImage = cornerImage.getScaledInstance(-1,mainScaledHeight, BufferedImage.SCALE_DEFAULT);
+            newCornerImage = cornerImage.getScaledInstance(-1, mainScaledHeight, BufferedImage.SCALE_DEFAULT);
         } else {
             // Just scale
-            newCornerImage = cornerImage.getScaledInstance(-1,newHeight, BufferedImage.SCALE_DEFAULT);
+            newCornerImage = cornerImage.getScaledInstance(-1, newHeight, BufferedImage.SCALE_DEFAULT);
         }
 
         g.drawImage(newCornerImage, 0, 0, null);
