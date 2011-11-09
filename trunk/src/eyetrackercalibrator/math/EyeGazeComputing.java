@@ -63,6 +63,10 @@ public class EyeGazeComputing {
         this.allDriftCorrectionSets = allDriftCorrectionSets;
     }
 
+     public DefaultListModel getAllDriftCorrectionSets() {
+        return(this.allDriftCorrectionSets);
+    }
+
     public enum ComputingApproach {
 
         /** Compute using primary eye coefficient */
@@ -131,7 +135,7 @@ public class EyeGazeComputing {
         return point;
     }
 
-    private Point2D applyDriftCorrection(DefaultListModel allDriftCorrectionSets, int eyeFrameNumber, Point2D scenePoint) {
+    public Point2D applyDriftCorrection(DefaultListModel allDriftCorrectionSets, int eyeFrameNumber, Point2D scenePoint) {
         //search through drift correction sets, find the one with the closest eye frame
         //that is SMALLER than the current eyeFrameNumber. Get correction and apply it
         int MinDistance = Integer.MAX_VALUE;

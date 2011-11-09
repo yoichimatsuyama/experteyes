@@ -859,10 +859,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
      *
      */
 
-    public DefaultListModel getAllDriftCorrectionSets(){
-        return allDriftCorrectionSets;
-    }
-
+   
     private void updateDriftCorrectionOffsets() {
 
         //can't do anything if have no primary calibration
@@ -1279,7 +1276,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     //point = applyDriftCorrection(allDriftCorrectionSets, Integer.MAX_VALUE, point);
               //      }
 
-        panel.setCorrectPoints(calArray, testArray);
+        panel.setCorrectPoints(calArray, testArray, timer);
         panel.setEyeVector(primeEyeVecArray, CalibratingViewJDialog.PRIMARY);
         panel.setEyeVector(secondaryEyeVecArray, CalibratingViewJDialog.SECONDARY);
         panel.setEyeVector(testEyeVecArray, CalibratingViewJDialog.TEST);
