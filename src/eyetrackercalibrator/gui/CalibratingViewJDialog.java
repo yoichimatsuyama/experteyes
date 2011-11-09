@@ -31,6 +31,7 @@
  */
 package eyetrackercalibrator.gui;
 
+import eyetrackercalibrator.gui.util.AnimationTimer;
 import eyetrackercalibrator.math.CalibrateEyeGazeListener;
 import eyetrackercalibrator.math.Computation;
 import eyetrackercalibrator.math.DegreeErrorComputer;
@@ -42,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DecimalFormat;
 import javax.media.jai.JAI;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -85,6 +87,7 @@ public class CalibratingViewJDialog
     // Parameters for displaying the calibration estimation grid
     private Point[][] estimationGridPoints = new Point[TOTAL_CALIBRATION_TYPE][];
     private final static Color ESTIMATION_GRID_COLOR = Color.cyan;
+    private AnimationTimer timer;
 
     private void handleShowEstimationGrid() {
         this.eyeVectorSpacingTextField.setEnabled(this.showEstimatinoGridCheckBox.isSelected());
@@ -472,8 +475,9 @@ public class CalibratingViewJDialog
      * The points have to be in the same order as the gaze point for degree error
      * to be computed correctly
      */
-    public void setCorrectPoints(Point2D[][] correctPoints, Point2D[] testPoints) {
+    public void setCorrectPoints(Point2D[][] correctPoints, Point2D[] testPoints, AnimationTimer timer) {
         this.correctPoints = new Point[TOTAL_INFO_TYPE][];
+        this.timer = timer;
 
         /*
          * Store all correct points for each calibration type. The last one
@@ -621,18 +625,27 @@ public class CalibratingViewJDialog
         for (int i = 0; i < TOTAL_INFO_TYPE; i++) {
             if (i != pos && eyeVector[i] != null) {
                 for (int j = 0; j < eyeVector[i].length; j++) {
-                    Point2D.Double point = Computation.computeEyeGazePoint(
+                    Point2D point = Computation.computeEyeGazePoint(
                             eyeVector[i][j].x, eyeVector[i][j].y, coeff[pos]);
-
-                    /*
+ /*
                      * could correct for drift using the last drift
                      */
-                   /* if (allDriftCorrectionSets != null)
+
+                if ((i>0)&&(pos==0)){//if secondary or drift point AND we are doing primary calibration
+                    DefaultListModel allDriftCorrectionSets = timer.getEyeGazeComputing().getAllDriftCorrectionSets();
+
+                    if (allDriftCorrectionSets != null)
                     {
-                    point = applyDriftCorrection(allDriftCorrectionSets, currentFrame, point);
+                        Point2D pointTemp = point;
+                        pointTemp =   timer.getEyeGazeComputing().applyDriftCorrection(allDriftCorrectionSets, Integer.MAX_VALUE, pointTemp);
+                       point = new Point2D.Double(pointTemp.getX(), pointTemp.getY());
+                       // point = new Point2D.Double(200,500);
                     }
-                    * 
-                    */
+
+
+                }
+
+                   
                     estimatedTestPoints[pos][m].setLocation(point);
                     if (this.degreeErrorComputer != null && this.combinedTestPoints[pos][m] != null) {
                         totalTestDegreeError += this.degreeErrorComputer.degreeError(
