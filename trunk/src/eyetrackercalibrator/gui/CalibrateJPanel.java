@@ -962,10 +962,14 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                      * cumulativeError
                      *
                      */
-                    this.driftCorrectionInfo = new DriftCorrectionInfo(info.startEyeFrame, info.startSceneFrame, cumulativeError);
+
+                    //although it says eye frame below, when we do the correction we are using the currentFrame, which is in neither
+                    //the eye or scene frame list, so we need to convert the eye frame to the Sync Frame
+                    FrameSynchronizor frameSynchronizor = timer.getFrameSynchronizor();
+
+                    this.driftCorrectionInfo = new DriftCorrectionInfo( frameSynchronizor.eyeFrameToSyncFrame(info.startEyeFrame), info.startSceneFrame, cumulativeError);
 
                     final DriftCorrectionInfo driftCorrectionSetInfo = this.driftCorrectionInfo;
-
 
                     //Set user selected point
                     //driftCorrectionSetInfo.cumulativeError = cumulativeError;
@@ -1328,8 +1332,15 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             public void run() {
                 // Start computation
                 try {
-                    eyeGazeCoefficient[1] =
+                    if (secondaryEyeVecArray.length>0)
+                    {
+                        eyeGazeCoefficient[1] =
                             secondaryCalibrator.calibrate(secondaryEyeVecArray, calArray[1]);
+                    }
+                    else
+                    {
+                       eyeGazeCoefficient[1]=null;//leave at null
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

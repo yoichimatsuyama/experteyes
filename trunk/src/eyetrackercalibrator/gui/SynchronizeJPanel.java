@@ -295,14 +295,14 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         SynchPointList.setMinimumSize(new java.awt.Dimension(10, 100));
         SynchPointList.setPreferredSize(new java.awt.Dimension(10, 321));
 
-        addSynchPointButton.setText("+");
+        addSynchPointButton.setText("Add");
         addSynchPointButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addSynchPointButtonActionPerformed(evt);
             }
         });
 
-        removeSynchPointButton.setText("-");
+        removeSynchPointButton.setText("Delete");
         removeSynchPointButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeSynchPointButtonActionPerformed(evt);
@@ -329,22 +329,22 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
                 .add(addSynchPointButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(removeSynchPointButton))
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
         );
         SynchPointListLayout.setVerticalGroup(
             SynchPointListLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, SynchPointListLayout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(SynchPointListLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(removeSynchPointButton)
                     .add(addSynchPointButton)))
         );
 
-        synchronizeButton.setText("Synchronize");
+        synchronizeButton.setText("Finished");
 
         cancelButton.setText("Cancel");
 
@@ -376,7 +376,7 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
+                        .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(SynchPointList, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE))
