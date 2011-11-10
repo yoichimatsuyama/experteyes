@@ -135,7 +135,7 @@ public class EyeGazeComputing {
         return point;
     }
 
-    public Point2D applyDriftCorrection(DefaultListModel allDriftCorrectionSets, int eyeFrameNumber, Point2D scenePoint) {
+    public Point2D applyDriftCorrection(DefaultListModel allDriftCorrectionSets, int currentFrame, Point2D scenePoint) {
         //search through drift correction sets, find the one with the closest eye frame
         //that is SMALLER than the current eyeFrameNumber. Get correction and apply it
         int MinDistance = Integer.MAX_VALUE;
@@ -144,7 +144,7 @@ public class EyeGazeComputing {
                 en.hasMoreElements();) {
             // Add calibration points
             DriftCorrectionInfo driftCorrectionInfo = (DriftCorrectionInfo) en.nextElement();
-            int thisDistance = eyeFrameNumber - driftCorrectionInfo.startEyeFrame;
+            int thisDistance = currentFrame - driftCorrectionInfo.startEyeFrame;//actually not eyeFrame- in syncFrame coordinates
             if (thisDistance >= 0) {
                 if (thisDistance < MinDistance) {
                     MinDistance = thisDistance;
@@ -203,6 +203,7 @@ public class EyeGazeComputing {
                     //first check to see if there are any drift correction points
                     if (allDriftCorrectionSets != null)
                     {
+//currentFrame is a sync frame (not eyeframe or sceneframe)
                     point = applyDriftCorrection(allDriftCorrectionSets, currentFrame, point);
                     }
                     

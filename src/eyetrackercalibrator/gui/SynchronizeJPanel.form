@@ -42,7 +42,7 @@
           <Group type="102" alignment="1" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="displayJPanel" pref="369" max="32767" attributes="0"/>
+                      <Component id="displayJPanel" pref="374" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -79,8 +79,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="removeSynchPointButton" min="-2" max="-2" attributes="0"/>
               </Group>
-              <Component id="jLabel1" alignment="0" pref="190" max="32767" attributes="0"/>
-              <Component id="jScrollPane1" alignment="0" pref="190" max="32767" attributes="0"/>
+              <Component id="jLabel1" alignment="0" pref="199" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" alignment="0" pref="199" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -88,7 +88,7 @@
               <Group type="102" alignment="1" attributes="0">
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="409" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="406" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="removeSynchPointButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -101,7 +101,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="addSynchPointButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="text" type="java.lang.String" value="Add"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addSynchPointButtonActionPerformed"/>
@@ -109,7 +109,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="removeSynchPointButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="-"/>
+            <Property name="text" type="java.lang.String" value="Delete"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeSynchPointButtonActionPerformed"/>
@@ -146,7 +146,7 @@
     </Container>
     <Component class="javax.swing.JButton" name="synchronizeButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Synchronize"/>
+        <Property name="text" type="java.lang.String" value="Finished"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="cancelButton">
