@@ -325,12 +325,13 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
         SynchPointListLayout.setHorizontalGroup(
             SynchPointListLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, SynchPointListLayout.createSequentialGroup()
-                .add(34, 34, 34)
+                .addContainerGap()
                 .add(addSynchPointButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(removeSynchPointButton))
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                .add(18, 18, 18)
+                .add(removeSynchPointButton)
+                .add(5, 5, 5))
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
         );
         SynchPointListLayout.setVerticalGroup(
             SynchPointListLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -340,8 +341,8 @@ public class SynchronizeJPanel extends javax.swing.JPanel {
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(SynchPointListLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(removeSynchPointButton)
-                    .add(addSynchPointButton)))
+                    .add(addSynchPointButton)
+                    .add(removeSynchPointButton)))
         );
 
         synchronizeButton.setText("Finished");
