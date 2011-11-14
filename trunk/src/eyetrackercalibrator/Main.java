@@ -612,12 +612,12 @@ public class Main extends javax.swing.JFrame {
     }
 
     /** 
-     * Handle when "Synchronize" and "Cancel" are pressed in synchronize panel
+     * Handle when "Finished" and "Cancel" are pressed in synchronize panel
      * @param evt 
      */
     protected void synchronizeJPanelActionPerformed(java.awt.event.ActionEvent evt) {
         boolean switchBack = false;
-        if ("Synchronize".equals(evt.getActionCommand())) {
+        if ("Finished".equals(evt.getActionCommand())) {
             // Read in synchronize data and set all offset in all panel
             sync();
 
