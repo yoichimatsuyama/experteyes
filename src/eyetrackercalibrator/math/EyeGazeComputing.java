@@ -148,8 +148,8 @@ public class EyeGazeComputing {
             if (thisDistance >= 0) {
                 if (thisDistance < MinDistance) {
                     MinDistance = thisDistance;
+                    driftCorrectionToApply.setLocation(driftCorrectionInfo.GetCumulativeError());
                 }
-                driftCorrectionToApply.setLocation(driftCorrectionInfo.GetCumulativeError());
             }
         }
         Point2D driftCorrectedPoint = new Point2D.Double(scenePoint.getX() - driftCorrectionToApply.getX(), scenePoint.getY() - driftCorrectionToApply.getY());
