@@ -56,7 +56,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="933" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="930" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -84,7 +84,7 @@
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="fittingEquationChoiceComboBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="389" max="32767" attributes="0"/>
+                  <EmptySpace pref="392" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -126,8 +126,11 @@
         <Component class="javax.swing.JCheckBox" name="useCorneaReflectionCheckBox">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="Use Cornia Reflection"/>
+            <Property name="label" type="java.lang.String" value="Use Cornea Reflection"/>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Use Cornea Reflection"/>
+          </AccessibilityProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useCorneaReflectionCheckBoxActionPerformed"/>
           </Events>

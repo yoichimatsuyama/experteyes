@@ -951,7 +951,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     screenFrame++;
                     eyeFrame++;
                 }
-                //now get average drift for this set of points
+            //now get average drift for this set of points
                 if (numPointsAccumulated > 0) {
                     cumulativeError.x = cumulativeError.x / (double) numPointsAccumulated;
                     cumulativeError.y = cumulativeError.y / (double) numPointsAccumulated;
@@ -1474,7 +1474,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         graphHolder.setLayout(graphHolderLayout);
         graphHolderLayout.setHorizontalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 933, Short.MAX_VALUE)
+            .add(0, 930, Short.MAX_VALUE)
         );
         graphHolderLayout.setVerticalGroup(
             graphHolderLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1491,7 +1491,7 @@ public class CalibrateJPanel extends javax.swing.JPanel {
         });
 
         useCorneaReflectionCheckBox.setSelected(true);
-        useCorneaReflectionCheckBox.setText("Use Cornia Reflection");
+        useCorneaReflectionCheckBox.setLabel("Use Cornea Reflection");
         useCorneaReflectionCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 useCorneaReflectionCheckBoxActionPerformed(evt);
@@ -1516,14 +1516,14 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                 .add(calibrateButton)
                 .add(18, 18, 18)
                 .add(useCorneaReflectionCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 178, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 199, Short.MAX_VALUE)
                 .add(backButton))
             .add(bottomPanelLayout.createSequentialGroup()
                 .add(9, 9, 9)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(fittingEquationChoiceComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(368, Short.MAX_VALUE))
+                .addContainerGap(392, Short.MAX_VALUE))
         );
         bottomPanelLayout.setVerticalGroup(
             bottomPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1539,6 +1539,8 @@ public class CalibrateJPanel extends javax.swing.JPanel {
                     .add(useCorneaReflectionCheckBox)
                     .add(calibrateButton)))
         );
+
+        useCorneaReflectionCheckBox.getAccessibleContext().setAccessibleName("Use Cornea Reflection");
 
         displayJPanel.setMinimumSize(new java.awt.Dimension(200, 100));
 
@@ -1652,10 +1654,10 @@ public class CalibrateJPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1030, Short.MAX_VALUE)
+                    .add(displayJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1051, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(10, 10, 10)
-                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1020, Short.MAX_VALUE)))
+                        .add(frameScrollingJPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1041, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(controlPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -1776,6 +1778,9 @@ private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 
         //update to allow for drift correct
         updateDriftCorrectionOffsets();
+
+        //Shouldn't be necessary, but add it anyway
+        calibrateButton.setEnabled(true);
     }
 }//GEN-LAST:event_calibrateButtonActionPerformed
 
