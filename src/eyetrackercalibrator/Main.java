@@ -234,6 +234,7 @@ public class Main extends javax.swing.JFrame {
             // Print header
             out.println(
                     "Frame\t"
+                    + "CalibrationType\t"
                     + "Scene X\t"
                     + "Scene Y\t"
                     + "Top Left X\t"
@@ -244,6 +245,8 @@ public class Main extends javax.swing.JFrame {
                     + "Bottom Left Y\t"
                     + "Bottom Right X\t"
                     + "Bottom Right Y\t"
+                    + "ProjectedScene X\t"
+                    + "ProjectedScene Y\t"
                     + "Eye Gaze X\t"
                     + "Eye Gaze Y\t"
                     + "Error Angle\t"
@@ -269,9 +272,10 @@ public class Main extends javax.swing.JFrame {
                     ScreenViewFrameInfo info =
                             (ScreenViewFrameInfo) screenFrameManager.getFrameInfo(
                             this.frameSynchronizor.getSceneFrame(i));
-
+//caution- if there are no corners, then info will be null
                     out.print(i);
-
+                    out.print("\t");
+                    out.print(calibrationPoint.type);
                     Point[] point = info.getMarkedPoints();
                     Point scenePos = null;
                     if (point != null) {
@@ -280,12 +284,13 @@ public class Main extends javax.swing.JFrame {
                     printPointHelper(scenePos, out);
 
                     Point p = null;
+                    Point2D pos = null;
                     Point[] corners = info.getCorners();
                     if (corners != null) {
                         printCorners(corners, p, out);
 
                         // Estimate true screen position
-                        Point2D pos = Computation.ComputeScreenPositionProjective(
+                        pos = Computation.ComputeScreenPositionProjective(
                                 trueMonitorDimension,
                                 scenePos,
                                 corners[ScreenViewFrameInfo.TOPLEFT],
@@ -311,19 +316,44 @@ public class Main extends javax.swing.JFrame {
                             // Computer eye gaze point
                             Point2D gazePoint = this.eyeGazeComputing.computeEyeGaze(
                                     i, gazeVec.x, gazeVec.y);
-
                             if (scenePos != null) {
-                                // Compute error angel
-                                double errorAngle = dec.degreeError(
-                                        scenePos, gazePoint);
 
-                                if (errorAngle >= 0) {
-                                    out.print("\t" + errorAngle);
+                                if ((corners[0] != null) & (corners[1] != null) & (corners[2] != null) & (corners[3] != null)) {
+                                    // Compute error angle based on monitor coordinates
+                                    //first project gazePoint into monitor coordinates
+                                    Point2D monitorBasedGazePoint = Computation.ComputeScreenPositionProjective(
+                                            trueMonitorDimension,
+                                            gazePoint,
+                                            corners[ScreenViewFrameInfo.TOPLEFT],
+                                            corners[ScreenViewFrameInfo.TOPRIGHT],
+                                            corners[ScreenViewFrameInfo.BOTTOMLEFT],
+                                            corners[ScreenViewFrameInfo.BOTTOMRIGHT]);
+
+                                    printPointHelper(monitorBasedGazePoint, out);
+
+                                    double errorAngle = dec.degreeError(
+                                            pos, monitorBasedGazePoint);
+
+                                    if (errorAngle >= 0) {
+                                        out.print("\t" + errorAngle);
+                                    } else {
+                                        out.print("\t" + GlobalConstants.ERROR_VALUE);
+                                    }
                                 } else {
-                                    out.print("\t" + GlobalConstants.ERROR_VALUE);
+                                    //compute error based on scene view coordinates
+                                    printPointHelper(gazePoint, out);
+
+                                    double errorAngle = dec.degreeError(
+                                            scenePos, gazePoint);
+
+                                    if (errorAngle >= 0) {
+                                        out.print("\t" + errorAngle);
+                                    } else {
+                                        out.print("\t" + GlobalConstants.ERROR_VALUE);
+                                    }
                                 }
                             } else {
-                                out.print("\t" + GlobalConstants.ERROR_VALUE);
+                                //scenepos is null, figure out how many erros to write out
                             }
                         }
                     }
@@ -376,10 +406,10 @@ public class Main extends javax.swing.JFrame {
                 this.projectSelectPanel.getFullScreenFrameDirectory());
 
         //ExportMovieJFrame exportMovieJFrame = new ExportMovieJFrame(
-         //       projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
-          //      this.eyeGazeComputing, this.frameSynchronizor,
-           //     this.eyeFrameManager, this.screenFrameManager,
-            //    this.projectSelectPanel.getFullScreenFrameDirectory());
+        //       projectLocation, DISPLAY_WIDTH, DISPLAY_HEIGHT,
+        //      this.eyeGazeComputing, this.frameSynchronizor,
+        //     this.eyeFrameManager, this.screenFrameManager,
+        //    this.projectSelectPanel.getFullScreenFrameDirectory());
 
         exportMovieJFrame.setLocationByPlatform(true);
         exportMovieJFrame.setVisible(true);
