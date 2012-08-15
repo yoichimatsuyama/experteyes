@@ -1,0 +1,8 @@
+#labels Tutorial,Video
+==Here you can find links to video tutorials to use the most updated version of the ExpertEyes software==
+
+1. Create a new project, import data, and synchronize video streams: *[http://youtu.be/S9t4T3KTKm0]*
+
+2. Create and compute an eye model: *[http://youtu.be/Z7x7X0WZs1c]*
+
+=== Updated August 2012 ===
