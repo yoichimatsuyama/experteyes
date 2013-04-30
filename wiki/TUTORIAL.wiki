@@ -5,6 +5,7 @@
 
 2. Create and compute an eye model: *[http://youtu.be/Z7x7X0WZs1c]*
 
-3. An extended version of the small tutorial that you can find in the article ExpertEyes: Open Source, High Definition Eyetracking. Parada, Wyatte, Yu, Akavipat, Emerick, & Busey (in preparation): https://www.dropbox.com/s/x722l7zvadzs2l4/Tutorial%20-%20The%20ExpertEyes%20software.docx
+3. An extended version of the small tutorial that you can find in the article ExpertEyes: Open Source, High Definition Eyetracking. Parada, Wyatte, Yu, Akavipat, Emerick, & Busey (in preparation): 
+*[https://www.dropbox.com/s/x722l7zvadzs2l4/Tutorial%20-%20The%20ExpertEyes%20software.docx]*
 
 === Updated April 2013 ===
