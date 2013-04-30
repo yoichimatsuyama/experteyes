@@ -1,6 +1,7 @@
-#summary Video with step-by-step instructions to use this module.
+#summary Legacy cideo with step-by-step instructions to use this module.
 #labels Eye-ModelFit
 
+= For a more updated version see the TUTORIAL =
 
 = VIDEO =
 
