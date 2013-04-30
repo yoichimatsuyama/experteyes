@@ -1,7 +1,5 @@
-#summary Legacy video with step-by-step instructions to use this module.
 #labels Eye-ModelFit
-
-= For a more updated version see the TUTORIAL =
+= This is a legacy video with step-by-step instructions to use this module. For a more updated version see the TUTORIAL =
 
 = VIDEO =
 
