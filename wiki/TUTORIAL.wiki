@@ -1,4 +1,4 @@
-#summary Here you can find links to video tutorials to use the most updated version of the ExpertEyes software
+#summary Here you can find links to the most updated video tutorials to use the most recent version of the ExpertEyes software
 #labels Tutorial,VideoTutorial
 
 1. Create a new project, import data, and synchronize video streams: *[http://youtu.be/S9t4T3KTKm0]*
