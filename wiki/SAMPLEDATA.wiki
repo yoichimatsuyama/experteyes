@@ -1,0 +1,9 @@
+#summary Here you can download sample data to get you started with the ExpertEyes software
+#labels SampleData
+
+= Follow the link to download =
+
+
+= Details =
+
+The data is composed by a folder with eye images and a folder with scene images.
