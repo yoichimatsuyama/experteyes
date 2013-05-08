@@ -1,5 +1,5 @@
 #summary Here you can download sample data to get you started with the ExpertEyes software
-#labels SampleData
+#labels SampleData,ExpertEyes,Paper
 
 = Follow the link to download =
 
