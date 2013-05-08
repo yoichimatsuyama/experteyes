@@ -1,5 +1,5 @@
 #summary Detailed description of ExpertEyes output file
-#labels Output,File,Details
+#labels Output,File,Details,ExpertEyes,Paper
 
 Here is the explanation of each column in the output file.  All numbers are 0 or positive real number (except for trial number)  -666 represents an error or unavailable information.
 
