@@ -1,5 +1,5 @@
 #summary Sample MATLAB routines to import data from the ExpertEyes software
-#labels Sample,Routines,MATLAB,Data,Import
+#labels Sample,Routines,MATLAB,Data,Import,ExpertEyes,Paper
 
 = Follow the link to download =
 
