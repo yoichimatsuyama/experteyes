@@ -1,0 +1,4 @@
+#summary Here's the plan for the IR power supply
+#labels IR,LED,plan,powersupply
+
+*[https://www.dropbox.com/s/m1b4j4jjfqsz54e/Ir%20led%20drive.pdf]*
