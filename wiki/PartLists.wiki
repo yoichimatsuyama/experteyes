@@ -1,4 +1,4 @@
 #summary Here you can find a list with parts in order to build you the suggested eye tracking hardware
 #labels Parts,List,Hardware,ExpertEyes,Paper
 
-Part list: *[https://www.dropbox.com/s/o1w72s5uouwzwxc/PartList.docx]*
+Part list: *[https://www.dropbox.com/s/lew39l6168ebiuk/PartsList.docx]*
