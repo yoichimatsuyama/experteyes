@@ -1,4 +1,6 @@
 #summary Here you can find a list with parts in order to build you the suggested eye tracking hardware
 #labels Parts,List,Hardware,ExpertEyes,Paper
 
-Part list: *[https://www.dropbox.com/s/lew39l6168ebiuk/PartsList.docx]*
+A part list for the parts used in the eyetracker used in the article ExpertEyes in preparation (ExpertEyes: Open Source, High Definition Eyetracking. Parada, Wyatte, Yu, Akavipat, Emerick, & Busey) can be found here:
+
+*[https://www.dropbox.com/s/lew39l6168ebiuk/PartsList.docx]*
