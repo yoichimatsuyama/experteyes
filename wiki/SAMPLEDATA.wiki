@@ -1,7 +1,13 @@
 #summary Here you can download sample data to get you started with the ExpertEyes software
 #labels SampleData,ExpertEyes,Paper
 
-= Follow the link to download =
+= Follow the links to download =
+
+Full dataset used in Educational tutorial videos:
+
+https://www.dropbox.com/s/govg5sdlni4jwnh/HeatherSampleData.zip
+
+Dataset used in older tutorial videos:
 
 EYE data: 
 https://www.dropbox.com/s/850e453n6170krc/eye.MOV.zip?v=1mci
